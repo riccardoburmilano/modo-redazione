@@ -230,6 +230,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--g
       <div class="left-section">
         <button class="btn-fetch" id="btn-fetch" onclick="fetchNews()">↓ Aggiorna notizie</button>
         <button class="btn-auto" id="btn-auto" onclick="toggleAuto()">◯ Auto H24 (ogni 2 min)</button>
+        <button class="btn-auto" onclick="resetNews()" style="margin-top:4px;border-color:var(--red);color:var(--red);">✕ Reset notizie</button>
       </div>
 
       <div class="left-section">
@@ -266,18 +267,19 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--g
       <div class="ed-toolbar">
         <button class="ed-back" onclick="showFeed()">← Torna al feed</button>
         <div class="ed-toolbar-right">
-          <!-- Icone azione tonde -->
+          <button id="ic-generate" onclick="generateCurrent()" style="display:flex;align-items:center;gap:6px;padding:7px 14px;background:var(--green);border:none;color:#fff;font-size:12px;font-weight:600;cursor:pointer;transition:opacity .15s;" title="Genera articolo completo con AI">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            Genera con AI
+          </button>
+          <div style="width:1px;height:20px;background:var(--b1);margin:0 4px;"></div>
           <button class="ic-btn purple" id="ic-forecast" title="Segna come Previsione" onclick="toggleFlag('forecast')">
-            <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
           </button>
           <button class="ic-btn blue" id="ic-ads" title="Aggiungi Ads" onclick="toggleFlag('ads')">
-            <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
           </button>
           <button class="ic-btn" id="ic-wiki" title="Aggiungi Wiki keyword" onclick="addWikiKeyword()">
-            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          </button>
-          <button class="ic-btn green" id="ic-generate" title="Genera con AI" onclick="generateCurrent()">
-            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           </button>
         </div>
       </div>
@@ -633,6 +635,15 @@ async function sendChat(){
 
 function qc(m){document.getElementById('chat-ta').value=m;sendChat();}
 function ckd(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}}
+
+// ── RESET ─────────────────────────────────────────────────────
+function resetNews(){
+  if(!confirm('Cancellare tutte le notizie e ricominciare?')) return;
+  articles=[];stats={f:0,g:0,a:0,p:0};activeArt=null;
+  localStorage.removeItem('modo_v2');
+  upStats();showFeed();renderFeed();
+  log('Feed resettato','info');
+}
 
 // ── INIT ──────────────────────────────────────────────────────
 load();renderCats();renderFeed();
