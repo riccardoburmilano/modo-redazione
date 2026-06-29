@@ -105,7 +105,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--g
 .ed-title{font-family:var(--serif);font-size:22px;font-weight:700;width:100%;border:none;outline:none;background:transparent;color:var(--text);line-height:1.3;margin-bottom:14px;border-bottom:2px solid transparent;transition:border-color .15s;padding-bottom:4px}
 .ed-title:focus{border-bottom-color:var(--gl)}
 .ed-sommario{width:100%;border:none;outline:none;background:var(--s1);color:var(--t2);font-size:14px;font-weight:500;line-height:1.6;padding:10px 14px;margin-bottom:16px;border-left:3px solid var(--gl);resize:none;min-height:52px;font-family:var(--g)}
-.ed-corpo{width:100%;border:none;outline:none;background:transparent;color:var(--t2);font-size:14px;line-height:1.85;resize:none;min-height:280px;font-family:var(--g)}
+.ed-corpo{width:100%;border:none;outline:none;background:transparent;color:var(--t2);font-size:14px;line-height:1.85;resize:none;min-height:60vh;font-family:var(--g)}
 .ed-bottom{border-top:1px solid var(--b1);padding:8px 14px;background:var(--s1);display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap}
 .ed-menu-btn{font-size:11px;font-weight:500;padding:6px 12px;background:#fff;border:1px solid var(--b1);color:var(--t2);cursor:pointer;transition:all .12s}
 .ed-menu-btn:hover{border-color:var(--gl);color:var(--gold)}
@@ -285,8 +285,8 @@ function rel(iso){const m=Math.round((Date.now()-new Date(iso))/60000);if(m<1)re
 function today(iso){return Date.now()-new Date(iso)<86400000}
 function renderCats(){document.getElementById('cat-grid').innerHTML=CATS.map(c=>'<button class="cat-btn'+(cats.has(c.id)?' on':'')+'" onclick="toggleCat('+"'"+c.id+"'"+')">'+c.l+'</button>').join('');}
 function toggleCat(id){cats.has(id)?cats.delete(id):cats.add(id);renderCats();save()}
-async function fetchNews(){const btn=document.getElementById('btn-fetch');btn.disabled=true;btn.textContent='Aggiornando...';setStatus('spin','Connessione...');log('Fetch notizie...','info');try{const r=await fetch(BUR+'/api/v2/modo/news?limit=150');const d=await r.json();if(!d.ok)throw new Error(d.error||'Errore');let n=0;(d.articles||[]).forEach(a=>{if(articles.find(x=>x.sourceTitle===a.sourceTitle))return;articles.unshift({id:Date.now()+Math.random(),catLabel:a.cat,sourceTitle:a.sourceTitle,sourceDesc:a.sourceDesc||'',sourceUrl:a.sourceUrl,sourceName:a.sourceName,img:a.img,publishedAt:a.publishedAt,status:'pending',genTitle:null,genBody:null,genSommario:null,isForecast:a.isForecast||false,hasAds:false,wikiKws:[],adsKws:[]});n++;});stats.f+=n;upStats();renderFeed();setStatus('ok',d.count+' notizie');log(n+' nuove notizie','ok');}catch(e){log('Errore: '+e.message,'err');setStatus('','Errore');}btn.disabled=false;btn.textContent='↓ Aggiorna notizie';}
-function toggleAuto(){const b=document.getElementById('btn-auto');if(autoInt){clearInterval(autoInt);autoInt=null;b.textContent='◯ Auto H24 (ogni 2 min)';b.classList.remove('on');}else{autoInt=setInterval(fetchNews,120000);b.textContent='● Stop auto';b.classList.add('on');fetchNews();}}
+async function fetchNews(){const btn=document.getElementById('btn-fetch');btn.disabled=true;btn.textContent='Aggiornando...';setStatus('spin','Connessione...');log('Fetch notizie...','info');try{const r=await fetch(BUR+'/api/v2/modo/news?limit=30');const d=await r.json();if(!d.ok)throw new Error(d.error||'Errore');let n=0;(d.articles||[]).forEach(a=>{if(articles.find(x=>x.sourceTitle===a.sourceTitle))return;articles.unshift({id:Date.now()+Math.random(),catLabel:a.cat,sourceTitle:a.sourceTitle,sourceDesc:a.sourceDesc||'',sourceUrl:a.sourceUrl,sourceName:a.sourceName,img:a.img,publishedAt:a.publishedAt,status:'pending',genTitle:null,genBody:null,genSommario:null,isForecast:a.isForecast||false,hasAds:false,wikiKws:[],adsKws:[]});n++;});stats.f+=n;upStats();renderFeed();setStatus('ok',d.count+' notizie');log(n+' nuove notizie','ok');}catch(e){log('Errore: '+e.message,'err');setStatus('','Errore');}btn.disabled=false;btn.textContent='↓ Aggiorna notizie';}
+function toggleAuto(){const b=document.getElementById('btn-auto');if(autoInt){clearInterval(autoInt);autoInt=null;b.textContent='◯ Auto H24 (ogni 2 min)';b.classList.remove('on');}else{autoInt=setInterval(autoFetch,120000);b.textContent='● Stop auto';b.classList.add('on');fetchNews();}}
 function resetNews(){if(!confirm('Cancellare tutte le notizie?'))return;articles=[];stats={f:0,g:0,a:0,p:0};art=null;localStorage.removeItem('modo_v3');upStats();showFeed();renderFeed();log('Feed resettato','info');}
 function resetAI(){localStorage.removeItem('modo_groq_key');const c=document.getElementById('chat-msgs');c.innerHTML='<div class="chat-msg ai"><div class="bubble">Chat resettata.</div><div class="chat-time">MODO Redazione</div></div>';log('Chiave AI resettata','info');}
 function showFeed(){document.getElementById('feed-view').style.display='block';document.getElementById('editor').classList.remove('show');art=null;}
@@ -322,7 +322,7 @@ async function generateCurrent(){
     const sommario=await callGroq('Rispondi con UNA sola frase breve, max 130 caratteri.','Occhiello per: '+titolo,80);
     art.genTitle=titolo.replace(/["\']/g,'').trim().slice(0,90);
     art.genSommario=sommario.replace(/["\']/g,'').trim().slice(0,130);
-    art.genBody=corpo.trim();
+    art.genBody=corpo.trim();art.adsKws=detectAdsTags(art.genTitle+' '+art.genBody);if(art.adsKws.length)art.hasAds=true;
     art.status='pending';stats.g++;upStats();
     document.getElementById('ed-title').value=art.genTitle;
     document.getElementById('ed-sommario').value=art.genSommario;
@@ -340,6 +340,43 @@ async function sendChat(){const ta=document.getElementById('chat-ta');const msg=
 function qc(m){document.getElementById('chat-ta').value=m;sendChat();}
 function ckd(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}}
 setInterval(function(){fetch(BUR+'/api/v2/health').catch(function(){});},8*60*1000);
+
+// AUTO FETCH silenzioso - aggiorna solo se 10+ nuove
+async function autoFetch(){
+  try{
+    const r=await fetch(BUR+'/api/v2/modo/news?limit=30');
+    const d=await r.json();
+    if(!d.ok)return;
+    let n=0;
+    (d.articles||[]).forEach(a=>{
+      if(articles.find(x=>x.sourceTitle===a.sourceTitle))return;
+      articles.unshift({id:Date.now()+Math.random(),catLabel:a.cat,sourceTitle:a.sourceTitle,sourceDesc:a.sourceDesc||'',sourceUrl:a.sourceUrl,sourceName:a.sourceName,img:a.img,publishedAt:a.publishedAt,status:'pending',genTitle:null,genBody:null,genSommario:null,isForecast:a.isForecast||false,hasAds:false,wikiKws:[],adsKws:[]});n++;
+    });
+    if(n>=10){stats.f+=n;upStats();renderFeed();log(n+' nuove notizie in automatico','ok');setStatus('ok',n+' nuove');}
+  }catch(e){}
+}
+
+// ADS TAGS automatici — parole chiave commerciali
+const ADS_TAGS={
+  'energia':['Enel','Edison','A2A','fotovoltaico','rinnovabili','bolletta'],
+  'finanza':['ETF','BTP','spread','mutuo','tasso','BCE','inflazione','Fineco','Degiro'],
+  'tech':['AI','iPhone','Google','Amazon','chip','semiconductor','startup'],
+  'auto':['Tesla','BMW','Mercedes','elettrico','EV','ricarica'],
+  'immobiliare':['mutuo','casa','affitto','mercato immobiliare'],
+  'salute':['farmaco','vaccino','ricerca medica','oncologia'],
+  'sport':['Serie A','Champions','Juventus','Inter','Milan','scommesse','pronostico'],
+  'viaggi':['volo','hotel','booking','airbnb']
+};
+
+function detectAdsTags(text){
+  const t=(text||'').toLowerCase();
+  const found=[];
+  Object.entries(ADS_TAGS).forEach(([cat,kws])=>{
+    kws.forEach(kw=>{if(t.includes(kw.toLowerCase()))found.push(kw);});
+  });
+  return [...new Set(found)].slice(0,5);
+}
+
 load();renderCats();renderFeed();
 fetch(BUR+'/api/v2/health').then(function(){log('Backend BUR connesso','ok');}).catch(function(){log('Backend in avvio...','info');});
 log('Gestionale pronto.'+(articles.length?' '+articles.length+' articoli in sessione.':''));
