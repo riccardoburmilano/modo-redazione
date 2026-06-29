@@ -511,15 +511,14 @@ async function publishArt(){
   showFeed();
 }
 
-// GENERA CON AI — Groq diretto dal browser
+// GENERA CON AI — scraping browser + Groq diretto
 async function generateCurrent(){
   if(!art)return;
   const btn=document.getElementById('btn-gen');
 
-  // Recupera o chiedi Groq key
   let groqKey=localStorage.getItem('modo_groq_key');
   if(!groqKey){
-    groqKey=prompt('Inserisci la tua Groq API key:\n(console.groq.com → API Keys)\nViene salvata solo nel tuo browser.');
+    groqKey=prompt('Inserisci la tua Groq API key:\n(console.groq.com → API Keys)');
     if(!groqKey||!groqKey.trim())return;
     localStorage.setItem('modo_groq_key',groqKey.trim());
     groqKey=groqKey.trim();
@@ -528,9 +527,57 @@ async function generateCurrent(){
   btn.disabled=true;btn.textContent='Generando...';
   art.status='generating';renderFeed();
   setStatus('spin','AI in elaborazione...');
-  log('Generando: '+art.sourceTitle.slice(0,40)+'...','info');
 
-  const aiPrompt='Sei un giornalista italiano senior con 20 anni di esperienza. Devi scrivere un articolo giornalistico originale e completo per MODO, una testata italiana seria.\n\nNOTIZIA DI PARTENZA:\nFonte: '+art.sourceName+'\nTitolo originale: '+art.sourceTitle+'\nContenuto disponibile: '+(art.sourceDesc||'Non disponibile')+'\n\nISTRUZIONI FONDAMENTALI:\n- Scrivi COMPLETAMENTE con parole tue, non copiare nulla dalla fonte\n- L articolo deve essere lungo almeno 800 parole\n- Struttura: apertura forte (chi, cosa, dove, quando, perché), sviluppo approfondito con contesto storico e geopolitico, analisi delle implicazioni, prospettive future\n- Aggiungi contesto e background che un lettore italiano aprezzerebbe\n- Stile: giornalistico italiano serio, come Corriere della Sera o Sole 24 Ore\n- NON menzionare mai la fonte originale nel testo\n- Paragrafi separati da \\n\\n\n\nRispondi SOLO con JSON valido, zero testo extra:\n{"titolo":"titolo originale accattivante max 90 caratteri","sommario":"occhiello che cattura il lettore max 150 caratteri","corpo":"articolo completo MINIMO 800 parole in italiano, paragrafi separati da \\n\\n","is_previsione":false,"parole_chiave_ads":[],"parole_chiave_wiki":[]}';
+  // Prova scraping via allorigins proxy (CORS-free)
+  let fullText = art.sourceDesc || '';
+  if(art.sourceUrl){
+    try{
+      log('Scaricando articolo originale...','info');
+      const proxyUrl = 'https://api.allorigins.win/get?url='+encodeURIComponent(art.sourceUrl);
+      const pr = await fetch(proxyUrl, {signal:AbortSignal.timeout(8000)});
+      const pd = await pr.json();
+      if(pd.contents){
+        // Estrai paragrafi dal HTML
+        const tmp = document.createElement('div');
+        tmp.innerHTML = pd.contents;
+        const paras = Array.from(tmp.querySelectorAll('p'))
+          .map(p=>p.textContent.trim())
+          .filter(t=>t.length>60 && !t.includes('cookie') && !t.includes('Cookie') && !t.includes('©'));
+        if(paras.length>2){
+          fullText = paras.slice(0,10).join('
+
+');
+          log('Articolo originale: '+fullText.split(' ').length+' parole scaricate','ok');
+        }
+      }
+    }catch(e){
+      log('Scraping non disponibile, uso descrizione RSS','info');
+    }
+  }
+
+  const wordCount = fullText.split(' ').length;
+  log('Generando articolo ('+wordCount+' parole di contesto)...','info');
+
+  const aiPrompt = 'Sei un giornalista italiano senior del Corriere della Sera.
+
+'+
+    'FONTE: '+art.sourceName+'
+'+
+    'TITOLO ORIGINALE: '+art.sourceTitle+'
+'+
+    'TESTO ORIGINALE:
+'+fullText+'
+
+'+
+    'COMPITO: Scrivi un articolo giornalistico ORIGINALE per MODO. '+
+    'NON copiare il testo originale. Riscrivilo completamente con parole tue. '+
+    'Aggiungi contesto storico, analisi, implicazioni e prospettive future. '+
+    'MINIMO 600 PAROLE. Struttura: apertura forte, contesto, sviluppo, analisi, conclusione.
+
+'+
+    'Rispondi SOLO con questo JSON valido:
+'+
+    '{"titolo":"titolo italiano originale max 90 caratteri","sommario":"occhiello max 150 caratteri","corpo":"articolo MINIMO 600 parole, paragrafi separati da \n\n","is_previsione":false,"parole_chiave_ads":[],"parole_chiave_wiki":[]}';
 
   try{
     const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
@@ -539,9 +586,9 @@ async function generateCurrent(){
       body:JSON.stringify({
         model:'llama-3.3-70b-versatile',
         max_tokens:4000,
-        temperature:0.7,
+        temperature:0.6,
         messages:[
-          {role:'system',content:'Sei un giornalista italiano senior del Corriere della Sera. REGOLA ASSOLUTA E NON NEGOZIABILE: il campo "corpo" nel JSON deve contenere ESATTAMENTE tra 800 e 1000 parole. Conta le parole. Se ne hai meno di 800, aggiungi paragrafi. Struttura OBBLIGATORIA: paragrafo 1-2 apertura (chi cosa dove quando perché), paragrafo 3-4 contesto storico, paragrafo 5-6-7 sviluppo e dettagli, paragrafo 8-9 analisi e conseguenze, paragrafo 10 prospettive. Rispondi SOLO con JSON valido.'},
+          {role:'system',content:'Sei un giornalista italiano esperto. Scrivi articoli lunghi e completi. Il campo corpo deve avere MINIMO 600 parole. Rispondi SOLO con JSON valido.'},
           {role:'user',content:aiPrompt}
         ]
       })
@@ -551,16 +598,17 @@ async function generateCurrent(){
       if(raw.error.message&&raw.error.message.includes('invalid'))localStorage.removeItem('modo_groq_key');
       throw new Error(raw.error.message||'Errore Groq');
     }
-    const text=raw.choices&&raw.choices[0]&&raw.choices[0].message&&raw.choices[0].message.content||'{}';
+    const text=(raw.choices&&raw.choices[0]&&raw.choices[0].message&&raw.choices[0].message.content)||'{}';
     const match=text.match(/\{[\s\S]*\}/);
     const d=JSON.parse(match?match[0]:text);
 
     art.genTitle=d.titolo||art.sourceTitle;
     art.genBody=d.corpo||'';
     art.genSommario=d.sommario||'';
-    if(d.is_previsione&&!art.isForecast){art.isForecast=true;stats.p++;log('⚡ Rilevata come Previsione','info')}
-    if(d.parole_chiave_ads&&d.parole_chiave_ads.length){art.adsKws=d.parole_chiave_ads;art.hasAds=true;log('📢 Ads: '+d.parole_chiave_ads.join(', '),'info')}
-    if(d.parole_chiave_wiki&&d.parole_chiave_wiki.length){art.wikiKws=d.parole_chiave_wiki;log('🔍 Wiki: '+d.parole_chiave_wiki.join(', '),'info')}
+    const wc=art.genBody.split(' ').length;
+    if(d.is_previsione&&!art.isForecast){art.isForecast=true;stats.p++;}
+    if(d.parole_chiave_ads&&d.parole_chiave_ads.length){art.adsKws=d.parole_chiave_ads;art.hasAds=true;}
+    if(d.parole_chiave_wiki&&d.parole_chiave_wiki.length){art.wikiKws=d.parole_chiave_wiki;}
     art.status='pending';stats.g++;upStats();
 
     document.getElementById('ed-title').value=art.genTitle;
@@ -568,8 +616,11 @@ async function generateCurrent(){
     document.getElementById('ed-corpo').value=art.genBody;
     updateBadges();updateIcons();renderFeed();
 
-    setStatus('ok','✓ Articolo generato');
-    log('✓ Generato: '+art.genTitle.slice(0,40)+'...','ok');
+    setStatus('ok','✓ Articolo generato ('+wc+' parole)');
+    log('✓ Generato: '+art.genTitle.slice(0,40)+'... ('+wc+' parole)','ok');
+    if(art.isForecast)log('⚡ Previsione rilevata','info');
+    if(art.adsKws&&art.adsKws.length)log('📢 Ads: '+art.adsKws.join(', '),'info');
+    if(art.wikiKws&&art.wikiKws.length)log('🔍 Wiki: '+art.wikiKws.join(', '),'info');
 
   }catch(e){
     art.status='pending';renderFeed();
