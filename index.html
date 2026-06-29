@@ -542,24 +542,6 @@ async function generateCurrent(){
   setStatus('spin','AI in elaborazione...');
   log(`Generando articolo completo: "${activeArt.sourceTitle.slice(0,40)}..."`,'info');
 
-  // Prompt arricchito — genera tutto in uno
-  const prompt = `Sei un giornalista italiano esperto. Analizza questa notizia e produci un articolo professionale completo per MODO.
-
-NOTIZIA ORIGINALE:
-Fonte: ${activeArt.sourceName}
-Titolo: ${activeArt.sourceTitle}
-Descrizione: ${activeArt.sourceDesc||'Non disponibile'}
-
-Produci SOLO un JSON valido (zero testo extra, zero markdown):
-{
-  "titolo": "titolo italiano professionale, max 90 caratteri, diverso dall'originale",
-  "sommario": "frase di apertura che cattura il lettore, max 130 caratteri",
-  "corpo": "articolo completo 200-300 parole, 3-4 paragrafi separati da \n\n, stile giornalistico italiano serio, cita la fonte originale alla fine",
-  "is_previsione": true/false (true se parla di elezioni, sport imminente, mercati, previsioni meteo, GP F1, partite, scommesse, outlook economico),
-  "parole_chiave_ads": ["max 3 parole chiave commerciali presenti nell'articolo, es: ETF, mutuo, fotovoltaico"],
-  "parole_chiave_wiki": ["max 4 concetti che meritano approfondimento, es: BCE, inflazione, Serie A"]
-}`;
-
   try{
     const r=await fetch(`${BUR}/api/v2/modo/generate`,{
       method:'POST',
