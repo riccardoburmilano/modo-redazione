@@ -324,7 +324,7 @@ async function generateCurrent(){
           const tmp=document.createElement('div');
           tmp.innerHTML=html;
           tmp.querySelectorAll('script,style,nav,footer,header,aside').forEach(el=>el.remove());
-          const paras=Array.from(tmp.querySelectorAll('p')).map(p=>p.textContent.trim()).filter(t=>t.length>80&&!t.toLowerCase().includes('cookie')&&!t.includes('©'));
+          const BLOCKLIST=['cookie','©','subscribe','sign up','newsletter','download','app','follow us','breaking news alerts','bbc','reuters','bloomberg','associated press','all rights','terms of use','privacy','advertisement','skip to','click here','read more','related:','tags:','share this','twitter','facebook','instagram','@bbc','@reuters'];const paras=Array.from(tmp.querySelectorAll('p')).map(p=>p.textContent.trim()).filter(t=>{if(t.length<80)return false;const tl=t.toLowerCase();return!BLOCKLIST.some(b=>tl.includes(b));});
           if(paras.length>=2){fullText=paras.slice(0,12).join(' --- ');log('Scaricate '+fullText.split(' ').length+' parole','ok');break;}
         }
       }catch(e){}
@@ -335,9 +335,16 @@ async function generateCurrent(){
     const titolo=await callGroq('Sei un caporedattore italiano. Scrivi SOLO il titolo, max 90 caratteri, nient altro.','Titolo per: '+art.sourceTitle+(art.sourceDesc?' - '+art.sourceDesc:''),80);
     log('Generando corpo...','info');
     const hasTesto=fullText.length>200;
-    const sys1=hasTesto?'Sei un giornalista italiano. Riscrivi questo articolo con parole tue mantenendo tutti i fatti. Tono umano, naturale, no elenchi puntati, no grassetti.':'Sei un giornalista italiano esperto. Scrivi un articolo approfondito. Tono umano, naturale, no elenchi puntati.';
-    const usr1=hasTesto?'Riscrivi per MODO (min 500 parole): '+fullText:'Scrivi articolo approfondito (min 500 parole) su: '+art.sourceTitle+' - Fonte: '+art.sourceName;
-    const corpo=await callGroq(sys1,usr1,3000);
+    const sys1='Sei un giornalista italiano senior che scrive per MODO. REGOLE ASSOLUTE: 1) Non menzionare mai BBC, Reuters, Bloomberg o qualsiasi altra fonte 2) Non includere mai frasi come scarica lapp, segui su Twitter, ricarica la pagina, iscriviti alla newsletter 3) Scrivi sempre in prima persona editoriale come se fossi tu ad aver scoperto la notizia 4) Minimo 600 parole 5) Tono umano e naturale, niente elenchi puntati, niente grassetti.';
+    const usr1=hasTesto?'Scrivi un articolo giornalistico completo di almeno 600 parole su questo testo. Riscrivi con parole tue, mantieni i fatti. Testo originale: '+fullText:'Scrivi un articolo giornalistico di almeno 600 parole su: '+art.sourceTitle+'. Approfondisci con contesto, storia, analisi e prospettive future.';
+    let corpo=await callGroq(sys1,usr1,4000);
+    // Se troppo corto, richiedi continuazione
+    if(corpo.split(' ').length<400){
+      log('Articolo corto ('+corpo.split(' ').length+' parole), richiedo continuazione...','info');
+      const cont=await callGroq('Sei un giornalista italiano. Continua questo articolo con altri 4-5 paragrafi di approfondimento. Scrivi solo la continuazione, non ripetere quello che è già scritto.','Continua questo articolo con almeno altri 300 parole:\n\n'+corpo,2000);
+      corpo=corpo+' '+cont;
+    }
+    log('Corpo: '+corpo.split(' ').length+' parole','info');
     log('Revisione stile...','info');
     const corpoFinale=await callGroq('Sei un editor italiano. Rendi questo testo indistinguibile da un articolo scritto da un giornalista umano: varia le frasi, usa connettivi naturali come eppure, del resto, va detto che. Non aggiungere contenuti. Restituisci solo il testo.',corpo,3000);
     log('Generando sommario...','info');
