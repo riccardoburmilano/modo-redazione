@@ -231,7 +231,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--g
       </div>
       <div class="ed-bottom">
         <button class="ed-menu-btn" id="btn-prev" onclick="toggleFlag('forecast')">⚡ Previsione</button>
-        <button class="ed-menu-btn" id="btn-ads" onclick="toggleFlag('ads')">📢 Ads</button>
+        
         <button class="ed-menu-btn" onclick="addWiki()">🔍 Wiki</button>
         <button class="ed-menu-btn" onclick="setCtx()">💬 Chiedi AI</button>
         <button class="ed-save" onclick="saveArt()">Salva</button>
@@ -290,7 +290,7 @@ function toggleAuto(){const b=document.getElementById('btn-auto');if(autoInt){cl
 function resetNews(){if(!confirm('Cancellare tutte le notizie?'))return;articles=[];stats={f:0,g:0,a:0,p:0};art=null;localStorage.removeItem('modo_v3');upStats();showFeed();renderFeed();log('Feed resettato','info');}
 function resetAI(){localStorage.removeItem('modo_groq_key');const c=document.getElementById('chat-msgs');c.innerHTML='<div class="chat-msg ai"><div class="bubble">Chat resettata.</div><div class="chat-time">MODO Redazione</div></div>';log('Chiave AI resettata','info');}
 function showFeed(){document.getElementById('feed-view').style.display='block';document.getElementById('editor').classList.remove('show');art=null;}
-function renderFeed(){const list=document.getElementById('feed-list');const empty=document.getElementById('empty');if(!articles.length){empty.style.display='flex';list.innerHTML='';return;}empty.style.display='none';const sorted=[...articles].sort((a,b)=>new Date(b.publishedAt)-new Date(a.publishedAt));let html='',shownOld=false;sorted.forEach(function(a){if(!today(a.publishedAt)&&!shownOld){html+='<div class="day-sep">Ieri e precedenti</div>';shownOld=true;}const t=a.genTitle||a.sourceTitle;const isActive=art&&art.id===a.id;html+='<div class="card '+a.status+(isActive?' active':'')+' " id="c'+a.id+'" onclick="openEditor('+a.id+')"><div class="card-inner"><div class="card-cat">'+a.catLabel+'</div><div><div class="card-title">'+t+'</div><div class="card-meta"><span class="card-src">'+a.sourceName+'</span><span class="card-ago">'+rel(a.publishedAt)+'</span><span class="badge '+a.status+'">'+(a.status==='pending'?'Bozza':a.status==='generating'?'AI...':a.status==='approved'?'Pubblicato':'Scartato')+'</span>'+(a.isForecast?'<span class="badge forecast">⚡</span>':'')+(a.hasAds?'<span class="badge ads">📢</span>':'')+(!a.genBody&&a.status!=='generating'?'<span style="color:var(--t4);font-size:10px"> · Da generare</span>':'')+'</div></div><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="var(--t4)" stroke-width="1.5"><path d="M4 2l4 4-4 4"/></svg></div></div>';});list.innerHTML=html;}
+function renderFeed(){const list=document.getElementById('feed-list');const empty=document.getElementById('empty');if(!articles.length){empty.style.display='flex';list.innerHTML='';return;}empty.style.display='none';const sorted=[...articles].sort((a,b)=>new Date(b.publishedAt)-new Date(a.publishedAt));let html='',shownOld=false;sorted.forEach(function(a){if(!today(a.publishedAt)&&!shownOld){html+='<div class="day-sep">Ieri e precedenti</div>';shownOld=true;}const t=a.genTitle||a.sourceTitle;const isActive=art&&art.id===a.id;html+='<div class="card '+a.status+(isActive?' active':'')+' " id="c'+a.id+'" onclick="openEditor('+a.id+')"><div class="card-inner"><div class="card-cat">'+a.catLabel+'</div><div><div class="card-title">'+t+'</div><div class="card-meta"><span class="card-src">'+a.sourceName+'</span><span class="card-ago">'+rel(a.publishedAt)+'</span><span class="badge '+a.status+'">'+(a.status==='pending'?'Bozza':a.status==='generating'?'AI...':a.status==='approved'?'Pubblicato':'Scartato')+'</span>'+(a.isForecast?'<span class="badge forecast">⚡</span>':'')+(!a.genBody&&a.status!=='generating'?'<span style="color:var(--t4);font-size:10px"> · Da generare</span>':'')+'</div></div><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="var(--t4)" stroke-width="1.5"><path d="M4 2l4 4-4 4"/></svg></div></div>';});list.innerHTML=html;}
 function openEditor(id){const a=articles.find(x=>x.id===id);if(!a)return;art=a;ctxArt=a;document.getElementById('feed-view').style.display='none';document.getElementById('editor').classList.add('show');const sel=document.getElementById('ed-cat');sel.innerHTML=CATS.map(c=>'<option value="'+c.l+'"'+(a.catLabel===c.l?' selected':'')+'>'+c.l+'</option>').join('');document.getElementById('ed-title').value=a.genTitle||a.sourceTitle||'';document.getElementById('ed-sommario').value=a.genSommario||'';const bc=a.genBody||(a.sourceDesc?a.sourceTitle+'\n\n'+a.sourceDesc:'');document.getElementById('ed-corpo').value=bc;updateBadges();updateIcons();renderFeed();}
 function updateBadges(){if(!art)return;const b=document.getElementById('ed-badges');let h='';if(art.isForecast)h+='<span class="badge forecast">⚡ Previsione</span>';if(art.hasAds&&art.adsKws&&art.adsKws.length)h+='<span class="badge ads">📢 '+art.adsKws.join(', ')+'</span>';if(art.wikiKws&&art.wikiKws.length)h+='<span class="badge" style="color:var(--blue);border-color:var(--blue)">🔍 '+art.wikiKws.join(', ')+'</span>';b.innerHTML=h;}
 function updateIcons(){if(!art)return;document.getElementById('btn-prev').classList.toggle('on',!!art.isForecast);document.getElementById('btn-ads').classList.toggle('on',!!art.hasAds);}
@@ -322,13 +322,13 @@ async function generateCurrent(){
     const sommario=await callGroq('Rispondi con UNA sola frase breve, max 130 caratteri.','Occhiello per: '+titolo,80);
     art.genTitle=titolo.replace(/["\']/g,'').trim().slice(0,90);
     art.genSommario=sommario.replace(/["\']/g,'').trim().slice(0,130);
-    art.genBody=corpo.trim();art.adsKws=detectAdsTags(art.genTitle+' '+art.genBody);if(art.adsKws.length)art.hasAds=true;
+    art.genBody=(corpoUmano||corpo).trim();
     art.status='pending';stats.g++;upStats();
     document.getElementById('ed-title').value=art.genTitle;
     document.getElementById('ed-sommario').value=art.genSommario;
     document.getElementById('ed-corpo').value=art.genBody;
     updateBadges();updateIcons();renderFeed();
-    const wc=corpo.split(' ').length;
+    const wc=art.genBody.split(' ').length;
     setStatus('ok','Generato ('+wc+' parole)');
     log('Generato: '+art.genTitle.slice(0,40)+'... ('+wc+' parole)','ok');
   }catch(e){art.status='pending';renderFeed();log('Errore AI: '+e.message,'err');setStatus('','Errore AI');}
@@ -354,27 +354,6 @@ async function autoFetch(){
     });
     if(n>=10){stats.f+=n;upStats();renderFeed();log(n+' nuove notizie in automatico','ok');setStatus('ok',n+' nuove');}
   }catch(e){}
-}
-
-// ADS TAGS automatici — parole chiave commerciali
-const ADS_TAGS={
-  'energia':['Enel','Edison','A2A','fotovoltaico','rinnovabili','bolletta'],
-  'finanza':['ETF','BTP','spread','mutuo','tasso','BCE','inflazione','Fineco','Degiro'],
-  'tech':['AI','iPhone','Google','Amazon','chip','semiconductor','startup'],
-  'auto':['Tesla','BMW','Mercedes','elettrico','EV','ricarica'],
-  'immobiliare':['mutuo','casa','affitto','mercato immobiliare'],
-  'salute':['farmaco','vaccino','ricerca medica','oncologia'],
-  'sport':['Serie A','Champions','Juventus','Inter','Milan','scommesse','pronostico'],
-  'viaggi':['volo','hotel','booking','airbnb']
-};
-
-function detectAdsTags(text){
-  const t=(text||'').toLowerCase();
-  const found=[];
-  Object.entries(ADS_TAGS).forEach(([cat,kws])=>{
-    kws.forEach(kw=>{if(t.includes(kw.toLowerCase()))found.push(kw);});
-  });
-  return [...new Set(found)].slice(0,5);
 }
 
 load();renderCats();renderFeed();
