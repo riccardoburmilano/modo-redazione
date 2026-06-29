@@ -190,6 +190,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--g
           <div class="stat"><div class="stat-n" id="st-a" style="color:var(--green)">0</div><div class="stat-l">Pubblicate</div></div>
           <div class="stat"><div class="stat-n" id="st-p" style="color:var(--purple)">0</div><div class="stat-l">Previsioni</div></div>
         </div>
+        <div style="background:#fff;border:1px solid var(--b1);padding:10px 12px;margin-top:4px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--t3);margin-bottom:8px">Stato redazione oggi</div>
+          <div id="dash-stato" style="font-size:11px;color:var(--t2);line-height:1.8">Caricamento...</div>
+        </div>
       </div>
       <div>
         <div class="ls-title">Log</div>
@@ -284,7 +288,26 @@ function save(){try{localStorage.setItem('modo_v3',JSON.stringify({articles:arti
 function load(){try{const d=JSON.parse(localStorage.getItem('modo_v3')||'{}');if(d.articles&&d.articles.length){articles=d.articles;log('Ripristinati '+articles.length+' articoli','ok')}if(d.cestino)cestino=d.cestino;if(d.stats)stats=d.stats;if(d.cats)cats=new Set(d.cats);upStats();}catch(e){}}
 function setStatus(s,t){document.getElementById('dot').className='tb-dot'+(s?' '+s:'');document.getElementById('dot-txt').textContent=t}
 function log(m,t){const b=document.getElementById('log');const d=document.createElement('div');const h=new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',second:'2-digit'});d.className=t==='ok'?'lok':t==='err'?'lerr':t==='info'?'linf':'';d.textContent='['+h+'] '+m;b.appendChild(d);b.scrollTop=b.scrollHeight;}
-function upStats(){document.getElementById('st-f').textContent=stats.f;document.getElementById('st-g').textContent=stats.g;document.getElementById('st-a').textContent=stats.a;document.getElementById('st-p').textContent=stats.p;save();}
+function upStats(){
+  document.getElementById('st-f').textContent=stats.f;
+  document.getElementById('st-g').textContent=stats.g;
+  document.getElementById('st-a').textContent=stats.a;
+  document.getElementById('st-p').textContent=stats.p;
+  const dash=document.getElementById('dash-stato');
+  if(dash){
+    const bozze=articles.filter(a=>a.status==='pending'&&a.genBody).length;
+    const daGen=articles.filter(a=>a.status==='pending'&&!a.genBody).length;
+    const sched=articles.filter(a=>a.scheduledAt&&a.status!=='approved').length;
+    const prev=articles.filter(a=>a.isForecast&&a.status==='approved').length;
+    dash.innerHTML=
+      (daGen>0?'<span style="color:var(--t3)">📥 '+daGen+' da generare</span><br>':'')+
+      (bozze>0?'<span style="color:var(--gold)">✎ '+bozze+' bozze pronte</span><br>':'')+
+      (sched>0?'<span style="color:var(--blue)">🕐 '+sched+' schedulate</span><br>':'')+
+      '<span style="color:var(--green)">✓ '+stats.a+' pubblicate oggi</span><br>'+
+      (prev>0?'<span style="color:var(--purple)">⚡ '+prev+' previsioni live</span>':'');
+  }
+  save();
+}
 function rel(iso){const m=Math.round((Date.now()-new Date(iso))/60000);if(m<1)return 'ora';if(m<60)return m+'m fa';const h=Math.round(m/60);if(h<24)return h+'h fa';return Math.round(h/24)+'g fa';}
 function today(iso){return Date.now()-new Date(iso)<86400000}
 function renderCats(){document.getElementById('cat-grid').innerHTML=CATS.map(c=>'<button class="cat-btn'+(cats.has(c.id)?' on':'')+'" onclick="toggleCat('+"'"+c.id+"'"+')">'+c.l+'</button>').join('');}
@@ -296,8 +319,8 @@ async function fetchNews(){const btn=document.getElementById('btn-fetch');btn.di
       if(articles.find(x=>x.sourceTitle===a.sourceTitle))return;// Dedup per URL esatto — evita duplicati senza falsi positivi
       if(a.sourceUrl&&articles.find(x=>x.sourceUrl===a.sourceUrl))return;
       if(!a.sourceUrl&&articles.find(x=>x.sourceTitle===a.sourceTitle))return;
-      const prio=calcPriority(a.sourceTitle,a.cat);
-      articles.unshift({id:Date.now()+Math.random(),priority:prio,catLabel:a.cat,sourceTitle:a.sourceTitle,sourceDesc:a.sourceDesc||'',sourceUrl:a.sourceUrl,sourceName:a.sourceName,img:a.img,publishedAt:a.publishedAt,status:'pending',genTitle:null,genBody:null,genSommario:null,isForecast:a.isForecast||false,hasAds:false,wikiKws:[],adsKws:[]});n++;});stats.f+=n;upStats();renderFeed();setStatus('ok',d.count+' notizie');log(n+' nuove notizie','ok');}catch(e){log('Errore: '+e.message,'err');setStatus('','Errore');}btn.disabled=false;btn.textContent='↓ Aggiorna notizie';}
+      const catCorretta=reclassifica(a.sourceTitle,a.cat);const prio=calcPriority(a.sourceTitle,catCorretta);
+      articles.unshift({id:Date.now()+Math.random(),priority:prio,catLabel:catCorretta,sourceTitle:a.sourceTitle,sourceDesc:a.sourceDesc||'',sourceUrl:a.sourceUrl,sourceName:a.sourceName,img:a.img,publishedAt:a.publishedAt,status:'pending',genTitle:null,genBody:null,genSommario:null,isForecast:a.isForecast||false,hasAds:false,wikiKws:[],adsKws:[]});n++;});stats.f+=n;upStats();renderFeed();setStatus('ok',d.count+' notizie');log(n+' nuove notizie','ok');}catch(e){log('Errore: '+e.message,'err');setStatus('','Errore');}btn.disabled=false;btn.textContent='↓ Aggiorna notizie';}
 function toggleAuto(){const b=document.getElementById('btn-auto');if(autoInt){clearInterval(autoInt);autoInt=null;b.textContent='◯ Auto H24 (ogni 2 min)';b.classList.remove('on');}else{autoInt=setInterval(autoFetch,120000);b.textContent='● Stop auto';b.classList.add('on');fetchNews();}}
 function resetNews(){if(!confirm('Cancellare tutte le notizie?'))return;articles=[];stats={f:0,g:0,a:0,p:0};art=null;localStorage.removeItem('modo_v3');upStats();showFeed();renderFeed();log('Feed resettato','info');}
 function resetAI(){localStorage.removeItem('modo_groq_key');const c=document.getElementById('chat-msgs');c.innerHTML='<div class="chat-msg ai"><div class="bubble">Chat resettata.</div><div class="chat-time">MODO Redazione</div></div>';log('Chiave AI resettata','info');}
@@ -351,7 +374,7 @@ async function generateCurrent(){
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},
       body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:2000,temperature:0.8,messages:[
-        {role:'system',content:'Sei un giornalista italiano serio. REGOLE ANTI-ERRORE: 1) Scrivi SOLO fatti presenti nel testo originale fornito 2) Non inventare mai età, date, nomi, cifre o luoghi che non sono nel testo 3) Se un dato non è nel testo, NON scriverlo 4) Se non hai abbastanza informazioni su un dettaglio, scrivi in modo generale 5) Mai menzionare fonti esterne 6) Tono naturale e umano'},
+        {role:'system',content:'Sei il giornalista di punta di MODO, testata italiana digitale diretta da Riccardo e Matteo. Lo stile MODO è: frasi brevi e dirette, apertura con il fatto principale senza fronzoli, nessuna retorica vuota, aggiungi sempre una frase di contesto o analisi che il lettore non trova altrove. REGOLE FERRO: 1) Scrivi SOLO fatti presenti nel testo originale 2) Non inventare età, date, nomi, cifre o luoghi 3) Se un dato manca, non scriverlo 4) Mai citare fonti esterne nel testo 5) Ogni articolo deve avere una frase di apertura che cattura subito 6) Chiudi sempre con una frase che guarda avanti o invita alla riflessione'},
         {role:'user',content:prompt}
       ]})
     });
@@ -577,6 +600,29 @@ setInterval(function(){
     }
   });
 },60000);
+
+// RECLASSIFICA categoria in base al contenuto
+function reclassifica(sourceTitle, sourceCat){
+  const t=(sourceTitle||'').toLowerCase();
+  // Paesi/città stranieri → MONDO
+  const estero=['germania','berlino','parigi','francia','spagna','madrid','londra','uk','usa','america','cina','russia','ucraina','iran','israele','gaza','pakistan','afghanistan','giappone','brasile','india','australia','corea','taiwan','turchia','siria','egitto','libia','tunisia','trump','biden','macron','scholz','putin','zelensky','modi','xi jinping'];
+  if(estero.some(p=>t.includes(p)))return 'Mondo';
+  // Sport specifici
+  const sport=['calcio','serie a','champions','inter','milan','juventus','roma','napoli','lazio','sinner','wimbledon','formula','gp ','motogp','nba','tennis','basket','volley','ciclismo','nuoto','atletica','olimp'];
+  if(sport.some(p=>t.includes(p)))return 'Sport';
+  // Finanza/economia
+  const finanza=['borsa','spread','btp','bce','fed','inflazione','pil','euro','dollaro','azioni','mercati','etf','crypto','bitcoin','tesla','apple','google','amazon','nvidia'];
+  if(finanza.some(p=>t.includes(p)))return 'Finanza';
+  // Tech
+  const tech=['ai','intelligenza artificiale','openai','chatgpt','iphone','android','chip','semiconductor','startup','software','app','robot','drone','spazio','nasa'];
+  if(tech.some(p=>t.includes(p)))return 'Tech';
+  // Politica italiana
+  const politica=['meloni','salvini','governo','parlamento','senato','camera','decreto','riforma','regione','comune','sindaco','elezioni comunali','partito'];
+  if(politica.some(p=>t.includes(p)))return 'Politica';
+  // Se viene da fonte italiana e non è estero → Italia
+  if(sourceCat==='Italia')return 'Italia';
+  return sourceCat||'Mondo';
+}
 
 load();renderCats();renderFeed();
 fetch(BUR+'/api/v2/health').then(function(){log('Backend BUR connesso','ok');}).catch(function(){log('Backend in avvio...','info');});if(localStorage.getItem('modo_groq_key'))checkTokens();
