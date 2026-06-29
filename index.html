@@ -307,22 +307,44 @@ async function generateCurrent(){
   if(!groqKey){groqKey=window.prompt('Groq API key:');if(!groqKey||!groqKey.trim())return;localStorage.setItem('modo_groq_key',groqKey.trim());groqKey=groqKey.trim();}
   btn.disabled=true;btn.textContent='Generando...';art.status='generating';renderFeed();setStatus('spin','Generazione...');
   async function callGroq(sys,usr,tok){
-    const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:tok||2000,temperature:0.6,messages:[{role:'system',content:sys},{role:'user',content:usr}]})});
+    const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:tok||2000,temperature:0.75,messages:[{role:'system',content:sys},{role:'user',content:usr}]})});
     const d=await r.json();
     if(d.error){if(d.error.message.includes('invalid'))localStorage.removeItem('modo_groq_key');throw new Error(d.error.message);}
     return(d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||'';
   }
+  let fullText=art.sourceDesc||'';
+  if(art.sourceUrl){
+    const proxies=['https://corsproxy.io/?','https://api.allorigins.win/raw?url=','https://thingproxy.freeboard.io/fetch/'];
+    for(const proxy of proxies){
+      try{
+        log('Scaricando da '+art.sourceName+'...','info');
+        const pr=await fetch(proxy+encodeURIComponent(art.sourceUrl),{signal:AbortSignal.timeout(7000)});
+        const html=await pr.text();
+        if(html&&html.length>500){
+          const tmp=document.createElement('div');
+          tmp.innerHTML=html;
+          tmp.querySelectorAll('script,style,nav,footer,header,aside').forEach(el=>el.remove());
+          const paras=Array.from(tmp.querySelectorAll('p')).map(p=>p.textContent.trim()).filter(t=>t.length>80&&!t.toLowerCase().includes('cookie')&&!t.includes('©'));
+          if(paras.length>=2){fullText=paras.slice(0,12).join(' --- ');log('Scaricate '+fullText.split(' ').length+' parole','ok');break;}
+        }
+      }catch(e){}
+    }
+  }
   try{
-    const notizia=art.sourceTitle+(art.sourceDesc?' - '+art.sourceDesc:'')+' (Fonte: '+art.sourceName+')';
     log('Generando titolo...','info');
-    const titolo=await callGroq('Sei un giornalista italiano. Rispondi SOLO con il titolo, max 90 caratteri, nient altro.','Titolo per: '+notizia,80);
-    log('Generando corpo articolo 600+ parole...','info');
-    const corpo=await callGroq('Sei un giornalista senior italiano del Corriere della Sera. Scrivi articoli lunghi e originali. NON usare JSON. Solo testo puro.','Scrivi un articolo giornalistico completo in italiano (minimo 600 parole) con parole tue. Struttura: apertura con i fatti, contesto storico, analisi, prospettive future. Notizia: '+notizia,3000);
+    const titolo=await callGroq('Sei un caporedattore italiano. Scrivi SOLO il titolo, max 90 caratteri, nient altro.','Titolo per: '+art.sourceTitle+(art.sourceDesc?' - '+art.sourceDesc:''),80);
+    log('Generando corpo...','info');
+    const hasTesto=fullText.length>200;
+    const sys1=hasTesto?'Sei un giornalista italiano. Riscrivi questo articolo con parole tue mantenendo tutti i fatti. Tono umano, naturale, no elenchi puntati, no grassetti.':'Sei un giornalista italiano esperto. Scrivi un articolo approfondito. Tono umano, naturale, no elenchi puntati.';
+    const usr1=hasTesto?'Riscrivi per MODO (min 500 parole): '+fullText:'Scrivi articolo approfondito (min 500 parole) su: '+art.sourceTitle+' - Fonte: '+art.sourceName;
+    const corpo=await callGroq(sys1,usr1,3000);
+    log('Revisione stile...','info');
+    const corpoFinale=await callGroq('Sei un editor italiano. Rendi questo testo indistinguibile da un articolo scritto da un giornalista umano: varia le frasi, usa connettivi naturali come eppure, del resto, va detto che. Non aggiungere contenuti. Restituisci solo il testo.',corpo,3000);
     log('Generando sommario...','info');
-    const sommario=await callGroq('Rispondi con UNA sola frase breve, max 130 caratteri.','Occhiello per: '+titolo,80);
-    art.genTitle=titolo.replace(/["\']/g,'').trim().slice(0,90);
-    art.genSommario=sommario.replace(/["\']/g,'').trim().slice(0,130);
-    art.genBody=(corpoUmano||corpo).trim();
+    const sommario=await callGroq('Scrivi UNA frase breve max 120 caratteri. Solo la frase.','Occhiello per: '+titolo.trim(),80);
+    art.genTitle=titolo.replace(/^[#"'s*]+|[#"'s]+$/g,'').slice(0,90);
+    art.genSommario=sommario.replace(/^[#"'s*]+|[#"'s]+$/g,'').slice(0,120);
+    art.genBody=corpoFinale.trim();
     art.status='pending';stats.g++;upStats();
     document.getElementById('ed-title').value=art.genTitle;
     document.getElementById('ed-sommario').value=art.genSommario;
