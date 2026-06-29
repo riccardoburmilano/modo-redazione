@@ -80,17 +80,16 @@ nav{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid va
 .hero-side-meta{font-size:10px;color:var(--t3)}
 .forecast-badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:2px 7px;border:1px solid var(--purple);color:var(--purple);margin-top:6px}
 
-/* ── BOLLE ── */
-.bolle-section{max-width:1200px;margin:0 auto;padding:28px 24px}
-.bolle-title{font-family:var(--serif);font-size:13px;font-weight:600;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:10px}
-.bolle-title::after{content:'';flex:1;height:1px;background:var(--b1)}
-.bolle-container{position:relative;height:320px;background:#fff;border:1px solid var(--b1);overflow:hidden}
-.bolla{position:absolute;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;text-align:center;transition:transform .2s,opacity .3s;border:1px solid rgba(0,0,0,.06)}
-.bolla:hover{transform:scale(1.05)!important;z-index:10}
-.bolla-inner{padding:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:100%;height:100%}
-.bolla-cat{font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;opacity:.7}
-.bolla-title{font-family:var(--serif);font-size:11px;font-weight:700;line-height:1.25;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
-.bolla-ago{font-size:8px;opacity:.5;margin-top:2px}
+/* ── ALBERO CONCETTUALE ── */
+.tree-section{max-width:1200px;margin:0 auto;padding:28px 24px}
+.tree-title{font-family:var(--serif);font-size:13px;font-weight:600;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.tree-title::after{content:'';flex:1;height:1px;background:var(--b1)}
+.tree-wrap{background:#fff;border:1px solid var(--b1);overflow:hidden;position:relative}
+.tree-wrap svg{display:block;width:100%}
+.tree-node-root{cursor:default}
+.tree-node{cursor:pointer;transition:opacity .2s}
+.tree-node:hover .tree-node-rect{filter:brightness(.96)}
+.tree-node:hover .tree-node-title{text-decoration:underline}
 
 /* ── FEED LISTA ── */
 .feed-section{max-width:1200px;margin:0 auto;padding:0 24px 60px}
@@ -217,10 +216,10 @@ footer{background:#1c1b17;color:rgba(255,255,255,.5);padding:32px 24px;text-alig
   </div>
 </div>
 
-<!-- BOLLE -->
-<div class="bolle-section">
-  <div class="bolle-title">In evidenza · ultime 24 ore</div>
-  <div class="bolle-container" id="bolle-container"></div>
+<!-- ALBERO CONCETTUALE -->
+<div class="tree-section">
+  <div class="tree-title">Mappa concettuale · ultime 24 ore</div>
+  <div class="tree-wrap" id="tree-wrap"></div>
 </div>
 
 <!-- FEED -->
@@ -385,51 +384,222 @@ function renderHero(){
     </div>`;
 }
 
-// ── BOLLE ───────────────────────────────────────────────────────
+// ── ALBERO CONCETTUALE ────────────────────────────────────────
 function renderBolle(){
-  const container=document.getElementById('bolle-container');
-  const arts=filtered.slice(0,20);
-  const now=Date.now();
-  const colors={'Italia':'#dcfce7','Mondo':'#dbeafe','Finanza':'#fef9c3','Tech':'#ccfbf1','Sport':'#ffedd5','Previsioni':'#f3e8ff'};
-  const textColors={'Italia':'#166534','Mondo':'#1e3a8a','Finanza':'#9a6f00','Tech':'#0f766e','Sport':'#c2410c','Previsioni':'#581c87'};
-  const W=container.offsetWidth||900;
-  const H=320;
-  const placed=[];
-  container.innerHTML='';
+  const wrap = document.getElementById('tree-wrap');
+  if(!wrap) return;
+  const arts = filtered.slice(0, 30);
+  const now = Date.now();
 
-  arts.forEach((a,i)=>{
-    const age=(now-new Date(a.publishedAt))/3600000; // ore
-    const size=Math.max(70,Math.min(160,160-age*8));
-    const bg=colors[a.catLabel]||'#f3f4f6';
-    const tc=textColors[a.catLabel]||'#374151';
-
-    // Trova posizione senza overlap
-    let x,y,tries=0;
-    do{
-      x=size/2+Math.random()*(W-size);
-      y=size/2+Math.random()*(H-size);
-      tries++;
-    }while(tries<30&&placed.some(p=>Math.hypot(p.x-x,p.y-y)<(p.r+size/2+8)));
-    placed.push({x,y,r:size/2});
-
-    const div=document.createElement('div');
-    div.className='bolla';
-    div.style.cssText=`width:${size}px;height:${size}px;left:${x-size/2}px;top:${y-size/2}px;background:${bg};opacity:${Math.max(0.4,1-age/24)}`;
-    div.innerHTML=`<div class="bolla-inner"><div class="bolla-cat" style="color:${tc}">${a.catLabel}</div><div class="bolla-title" style="color:${tc};font-size:${size>100?'11':'9'}px">${(a.genTitle||'').slice(0,60)}</div><div class="bolla-ago">${rel(a.publishedAt)}</div></div>`;
-    div.onclick=()=>openArticle(a);
-    container.appendChild(div);
+  // Raggruppa per categoria
+  const cats = {};
+  arts.forEach(a => {
+    const cat = a.catLabel || 'Mondo';
+    if(!cats[cat]) cats[cat] = [];
+    cats[cat].push(a);
   });
 
-  // Anima lentamente
-  let t=0;
-  const anim=setInterval(()=>{
-    t+=0.3;
-    container.querySelectorAll('.bolla').forEach((b,i)=>{
-      const base=parseFloat(b.style.top);
-      b.style.top=(base+Math.sin(t/40+i)*0.15)+'px';
+  const CAT_COLORS = {
+    'Italia':    {stroke:'#166534', fill:'#f0fdf4', text:'#166534', dot:'#22c55e'},
+    'Mondo':     {stroke:'#1e3a8a', fill:'#eff6ff', text:'#1e3a8a', dot:'#3b82f6'},
+    'Finanza':   {stroke:'#9a6f00', fill:'#fefce8', text:'#9a6f00', dot:'#eab308'},
+    'Tech':      {stroke:'#0f766e', fill:'#f0fdfa', text:'#0f766e', dot:'#14b8a6'},
+    'Sport':     {stroke:'#c2410c', fill:'#fff7ed', text:'#c2410c', dot:'#f97316'},
+    'Previsioni':{stroke:'#581c87', fill:'#faf5ff', text:'#581c87', dot:'#a855f7'},
+  };
+
+  const catList = Object.keys(cats);
+  const W = wrap.offsetWidth || 1140;
+  const NODE_W = 110;
+  const NODE_H = 36;
+  const LEAF_W = 180;
+  const LEAF_H = 56;
+  const COL_GAP = 30;
+
+  // Calcola altezza totale
+  let totalH = 40;
+  catList.forEach(cat => {
+    totalH += NODE_H + 16;
+    cats[cat].forEach(() => { totalH += LEAF_H + 8; });
+    totalH += 24;
+  });
+  totalH = Math.max(400, totalH);
+
+  // SVG
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.setAttribute('viewBox', '0 0 ' + W + ' ' + totalH);
+  svg.setAttribute('height', totalH);
+
+  // Defs per frecce
+  const defs = document.createElementNS(svgNS, 'defs');
+
+  // Layout: 2 colonne di alberi
+  const colW = (W - COL_GAP * 3) / 2;
+  const cols = [[], []];
+  catList.forEach((cat, i) => cols[i % 2].push(cat));
+
+  // Disegna ogni colonna
+  [0, 1].forEach(colIdx => {
+    const colX = COL_GAP + colIdx * (colW + COL_GAP);
+    let y = 32;
+
+    cols[colIdx].forEach(cat => {
+      const col = CAT_COLORS[cat] || CAT_COLORS['Mondo'];
+      const arts = cats[cat];
+
+      // Nodo radice categoria
+      const rootX = colX + colW / 2;
+      const rootY = y + NODE_H / 2;
+
+      // Sfondo nodo root
+      const rootRect = document.createElementNS(svgNS, 'rect');
+      rootRect.setAttribute('x', rootX - NODE_W/2);
+      rootRect.setAttribute('y', y);
+      rootRect.setAttribute('width', NODE_W);
+      rootRect.setAttribute('height', NODE_H);
+      rootRect.setAttribute('rx', '2');
+      rootRect.setAttribute('fill', col.fill);
+      rootRect.setAttribute('stroke', col.stroke);
+      rootRect.setAttribute('stroke-width', '1.5');
+      svg.appendChild(rootRect);
+
+      // Dot decorativo
+      const dot = document.createElementNS(svgNS, 'circle');
+      dot.setAttribute('cx', rootX - NODE_W/2 + 14);
+      dot.setAttribute('cy', rootY);
+      dot.setAttribute('r', '4');
+      dot.setAttribute('fill', col.dot);
+      svg.appendChild(dot);
+
+      // Label categoria
+      const rootLabel = document.createElementNS(svgNS, 'text');
+      rootLabel.setAttribute('x', rootX - NODE_W/2 + 26);
+      rootLabel.setAttribute('y', rootY + 4);
+      rootLabel.setAttribute('font-family', 'Inter, sans-serif');
+      rootLabel.setAttribute('font-size', '11');
+      rootLabel.setAttribute('font-weight', '700');
+      rootLabel.setAttribute('letter-spacing', '0.1em');
+      rootLabel.setAttribute('fill', col.text);
+      rootLabel.textContent = cat.toUpperCase();
+      svg.appendChild(rootLabel);
+
+      y += NODE_H + 12;
+
+      // Linea verticale dal root
+      const maxArts = Math.min(arts.length, 4);
+      const branchH = maxArts * (LEAF_H + 8);
+
+      const vLine = document.createElementNS(svgNS, 'line');
+      vLine.setAttribute('x1', rootX);
+      vLine.setAttribute('y1', rootY + NODE_H/2);
+      vLine.setAttribute('x2', rootX);
+      vLine.setAttribute('y2', y + branchH - LEAF_H/2);
+      vLine.setAttribute('stroke', col.stroke);
+      vLine.setAttribute('stroke-width', '1');
+      vLine.setAttribute('stroke-dasharray', '3,3');
+      vLine.setAttribute('opacity', '0.4');
+      svg.appendChild(vLine);
+
+      // Foglie (articoli)
+      arts.slice(0, 4).forEach((a, ai) => {
+        const leafY = y + ai * (LEAF_H + 8);
+        const leafCX = rootX;
+        const leafX = colX;
+        const age = Math.min(1, (now - new Date(a.publishedAt)) / (24 * 3600000));
+        const opacity = Math.max(0.5, 1 - age * 0.5);
+
+        // Linea orizzontale al leaf
+        const hLine = document.createElementNS(svgNS, 'line');
+        hLine.setAttribute('x1', leafCX);
+        hLine.setAttribute('y1', leafY + LEAF_H/2);
+        hLine.setAttribute('x2', leafX + 8);
+        hLine.setAttribute('y2', leafY + LEAF_H/2);
+        hLine.setAttribute('stroke', col.stroke);
+        hLine.setAttribute('stroke-width', '1');
+        hLine.setAttribute('opacity', String(opacity * 0.4));
+        svg.appendChild(hLine);
+
+        // Nodo foglia — gruppo cliccabile
+        const g = document.createElementNS(svgNS, 'g');
+        g.setAttribute('class', 'tree-node');
+        g.style.cursor = 'pointer';
+        g.setAttribute('opacity', String(opacity));
+
+        const leafRect = document.createElementNS(svgNS, 'rect');
+        leafRect.setAttribute('x', leafX);
+        leafRect.setAttribute('y', leafY);
+        leafRect.setAttribute('width', colW);
+        leafRect.setAttribute('height', LEAF_H);
+        leafRect.setAttribute('rx', '2');
+        leafRect.setAttribute('fill', '#fff');
+        leafRect.setAttribute('stroke', col.stroke);
+        leafRect.setAttribute('stroke-width', '0.5');
+        leafRect.setAttribute('stroke-opacity', '0.3');
+        g.appendChild(leafRect);
+
+        // Barra colorata sinistra
+        const bar = document.createElementNS(svgNS, 'rect');
+        bar.setAttribute('x', leafX);
+        bar.setAttribute('y', leafY);
+        bar.setAttribute('width', '3');
+        bar.setAttribute('height', LEAF_H);
+        bar.setAttribute('rx', '2');
+        bar.setAttribute('fill', col.dot);
+        g.appendChild(bar);
+
+        // Titolo foglia
+        const title = a.genTitle || a.sourceTitle || '';
+        const words = title.split(' ');
+        let line1 = '', line2 = '';
+        words.forEach(w => {
+          if((line1 + ' ' + w).trim().length <= 32) line1 = (line1 + ' ' + w).trim();
+          else if((line2 + ' ' + w).trim().length <= 32) line2 = (line2 + ' ' + w).trim();
+        });
+
+        const t1 = document.createElementNS(svgNS, 'text');
+        t1.setAttribute('x', leafX + 12);
+        t1.setAttribute('y', leafY + 19);
+        t1.setAttribute('font-family', 'Playfair Display, Georgia, serif');
+        t1.setAttribute('font-size', '12');
+        t1.setAttribute('font-weight', '600');
+        t1.setAttribute('fill', col.text);
+        t1.textContent = line1;
+        g.appendChild(t1);
+
+        if(line2){
+          const t2 = document.createElementNS(svgNS, 'text');
+          t2.setAttribute('x', leafX + 12);
+          t2.setAttribute('y', leafY + 33);
+          t2.setAttribute('font-family', 'Playfair Display, Georgia, serif');
+          t2.setAttribute('font-size', '12');
+          t2.setAttribute('font-weight', '600');
+          t2.setAttribute('fill', col.text);
+          t2.textContent = line2;
+          g.appendChild(t2);
+        }
+
+        // Metadati
+        const meta = document.createElementNS(svgNS, 'text');
+        meta.setAttribute('x', leafX + 12);
+        meta.setAttribute('y', leafY + LEAF_H - 8);
+        meta.setAttribute('font-family', 'Inter, sans-serif');
+        meta.setAttribute('font-size', '9');
+        meta.setAttribute('fill', '#9ca3af');
+        meta.textContent = (a.sourceName||'') + ' · ' + rel(a.publishedAt) + (a.isForecast ? ' · ⚡' : '');
+        g.appendChild(meta);
+
+        g.onclick = () => openArticle(a);
+        svg.appendChild(g);
+      });
+
+      y += branchH + 28;
     });
-  },50);
-  container._anim=anim;
+  });
+
+  svg.appendChild(defs);
+  wrap.innerHTML = '';
+  wrap.appendChild(svg);
 }
 
 // ── GRID ───────────────────────────────────────────────────────
