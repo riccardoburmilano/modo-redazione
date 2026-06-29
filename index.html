@@ -17,7 +17,7 @@
   --g:'Inter',sans-serif;--serif:'Playfair Display',Georgia,serif;
 }
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--g);font-size:14px}
-.app{display:grid;grid-template-columns:220px 1fr 300px;grid-template-rows:48px 1fr;height:100vh;overflow:hidden}
+.app{display:grid;grid-template-columns:200px 1fr 400px;grid-template-rows:48px 1fr;height:100vh;overflow:hidden}
 
 /* TOPBAR */
 .topbar{grid-column:1/-1;background:#fff;border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 18px;gap:16px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
@@ -179,6 +179,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--g
         <button class="btn-fetch" id="btn-fetch" onclick="fetchNews()">↓ Aggiorna notizie</button>
         <button class="btn-sec" id="btn-auto" onclick="toggleAuto()">◯ Auto H24 (ogni 2 min)</button>
         <button class="btn-reset" onclick="resetNews()">✕ Reset notizie</button>
+        <button class="btn-reset" onclick="resetAI()" style="margin-top:4px;border-color:var(--purple);color:var(--purple);">✕ Reset AI + chat</button>
       </div>
       <div>
         <div class="ls-title">Sessione</div>
@@ -214,16 +215,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--g
           Genera con AI
         </button>
         <div class="ed-toolbar-right">
-          <button class="ic-btn purple" id="ic-prev" title="Previsione" onclick="toggleFlag('forecast')">
-            <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          </button>
-          <button class="ic-btn blue" id="ic-ads" title="Ads" onclick="toggleFlag('ads')">
-            <svg viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
-          </button>
-          <button class="ic-btn" id="ic-wiki" title="Wiki keyword" onclick="addWiki()">
-            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          </button>
-          <button class="ic-btn" title="Apri originale" onclick="openOrig()">
+          <button class="ic-btn" title="Apri articolo originale" onclick="openOrig()">
             <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
           </button>
         </div>
@@ -372,6 +364,13 @@ function toggleAuto(){
   else{autoInt=setInterval(fetchNews,120000);b.textContent='● Stop auto';b.classList.add('on');log('Auto-fetch ogni 2 min attivo','ok');fetchNews()}
 }
 
+function resetAI(){
+  localStorage.removeItem('modo_groq_key');
+  const c=document.getElementById('chat-msgs');
+  c.innerHTML='<div class="chat-msg ai"><div class="bubble">Chat resettata. Premi "Genera con AI" per inserire la nuova chiave Groq.</div><div class="chat-time">MODO Redazione</div></div>';
+  log('Chiave AI e chat resettate','info');
+}
+
 function resetNews(){
   if(!confirm('Cancellare tutte le notizie?'))return;
   articles=[];stats={f:0,g:0,a:0,p:0};art=null;
@@ -441,10 +440,6 @@ function updateBadges(){
 }
 function updateIcons(){
   if(!art)return;
-  document.getElementById('ic-prev').classList.toggle('on',!!art.isForecast);
-  document.getElementById('ic-prev').classList.toggle('purple',!!art.isForecast);
-  document.getElementById('ic-ads').classList.toggle('on',!!art.hasAds);
-  document.getElementById('ic-ads').classList.toggle('blue',!!art.hasAds);
   document.getElementById('btn-prev').classList.toggle('on',!!art.isForecast);
   document.getElementById('btn-ads').classList.toggle('on',!!art.hasAds);
 }
@@ -478,12 +473,41 @@ function saveArt(){
   save();renderFeed();
   log('Salvato: '+art.genTitle.slice(0,40)+'...','ok');
 }
-function publishArt(){
+async function publishArt(){
   if(!art)return;
   saveArt();
   if(!art.genBody){alert('Genera o scrivi il corpo prima di pubblicare');return}
+
+  // Salva sul backend BUR come articolo pubblicato
+  try{
+    const r=await fetch(BUR+'/api/v2/modo/publish',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        id:art.id,
+        titolo:art.genTitle,
+        sommario:art.genSommario,
+        corpo:art.genBody,
+        categoria:art.catLabel,
+        fonte:art.sourceName,
+        sourceUrl:art.sourceUrl,
+        img:art.img,
+        isForecast:art.isForecast,
+        hasAds:art.hasAds,
+        adsKws:art.adsKws||[],
+        wikiKws:art.wikiKws||[],
+        publishedAt:new Date().toISOString()
+      })
+    });
+    const d=await r.json();
+    if(d.ok){log('✓ Pubblicato sul feed MODO: '+art.genTitle.slice(0,40)+'...','ok')}
+    else{log('Backend non disponibile — salvato solo in locale','info')}
+  }catch(e){
+    log('Backend offline — salvato in locale','info');
+  }
+
   art.status='approved';stats.a++;upStats();renderFeed();
-  log('✓ Pubblicato: '+art.genTitle.slice(0,40)+'...','ok');
+  log('✓ Pubblicato: '+(art.genTitle||'').slice(0,40)+'...','ok');
   showFeed();
 }
 
