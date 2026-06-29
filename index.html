@@ -343,7 +343,7 @@ async function publishArt(){if(!art)return;saveArt();
     const today=new Date().toISOString().slice(0,10);
     scheduleArt(art.id,today+'T'+schedTime);
     showFeed();return;
-  }if(!art.genBody){alert('Genera o scrivi il corpo prima di pubblicare');return;}try{const r=await fetch(BUR+'/api/v2/modo/publish',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:String(art.id),titolo:art.genTitle,sommario:art.genSommario,corpo:art.genBody,categoria:art.catLabel,fonte:art.sourceName,sourceUrl:art.sourceUrl,img:art.img,isForecast:art.isForecast,hasAds:art.hasAds,adsKws:art.adsKws||[],wikiKws:art.wikiKws||[],publishedAt:new Date().toISOString()})});const d=await r.json();if(d.ok)log('✓ Pubblicato sul feed MODO','ok');else log('Salvato in locale','info');}catch(e){log('Salvato in locale','info');}art.status='approved';stats.a++;upStats();renderFeed();showFeed();}
+  }if(!art.genBody){alert('Genera o scrivi il corpo prima di pubblicare');return;}try{const r=await fetch(BUR+'/api/v2/modo/publish',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:String(art.id||Date.now()),titolo:art.genTitle||art.sourceTitle||'Senza titolo',sommario:art.genSommario||'',corpo:art.genBody||'',categoria:art.catLabel||'Mondo',fonte:art.sourceName||'MODO',sourceUrl:art.sourceUrl||'',img:art.img||null,isForecast:!!art.isForecast,publishedAt:new Date().toISOString()})});const d=await r.json();if(d.ok)log('✓ Pubblicato sul feed MODO','ok');else log('Salvato in locale','info');}catch(e){log('Salvato in locale','info');}art.status='approved';stats.a++;upStats();renderFeed();showFeed();}
 async function generateCurrent(){
   if(!art)return;
   const btn=document.getElementById('btn-gen');
