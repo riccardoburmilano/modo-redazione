@@ -506,7 +506,7 @@ async function generateCurrent(){
   setStatus('spin','AI in elaborazione...');
   log('Generando: '+art.sourceTitle.slice(0,40)+'...','info');
 
-  const prompt='Sei un giornalista italiano professionista. Rielabora questa notizia come articolo originale per MODO.\n\nFONTE: '+art.sourceName+'\nTITOLO: '+art.sourceTitle+'\nTESTO: '+(art.sourceDesc||'Non disponibile')+'\n\nRispondi SOLO con JSON valido:\n{"titolo":"titolo italiano professionale max 90 caratteri","sommario":"occhiello accattivante max 130 caratteri","corpo":"articolo completo 250-350 parole in italiano, paragrafi separati con \\n\\n, cita fonte alla fine","is_previsione":false,"parole_chiave_ads":[],"parole_chiave_wiki":[]}';
+  const aiPrompt='Sei un giornalista italiano professionista. Rielabora questa notizia come articolo originale per MODO.\n\nFONTE: '+art.sourceName+'\nTITOLO: '+art.sourceTitle+'\nTESTO: '+(art.sourceDesc||'Non disponibile')+'\n\nRispondi SOLO con JSON valido:\n{"titolo":"titolo italiano professionale max 90 caratteri","sommario":"occhiello accattivante max 130 caratteri","corpo":"articolo completo 250-350 parole in italiano, paragrafi separati con \\n\\n, cita fonte alla fine","is_previsione":false,"parole_chiave_ads":[],"parole_chiave_wiki":[]}';
 
   try{
     const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
@@ -518,7 +518,7 @@ async function generateCurrent(){
         temperature:0.35,
         messages:[
           {role:'system',content:'Rispondi SEMPRE e SOLO con JSON valido. Zero testo extra prima o dopo il JSON.'},
-          {role:'user',content:prompt}
+          {role:'user',content:aiPrompt}
         ]
       })
     });
