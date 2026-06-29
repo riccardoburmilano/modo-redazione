@@ -145,7 +145,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--g
     <div class="tb-logo">MODO <em>·</em> Redazione</div>
     <div class="tb-sep"></div>
     <div class="tb-label">Gestionale editoriale</div>
-    <div class="tb-right">
+    <div class="tb-right"><button onclick="toggleCestino()" id="btn-cestino" style="font-size:11px;padding:4px 10px;background:none;border:1px solid var(--b1);color:var(--t3);cursor:pointer;">🗑 Cestino (<span id="cestino-count">0</span>)</button><div class="tb-status" id="token-bar" style="display:none"><span id="token-txt" style="font-size:11px;color:var(--t3);">Token: —</span></div>
       <div class="tb-status"><span class="tb-dot" id="dot"></span><span id="dot-txt">In attesa</span></div>
     </div>
   </header>
@@ -232,7 +232,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--g
       <div class="ed-bottom">
         <button class="ed-menu-btn" id="btn-prev" onclick="toggleFlag('forecast')">⚡ Previsione</button>
         
-        <button class="ed-menu-btn" onclick="addWiki()">🔍 Wiki</button>
+        <button class="ed-menu-btn" onclick="addWiki()">🔍 Wiki</button><button class="ed-menu-btn" onclick="scartaArt()" style="border-color:var(--red);color:var(--red);">✕ Scarta</button>
         <button class="ed-menu-btn" onclick="setCtx()">💬 Chiedi AI</button>
         <button class="ed-save" onclick="saveArt()">Salva</button>
         <button class="ed-publish" onclick="publishArt()">✓ Pubblica</button>
@@ -273,11 +273,11 @@ console.log("MODO JS loaded v2026-06-29T11:21");
 
 const BUR = 'https://god-core-backend.onrender.com';
 const CATS = [{id:'business',l:'Finanza'},{id:'technology',l:'Tech'},{id:'sports',l:'Sport'},{id:'world',l:'Mondo'},{id:'energy',l:'Energia'},{id:'science',l:'Scienza'},{id:'health',l:'Salute'},{id:'politics',l:'Politica'}];
-let articles=[],art=null,autoInt=null,ctxArt=null;
+let articles=[],cestino=[],art=null,autoInt=null,ctxArt=null;
 let stats={f:0,g:0,a:0,p:0};
 let cats=new Set(['business','technology','sports','world','energy']);
-function save(){try{localStorage.setItem('modo_v3',JSON.stringify({articles:articles.slice(0,200),stats,cats:[...cats]}))}catch(e){}}
-function load(){try{const d=JSON.parse(localStorage.getItem('modo_v3')||'{}');if(d.articles&&d.articles.length){articles=d.articles;log('Ripristinati '+articles.length+' articoli','ok')}if(d.stats)stats=d.stats;if(d.cats)cats=new Set(d.cats);upStats();}catch(e){}}
+function save(){try{localStorage.setItem('modo_v3',JSON.stringify({articles:articles.slice(0,200),cestino:cestino.slice(0,50),stats,cats:[...cats]}))}catch(e){}}
+function load(){try{const d=JSON.parse(localStorage.getItem('modo_v3')||'{}');if(d.articles&&d.articles.length){articles=d.articles;log('Ripristinati '+articles.length+' articoli','ok')}if(d.cestino)cestino=d.cestino;if(d.stats)stats=d.stats;if(d.cats)cats=new Set(d.cats);upStats();}catch(e){}}
 function setStatus(s,t){document.getElementById('dot').className='tb-dot'+(s?' '+s:'');document.getElementById('dot-txt').textContent=t}
 function log(m,t){const b=document.getElementById('log');const d=document.createElement('div');const h=new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',second:'2-digit'});d.className=t==='ok'?'lok':t==='err'?'lerr':t==='info'?'linf':'';d.textContent='['+h+'] '+m;b.appendChild(d);b.scrollTop=b.scrollHeight;}
 function upStats(){document.getElementById('st-f').textContent=stats.f;document.getElementById('st-g').textContent=stats.g;document.getElementById('st-a').textContent=stats.a;document.getElementById('st-p').textContent=stats.p;save();}
@@ -285,7 +285,10 @@ function rel(iso){const m=Math.round((Date.now()-new Date(iso))/60000);if(m<1)re
 function today(iso){return Date.now()-new Date(iso)<86400000}
 function renderCats(){document.getElementById('cat-grid').innerHTML=CATS.map(c=>'<button class="cat-btn'+(cats.has(c.id)?' on':'')+'" onclick="toggleCat('+"'"+c.id+"'"+')">'+c.l+'</button>').join('');}
 function toggleCat(id){cats.has(id)?cats.delete(id):cats.add(id);renderCats();save()}
-async function fetchNews(){const btn=document.getElementById('btn-fetch');btn.disabled=true;btn.textContent='Aggiornando...';setStatus('spin','Connessione...');log('Fetch notizie...','info');try{const r=await fetch(BUR+'/api/v2/modo/news?limit=30');const d=await r.json();if(!d.ok)throw new Error(d.error||'Errore');let n=0;(d.articles||[]).forEach(a=>{if(articles.find(x=>x.sourceTitle===a.sourceTitle))return;articles.unshift({id:Date.now()+Math.random(),catLabel:a.cat,sourceTitle:a.sourceTitle,sourceDesc:a.sourceDesc||'',sourceUrl:a.sourceUrl,sourceName:a.sourceName,img:a.img,publishedAt:a.publishedAt,status:'pending',genTitle:null,genBody:null,genSommario:null,isForecast:a.isForecast||false,hasAds:false,wikiKws:[],adsKws:[]});n++;});stats.f+=n;upStats();renderFeed();setStatus('ok',d.count+' notizie');log(n+' nuove notizie','ok');}catch(e){log('Errore: '+e.message,'err');setStatus('','Errore');}btn.disabled=false;btn.textContent='↓ Aggiorna notizie';}
+async function fetchNews(){const btn=document.getElementById('btn-fetch');btn.disabled=true;btn.textContent='Aggiornando...';setStatus('spin','Connessione...');log('Fetch notizie...','info');try{const r=await fetch(BUR+'/api/v2/modo/news?limit=30');const d=await r.json();if(!d.ok)throw new Error(d.error||'Errore');let n=0;(d.articles||[]).forEach(a=>{if(articles.find(x=>x.sourceTitle===a.sourceTitle))return;// Dedup fuzzy — salta se titolo simile già presente
+      const tNorm=a.sourceTitle.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,40);
+      if(articles.find(x=>{const xn=(x.sourceTitle||'').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,40);let match=0;for(let i=0;i<Math.min(tNorm.length,xn.length);i++)if(tNorm[i]===xn[i])match++;return match/Math.max(tNorm.length,xn.length)>0.7;}))return;
+      articles.unshift({id:Date.now()+Math.random(),catLabel:a.cat,sourceTitle:a.sourceTitle,sourceDesc:a.sourceDesc||'',sourceUrl:a.sourceUrl,sourceName:a.sourceName,img:a.img,publishedAt:a.publishedAt,status:'pending',genTitle:null,genBody:null,genSommario:null,isForecast:a.isForecast||false,hasAds:false,wikiKws:[],adsKws:[]});n++;});stats.f+=n;upStats();renderFeed();setStatus('ok',d.count+' notizie');log(n+' nuove notizie','ok');}catch(e){log('Errore: '+e.message,'err');setStatus('','Errore');}btn.disabled=false;btn.textContent='↓ Aggiorna notizie';}
 function toggleAuto(){const b=document.getElementById('btn-auto');if(autoInt){clearInterval(autoInt);autoInt=null;b.textContent='◯ Auto H24 (ogni 2 min)';b.classList.remove('on');}else{autoInt=setInterval(autoFetch,120000);b.textContent='● Stop auto';b.classList.add('on');fetchNews();}}
 function resetNews(){if(!confirm('Cancellare tutte le notizie?'))return;articles=[];stats={f:0,g:0,a:0,p:0};art=null;localStorage.removeItem('modo_v3');upStats();showFeed();renderFeed();log('Feed resettato','info');}
 function resetAI(){localStorage.removeItem('modo_groq_key');const c=document.getElementById('chat-msgs');c.innerHTML='<div class="chat-msg ai"><div class="bubble">Chat resettata.</div><div class="chat-time">MODO Redazione</div></div>';log('Chiave AI resettata','info');}
@@ -344,7 +347,7 @@ async function generateCurrent(){
     document.getElementById('ed-corpo').value=art.genBody;
     updateBadges();updateIcons();renderFeed();
     setStatus('ok','Generato ('+txt.split(' ').length+' parole)');
-    log('Generato: '+txt.split(' ').length+' parole','ok');
+    log('Generato: '+txt.split(' ').length+' parole','ok');checkTokens();
   }catch(e){art.status='pending';renderFeed();log('Errore AI: '+e.message,'err');setStatus('','Errore AI');}
   btn.disabled=false;btn.textContent='Genera con AI';
 }
@@ -370,8 +373,78 @@ async function autoFetch(){
   }catch(e){}
 }
 
+async function checkTokens(){
+  const groqKey=localStorage.getItem('modo_groq_key');
+  if(!groqKey)return;
+  try{
+    // Groq non ha endpoint utilizzo pubblico — lo calcoliamo dai response headers
+    // Usiamo una chiamata minimale per leggere x-ratelimit-remaining-tokens
+    const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},
+      body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:1,messages:[{role:'user',content:'hi'}]})
+    });
+    const remaining=parseInt(r.headers.get('x-ratelimit-remaining-tokens-day')||'0');
+    const limit=parseInt(r.headers.get('x-ratelimit-limit-tokens-day')||'100000');
+    const used=limit-remaining;
+    const pct=Math.round(used/limit*100);
+    const bar=document.getElementById('token-bar');
+    const txt=document.getElementById('token-txt');
+    if(bar&&txt){
+      bar.style.display='flex';
+      const color=pct>85?'var(--red)':pct>60?'var(--gold)':'var(--green)';
+      txt.innerHTML='Token oggi: <b style="color:'+color+'">'+remaining.toLocaleString('it-IT')+'</b> rimasti / '+limit.toLocaleString('it-IT');
+    }
+  }catch(e){}
+}
+
+function scartaArt(){
+  if(!art)return;
+  art.status='rejected';
+  cestino.push(art);
+  document.getElementById('cestino-count').textContent=cestino.length;
+  save();renderFeed();showFeed();
+  log('Scartato: '+(art.genTitle||art.sourceTitle).slice(0,40),'info');
+}
+
+let cestinoOpen=false;
+function toggleCestino(){
+  cestinoOpen=!cestinoOpen;
+  let panel=document.getElementById('cestino-panel');
+  if(!panel){
+    panel=document.createElement('div');
+    panel.id='cestino-panel';
+    panel.style.cssText='position:fixed;top:48px;right:0;width:380px;height:calc(100vh - 48px);background:#fff;border-left:1px solid var(--b1);z-index:500;overflow-y:auto;padding:16px;box-shadow:-4px 0 20px rgba(0,0,0,.08)';
+    document.body.appendChild(panel);
+  }
+  panel.style.display=cestinoOpen?'block':'none';
+  if(cestinoOpen)renderCestino();
+}
+
+function renderCestino(){
+  const p=document.getElementById('cestino-panel');
+  if(!p)return;
+  p.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px"><span style="font-family:var(--serif);font-size:16px;font-weight:700">Cestino</span><button onclick="toggleCestino()" style="background:none;border:none;font-size:18px;cursor:pointer;color:var(--t3)">×</button></div>'+
+    (cestino.length===0?'<div style="color:var(--t3);font-size:13px">Nessun articolo scartato</div>':
+    cestino.map((a,i)=>'<div style="border-bottom:1px solid var(--b1);padding:10px 0"><div style="font-size:13px;font-weight:600;margin-bottom:4px">'+(a.genTitle||a.sourceTitle)+'</div><div style="font-size:11px;color:var(--t3);margin-bottom:6px">'+a.sourceName+' · '+rel(a.publishedAt)+'</div><button onclick="ripristinaArt('+i+')" style="font-size:10px;padding:3px 8px;background:none;border:1px solid var(--green);color:var(--green);cursor:pointer;margin-right:4px">↩ Ripristina</button><button onclick="eliminaArt('+i+')" style="font-size:10px;padding:3px 8px;background:none;border:1px solid var(--red);color:var(--red);cursor:pointer">✕ Elimina</button></div>').join(''));
+}
+
+function ripristinaArt(i){
+  const a=cestino.splice(i,1)[0];
+  a.status='pending';
+  articles.unshift(a);
+  document.getElementById('cestino-count').textContent=cestino.length;
+  renderCestino();renderFeed();save();
+}
+
+function eliminaArt(i){
+  cestino.splice(i,1);
+  document.getElementById('cestino-count').textContent=cestino.length;
+  renderCestino();
+}
+
 load();renderCats();renderFeed();
-fetch(BUR+'/api/v2/health').then(function(){log('Backend BUR connesso','ok');}).catch(function(){log('Backend in avvio...','info');});
+fetch(BUR+'/api/v2/health').then(function(){log('Backend BUR connesso','ok');}).catch(function(){log('Backend in avvio...','info');});if(localStorage.getItem('modo_groq_key'))checkTokens();
 log('Gestionale pronto.'+(articles.length?' '+articles.length+' articoli in sessione.':''));
 </script>
 </body>
