@@ -329,7 +329,7 @@ async function generateCurrent(){
   btn.disabled=true;btn.textContent='Generando...';art.status='generating';renderFeed();setStatus('spin','Generazione...');
   let testo=art.sourceDesc||'';
   if(art.sourceUrl){
-    const proxies=['https://corsproxy.io/?','https://api.allorigins.win/raw?url='];
+    const proxies=['https://corsproxy.io/?','https://api.allorigins.win/raw?url=','https://api.codetabs.com/v1/proxy?quest=','https://thingproxy.freeboard.io/fetch/'];
     for(const p of proxies){
       try{
         const r=await fetch(p+encodeURIComponent(art.sourceUrl),{signal:AbortSignal.timeout(7000)});
@@ -338,8 +338,8 @@ async function generateCurrent(){
           const tmp=document.createElement('div');tmp.innerHTML=html;
           tmp.querySelectorAll('script,style,nav,footer,header,aside').forEach(e=>e.remove());
           const skip=['cookie','subscribe','newsletter','download','app store','follow us','bbc','reuters','bloomberg','sign up','click here','read more','all rights'];
-          const paras=Array.from(tmp.querySelectorAll('p')).map(p=>p.textContent.trim()).filter(t=>t.length>80&&!skip.some(s=>t.toLowerCase().includes(s)));
-          if(paras.length>=2){testo=paras.slice(0,10).join(' ');log('Scaricate '+testo.split(' ').length+' parole','ok');break;}
+          const paras=Array.from(tmp.querySelectorAll('p, article p, .article-body p, .story-body p, .content p')).map(p=>p.textContent.trim()).filter(t=>t.length>40&&!skip.some(s=>t.toLowerCase().includes(s)));
+          if(paras.length>=2){testo=paras.slice(0,15).join(' ');log('Scaricate '+testo.split(' ').length+' parole da '+p.split('/')[2],'ok');break;}
         }
       }catch(e){}
     }
@@ -351,7 +351,7 @@ async function generateCurrent(){
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},
       body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:2000,temperature:0.8,messages:[
-        {role:'system',content:'Sei un giornalista italiano. Scrivi in modo naturale e umano. Mai menzionare fonti esterne. Solo giornalismo.'},
+        {role:'system',content:'Sei un giornalista italiano serio. REGOLE ANTI-ERRORE: 1) Scrivi SOLO fatti presenti nel testo originale fornito 2) Non inventare mai età, date, nomi, cifre o luoghi che non sono nel testo 3) Se un dato non è nel testo, NON scriverlo 4) Se non hai abbastanza informazioni su un dettaglio, scrivi in modo generale 5) Mai menzionare fonti esterne 6) Tono naturale e umano'},
         {role:'user',content:prompt}
       ]})
     });
