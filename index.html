@@ -176,7 +176,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--g
         <div class="cat-grid" id="cat-grid"></div>
       </div>
       <div>
-        <button class="btn-fetch" id="btn-fetch" onclick="fetchNews()">↓ Aggiorna notizie</button>
+        <input id="search-input" type="text" placeholder="🔍 Cerca notizie..." style="width:100%;padding:8px 10px;border:1px solid var(--b1);background:#fff;font-size:12px;outline:none;margin-bottom:4px;font-family:var(--g)" oninput="filterFeed(this.value)">
+<button class="btn-fetch" id="btn-fetch" onclick="fetchNews()">↓ Aggiorna notizie</button>
         <button class="btn-sec" id="btn-auto" onclick="toggleAuto()">◯ Auto H24 (ogni 2 min)</button>
         <button class="btn-reset" onclick="resetNews()">✕ Reset notizie</button>
         <button class="btn-reset" onclick="resetAI()" style="margin-top:4px;border-color:var(--purple);color:var(--purple);">✕ Reset AI + chat</button>
@@ -210,7 +211,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--g
     <div class="editor" id="editor">
       <div class="ed-toolbar">
         <button class="ed-back" onclick="showFeed()">← Feed</button>
-        <button class="btn-generate" id="btn-gen" onclick="generateCurrent()">
+        <button onclick="creaPrevisione()" style="display:flex;align-items:center;gap:5px;padding:7px 12px;background:var(--purple);border:none;color:#fff;font-size:11px;font-weight:600;cursor:pointer;margin-right:4px" title="Crea rubrica Previsione MODO">
+    ⚡ Previsione
+  </button>
+  <button class="btn-generate" id="btn-gen" onclick="generateCurrent()">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
           Genera con AI
         </button>
@@ -285,7 +289,7 @@ function rel(iso){const m=Math.round((Date.now()-new Date(iso))/60000);if(m<1)re
 function today(iso){return Date.now()-new Date(iso)<86400000}
 function renderCats(){document.getElementById('cat-grid').innerHTML=CATS.map(c=>'<button class="cat-btn'+(cats.has(c.id)?' on':'')+'" onclick="toggleCat('+"'"+c.id+"'"+')">'+c.l+'</button>').join('');}
 function toggleCat(id){cats.has(id)?cats.delete(id):cats.add(id);renderCats();save()}
-async function fetchNews(){const btn=document.getElementById('btn-fetch');btn.disabled=true;btn.textContent='Aggiornando...';setStatus('spin','Connessione...');log('Fetch notizie...','info');try{const r=await fetch(BUR+'/api/v2/modo/news?limit=30');const d=await r.json();if(!d.ok)throw new Error(d.error||'Errore');let n=0;(d.articles||[]).forEach(a=>{// Filtra per categorie attive
+async function fetchNews(){const btn=document.getElementById('btn-fetch');btn.disabled=true;btn.textContent='Aggiornando...';setStatus('spin','Connessione...');log('Fetch notizie...','info');try{const r=await fetch(BUR+'/api/v2/modo/news?limit=50&lang=it');const d=await r.json();if(!d.ok)throw new Error(d.error||'Errore');let n=0;(d.articles||[]).forEach(a=>{// Filtra per categorie attive
       const catMap={'Finanza':'business','Tech':'technology','Sport':'sports','Mondo':'world','Energia':'energy','Scienza':'science','Salute':'health','Politica':'politics','Italia':'world'};
       const catId=catMap[a.cat]||'world';
       if(cats.size>0&&!cats.has(catId))return;
@@ -366,7 +370,7 @@ async function generateCurrent(){
   btn.disabled=false;btn.textContent='Genera con AI';
 }
 
-function addMsg(role,text){const c=document.getElementById('chat-msgs');const t=new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});const div=document.createElement('div');div.className='chat-msg '+role;div.innerHTML='<div class="bubble">'+text+'</div><div class="chat-time">'+(role==='user'?'Matteo':'MODO AI')+' · '+t+'</div>';c.appendChild(div);c.scrollTop=c.scrollHeight;return div;}
+function addMsg(role,text){const c=document.getElementById('chat-msgs');const t=new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});const div=document.createElement('div');div.className='chat-msg '+role;const copyBtn=role==='ai'?'<button onclick="navigator.clipboard.writeText(this.parentElement.querySelector(\'.bubble\').textContent)" style="float:right;background:none;border:none;cursor:pointer;font-size:10px;color:var(--t3);padding:2px 4px" title="Copia">⎘</button>':'';div.innerHTML='<div class="bubble">'+copyBtn+text+'</div><div class="chat-time">'+(role==='user'?'Matteo':'MODO AI')+' · '+t+'</div>';c.appendChild(div);c.scrollTop=c.scrollHeight;return div;}
 async function sendChat(){const ta=document.getElementById('chat-ta');const msg=ta.value.trim();if(!msg)return;const btn=document.getElementById('chat-send');btn.disabled=true;addMsg('user',msg);ta.value='';const typing=addMsg('ai','...');const groqKey=localStorage.getItem('modo_groq_key');if(!groqKey){typing.querySelector('.bubble').textContent='Configura prima la chiave AI premendo Genera con AI.';btn.disabled=false;return;}const ctx=ctxArt?('Titolo: '+(ctxArt.genTitle||ctxArt.sourceTitle)+'\n'+(ctxArt.genBody||ctxArt.sourceDesc).slice(0,400)):'';try{const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:600,temperature:0.3,messages:[{role:'system',content:'Sei l assistente editoriale di MODO, giornale italiano. Rispondi in italiano, professionale e diretto.'+(ctx?' Contesto: '+ctx:'')},{role:'user',content:msg}]})});const d=await r.json();if(d.error)throw new Error(d.error.message);const reply=(d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||'';typing.querySelector('.bubble').innerHTML=reply.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');}catch(e){typing.querySelector('.bubble').textContent='Errore: '+e.message;}btn.disabled=false;document.getElementById('chat-msgs').scrollTop=99999;}
 function qc(m){document.getElementById('chat-ta').value=m;sendChat();}
 function ckd(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}}
@@ -412,6 +416,50 @@ async function checkTokens(){
   }catch(e){}
 }
 
+async function creaPrevisione(){
+  if(!art)return;
+  const groqKey=localStorage.getItem('modo_groq_key');
+  if(!groqKey){alert('Configura prima la chiave AI');return;}
+  const tema=window.prompt('Su cosa vuoi fare la previsione?\nEs: Inter stagione prossima, mercato petrolio, elezioni USA, GP Monaco...\n\n(lascia vuoto per usare la notizia corrente)');
+  if(tema===null)return;
+  const argomento=tema.trim()||art.genTitle||art.sourceTitle;
+  const btn=document.querySelector('[onclick="creaPrevisione()"]');
+  if(btn){btn.textContent='Generando...';btn.disabled=true;}
+  log('Creando previsione su: '+argomento,'info');
+  try{
+    const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},
+      body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:1500,temperature:0.7,messages:[
+        {role:'system',content:'Sei un analista editoriale di MODO, giornale italiano. Scrivi rubriche di previsione serie e argomentate. Stile Gazzetta dello Sport per lo sport, Sole 24 Ore per finanza/economia. Usa dati reali che conosci.'},
+        {role:'user',content:'Scrivi una rubrica PREVISIONE MODO su: '+argomento+'. Struttura: 1) Titolo previsione (accattivante, inizia con "MODO prevede:" o "La nostra scommessa:") 2) Scenario principale con % di probabilità 3) Motivazioni (2-3 paragrafi) 4) Scenario alternativo 5) Verdetto finale in una frase. Minimo 400 parole, tono autorevole ma accessibile.'}
+      ]})
+    });
+    const d=await r.json();
+    if(d.error)throw new Error(d.error.message);
+    const txt=(d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||'';
+    // Crea nuovo articolo previsione
+    const newArt={
+      id:Date.now()+Math.random(),
+      catLabel:'Previsioni',
+      sourceTitle:'Previsione MODO: '+argomento,
+      sourceDesc:'',sourceUrl:'',sourceName:'MODO Redazione',
+      img:null,publishedAt:new Date().toISOString(),
+      status:'pending',
+      genTitle:'MODO Prevede: '+argomento,
+      genBody:txt.trim(),
+      genSommario:'La nostra analisi e previsione su '+argomento,
+      isForecast:true,hasAds:false,wikiKws:[],adsKws:[],
+      priority:4,note:'Rubrica Previsioni MODO'
+    };
+    articles.unshift(newArt);
+    save();renderFeed();
+    openEditor(newArt.id);
+    log('Previsione creata: '+argomento,'ok');
+  }catch(e){log('Errore: '+e.message,'err');}
+  if(btn){btn.textContent='⚡ Previsione';btn.disabled=false;}
+}
+
 async function suggerisciTitoli(){
   if(!art)return;
   const groqKey=localStorage.getItem('modo_groq_key');
@@ -432,6 +480,23 @@ async function suggerisciTitoli(){
       log('Titolo aggiornato','ok');
     }
   }catch(e){log('Errore: '+e.message,'err');}
+}
+
+function filterFeed(q){
+  const query=q.toLowerCase().trim();
+  if(!query){renderFeed();return;}
+  const filtered=articles.filter(a=>{
+    const text=((a.genTitle||a.sourceTitle)+' '+(a.genBody||a.sourceDesc)+' '+a.catLabel).toLowerCase();
+    return query.split(' ').every(w=>text.includes(w));
+  });
+  const list=document.getElementById('feed-list');
+  const empty=document.getElementById('empty');
+  if(!filtered.length){empty.style.display='flex';list.innerHTML='';return;}
+  empty.style.display='none';
+  list.innerHTML=filtered.map(a=>{
+    const t=a.genTitle||a.sourceTitle;
+    return '<div class="card '+a.status+'" id="c'+a.id+'" onclick="openEditor('+a.id+')"><div class="card-inner"><div class="card-cat">'+a.catLabel+'</div><div><div class="card-title">'+t+'</div><div class="card-meta"><span class="card-src">'+a.sourceName+'</span><span class="card-ago">'+rel(a.publishedAt)+'</span></div></div><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="var(--t4)" stroke-width="1.5"><path d="M4 2l4 4-4 4"/></svg></div></div>';
+  }).join('');
 }
 
 function scartaArt(){
