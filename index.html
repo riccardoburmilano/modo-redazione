@@ -600,9 +600,10 @@ async function generateCurrent(){
     renderFeed();
     log('Errore AI: '+e.message,'err');
     setStatus('','Errore AI');
+    alert('Errore AI: '+e.message);
   }
   btn.style.opacity='1';
-  btn.title='Genera con AI';
+  btn.innerHTML='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> Genera con AI';
 }
 
 // ── CHAT ──────────────────────────────────────────────────────
@@ -623,12 +624,36 @@ async function sendChat(){
   const btn=document.getElementById('chat-send');
   btn.disabled=true;addMsg('user',msg);ta.value='';
   const typing=addMsg('ai','...');
-  const ctx=ctxArt?`Titolo: ${ctxArt.genTitle||ctxArt.sourceTitle}\nCorpo: ${ctxArt.genBody||ctxArt.sourceDesc}`:null;
+  const ctx=ctxArt?`Titolo: ${ctxArt.genTitle||ctxArt.sourceTitle}\nCorpo: ${ctxArt.genBody||ctxArt.sourceDesc}`:'';
+
+  const groqKey=localStorage.getItem('modo_groq_key');
+  if(!groqKey){
+    typing.querySelector('.bubble').textContent='Inserisci prima la Groq API key premendo "Genera con AI".';
+    btn.disabled=false;return;
+  }
+
   try{
-    const r=await fetch(`${BUR}/api/v2/modo/chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg,context:ctx})});
+    const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},
+      body:JSON.stringify({
+        model:'llama-3.3-70b-versatile',
+        max_tokens:600,
+        temperature:0.3,
+        messages:[
+          {role:'system',content:'Sei l'assistente editoriale di MODO, giornale italiano AI-native. Rispondi in italiano, diretto e professionale.'+(ctx?' Contesto articolo: '+ctx:'')},
+          {role:'user',content:msg}
+        ],
+      }),
+    });
     const d=await r.json();
-    typing.querySelector('.bubble').innerHTML=(d.reply||'Errore').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
-  }catch(e){typing.querySelector('.bubble').textContent='Errore connessione backend.';}
+    if(d.error)throw new Error(d.error.message);
+    const reply=d.choices?.[0]?.message?.content||'';
+    typing.querySelector('.bubble').innerHTML=reply.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/
+/g,'<br>');
+  }catch(e){
+    typing.querySelector('.bubble').textContent='Errore: '+e.message;
+  }
   btn.disabled=false;
   document.getElementById('chat-msgs').scrollTop=99999;
 }
