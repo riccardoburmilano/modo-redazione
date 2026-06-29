@@ -227,14 +227,14 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--g
         </div>
         <input class="ed-title" id="ed-title" type="text" placeholder="Titolo articolo...">
         <textarea class="ed-sommario" id="ed-sommario" rows="2" placeholder="Sommario / occhiello..."></textarea>
-        <textarea class="ed-corpo" id="ed-corpo" placeholder="Premi 'Genera con AI' per creare l'articolo, oppure scrivi manualmente..."></textarea>
+        <textarea id="ed-note" placeholder="📝 Note redazionali (interno, non pubblica)..." style="width:100%;border:none;outline:none;background:rgba(240,165,0,.06);color:var(--t2);font-size:12px;padding:8px 12px;resize:none;min-height:36px;font-family:var(--g);border-left:3px solid var(--gold-l);margin-bottom:10px;font-style:italic" oninput="if(art)art.note=this.value"></textarea><textarea class="ed-corpo" id="ed-corpo" placeholder="Premi 'Genera con AI' per creare l'articolo, oppure scrivi manualmente..."></textarea>
       </div>
       <div class="ed-bottom">
         <button class="ed-menu-btn" id="btn-prev" onclick="toggleFlag('forecast')">⚡ Previsione</button>
         
         <button class="ed-menu-btn" onclick="addWiki()">🔍 Wiki</button><button class="ed-menu-btn" onclick="scartaArt()" style="border-color:var(--red);color:var(--red);">✕ Scarta</button>
-        <button class="ed-menu-btn" onclick="setCtx()">💬 Chiedi AI</button>
-        <button class="ed-save" onclick="saveArt()">Salva</button>
+        <button class="ed-menu-btn" onclick="suggerisciTitoli()">✎ 3 Titoli</button><button class="ed-menu-btn" onclick="setCtx()">💬 Chiedi AI</button>
+        <input type="time" id="schedule-time" style="font-size:11px;padding:6px;border:1px solid var(--b1);background:#fff;color:var(--t2);margin-left:auto" title="Pubblica alle..."><button class="ed-save" onclick="saveArt()">Salva</button>
         <button class="ed-publish" onclick="publishArt()">✓ Pubblica</button>
       </div>
     </div>
@@ -292,13 +292,17 @@ async function fetchNews(){const btn=document.getElementById('btn-fetch');btn.di
       if(articles.find(x=>x.sourceTitle===a.sourceTitle))return;// Dedup fuzzy — salta se titolo simile già presente
       const tNorm=a.sourceTitle.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,40);
       if(articles.find(x=>{const xn=(x.sourceTitle||'').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,40);let match=0;for(let i=0;i<Math.min(tNorm.length,xn.length);i++)if(tNorm[i]===xn[i])match++;return match/Math.max(tNorm.length,xn.length)>0.7;}))return;
-      articles.unshift({id:Date.now()+Math.random(),catLabel:a.cat,sourceTitle:a.sourceTitle,sourceDesc:a.sourceDesc||'',sourceUrl:a.sourceUrl,sourceName:a.sourceName,img:a.img,publishedAt:a.publishedAt,status:'pending',genTitle:null,genBody:null,genSommario:null,isForecast:a.isForecast||false,hasAds:false,wikiKws:[],adsKws:[]});n++;});stats.f+=n;upStats();renderFeed();setStatus('ok',d.count+' notizie');log(n+' nuove notizie','ok');}catch(e){log('Errore: '+e.message,'err');setStatus('','Errore');}btn.disabled=false;btn.textContent='↓ Aggiorna notizie';}
+      const prio=calcPriority(a.sourceTitle,a.cat);
+      articles.unshift({id:Date.now()+Math.random(),priority:prio,catLabel:a.cat,sourceTitle:a.sourceTitle,sourceDesc:a.sourceDesc||'',sourceUrl:a.sourceUrl,sourceName:a.sourceName,img:a.img,publishedAt:a.publishedAt,status:'pending',genTitle:null,genBody:null,genSommario:null,isForecast:a.isForecast||false,hasAds:false,wikiKws:[],adsKws:[]});n++;});stats.f+=n;upStats();renderFeed();setStatus('ok',d.count+' notizie');log(n+' nuove notizie','ok');}catch(e){log('Errore: '+e.message,'err');setStatus('','Errore');}btn.disabled=false;btn.textContent='↓ Aggiorna notizie';}
 function toggleAuto(){const b=document.getElementById('btn-auto');if(autoInt){clearInterval(autoInt);autoInt=null;b.textContent='◯ Auto H24 (ogni 2 min)';b.classList.remove('on');}else{autoInt=setInterval(autoFetch,120000);b.textContent='● Stop auto';b.classList.add('on');fetchNews();}}
 function resetNews(){if(!confirm('Cancellare tutte le notizie?'))return;articles=[];stats={f:0,g:0,a:0,p:0};art=null;localStorage.removeItem('modo_v3');upStats();showFeed();renderFeed();log('Feed resettato','info');}
 function resetAI(){localStorage.removeItem('modo_groq_key');const c=document.getElementById('chat-msgs');c.innerHTML='<div class="chat-msg ai"><div class="bubble">Chat resettata.</div><div class="chat-time">MODO Redazione</div></div>';log('Chiave AI resettata','info');}
 function showFeed(){document.getElementById('feed-view').style.display='block';document.getElementById('editor').classList.remove('show');art=null;}
-function renderFeed(){const list=document.getElementById('feed-list');const empty=document.getElementById('empty');if(!articles.length){empty.style.display='flex';list.innerHTML='';return;}empty.style.display='none';const sorted=[...articles].sort((a,b)=>new Date(b.publishedAt)-new Date(a.publishedAt));let html='',shownOld=false;sorted.forEach(function(a){if(!today(a.publishedAt)&&!shownOld){html+='<div class="day-sep">Ieri e precedenti</div>';shownOld=true;}const t=a.genTitle||a.sourceTitle;const isActive=art&&art.id===a.id;html+='<div class="card '+a.status+(isActive?' active':'')+' " id="c'+a.id+'" onclick="openEditor('+a.id+')"><div class="card-inner"><div class="card-cat">'+a.catLabel+'</div><div><div class="card-title">'+t+'</div><div class="card-meta"><span class="card-src">'+a.sourceName+'</span><span class="card-ago">'+rel(a.publishedAt)+'</span><span class="badge '+a.status+'">'+(a.status==='pending'?'Bozza':a.status==='generating'?'AI...':a.status==='approved'?'Pubblicato':'Scartato')+'</span>'+(a.isForecast?'<span class="badge forecast">⚡</span>':'')+(!a.genBody&&a.status!=='generating'?'<span style="color:var(--t4);font-size:10px"> · Da generare</span>':'')+'</div></div><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="var(--t4)" stroke-width="1.5"><path d="M4 2l4 4-4 4"/></svg></div></div>';});list.innerHTML=html;}
-function openEditor(id){const a=articles.find(x=>x.id===id);if(!a)return;art=a;ctxArt=a;document.getElementById('feed-view').style.display='none';document.getElementById('editor').classList.add('show');const sel=document.getElementById('ed-cat');sel.innerHTML=CATS.map(c=>'<option value="'+c.l+'"'+(a.catLabel===c.l?' selected':'')+'>'+c.l+'</option>').join('');document.getElementById('ed-title').value=a.genTitle||a.sourceTitle||'';document.getElementById('ed-sommario').value=a.genSommario||'';const bc=a.genBody||(a.sourceDesc?a.sourceTitle+'\n\n'+a.sourceDesc:'');document.getElementById('ed-corpo').value=bc;updateBadges();updateIcons();renderFeed();}
+function renderFeed(){const list=document.getElementById('feed-list');const empty=document.getElementById('empty');if(!articles.length){empty.style.display='flex';list.innerHTML='';return;}empty.style.display='none';const sorted=[...articles].sort((a,b)=>{const pd=new Date(b.publishedAt)-new Date(a.publishedAt);const pp=(b.priority||1)-(a.priority||1);return pp*3600000+pd;});let html='',shownOld=false;sorted.forEach(function(a){if(!today(a.publishedAt)&&!shownOld){html+='<div class="day-sep">Ieri e precedenti</div>';shownOld=true;}const t=a.genTitle||a.sourceTitle;const isActive=art&&art.id===a.id;html+='<div class="card '+a.status+(isActive?' active':'')+' " id="c'+a.id+'" onclick="openEditor('+a.id+')"><div class="card-inner"><div class="card-cat">'+a.catLabel+'</div><div><div class="card-title">'+t+'</div><div class="card-meta"><span class="card-src">'+a.sourceName+'</span><span class="card-ago">'+rel(a.publishedAt)+'</span><span class="badge '+a.status+'">'+(a.status==='pending'?'Bozza':a.status==='generating'?'AI...':a.status==='approved'?'Pubblicato':'Scartato')+'</span>'+(a.isForecast?'<span class="badge forecast">⚡</span>':'')+(!a.genBody&&a.status!=='generating'?'<span style="color:var(--t4);font-size:10px"> · Da generare</span>':'')+'</div></div><svg width="10" height="10" viewBox="0 0 12 12" fill="none" stroke="var(--t4)" stroke-width="1.5"><path d="M4 2l4 4-4 4"/></svg></div></div>';});list.innerHTML=html;}
+function openEditor(id){const a=articles.find(x=>x.id===id);if(!a)return;art=a;ctxArt=a;document.getElementById('feed-view').style.display='none';document.getElementById('editor').classList.add('show');const sel=document.getElementById('ed-cat');sel.innerHTML=CATS.map(c=>'<option value="'+c.l+'"'+(a.catLabel===c.l?' selected':'')+'>'+c.l+'</option>').join('');document.getElementById('ed-title').value=a.genTitle||a.sourceTitle||'';document.getElementById('ed-sommario').value=a.genSommario||'';const bc=a.genBody||(a.sourceDesc?a.sourceTitle+'\n\n'+a.sourceDesc:'');document.getElementById('ed-corpo').value=bc;const noteEl=document.getElementById('ed-note');if(noteEl)noteEl.value=a.note||'';// Check duplicato pubblicato
+  const pubSimilar=articles.find(x=>x.status==='approved'&&x.id!==art.id&&(()=>{const t1=(art.genTitle||'').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,30);const t2=(x.genTitle||x.sourceTitle||'').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,30);let m=0;for(let i=0;i<Math.min(t1.length,t2.length);i++)if(t1[i]===t2[i])m++;return m/Math.max(t1.length,t2.length)>0.6;})());
+  if(pubSimilar)log('⚠️ Attenzione: argomento simile già pubblicato — '+(pubSimilar.genTitle||'').slice(0,40),'info');
+  updateBadges();updateIcons();renderFeed();}
 function updateBadges(){if(!art)return;const b=document.getElementById('ed-badges');let h='';if(art.isForecast)h+='<span class="badge forecast">⚡ Previsione</span>';if(art.hasAds&&art.adsKws&&art.adsKws.length)h+='<span class="badge ads">📢 '+art.adsKws.join(', ')+'</span>';if(art.wikiKws&&art.wikiKws.length)h+='<span class="badge" style="color:var(--blue);border-color:var(--blue)">🔍 '+art.wikiKws.join(', ')+'</span>';b.innerHTML=h;}
 function updateIcons(){if(!art)return;const bp=document.getElementById('btn-prev');const ba=document.getElementById('btn-ads');if(bp)bp.classList.toggle('on',!!art.isForecast);if(ba)ba.classList.toggle('on',!!art.hasAds);}
 function toggleFlag(f){if(!art)return;if(f==='forecast'){art.isForecast=!art.isForecast;if(art.isForecast)stats.p++;else stats.p=Math.max(0,stats.p-1);}if(f==='ads')art.hasAds=!art.hasAds;updateBadges();updateIcons();upStats();}
@@ -306,7 +310,13 @@ function addWiki(){if(!art)return;const kw=window.prompt('Parola chiave Wiki/Aff
 function openOrig(){if(art&&art.sourceUrl)window.open(art.sourceUrl,'_blank');}
 function setCtx(){if(!art)return;document.getElementById('chat-ctx').classList.add('show');document.getElementById('ctx-title').textContent=(art.genTitle||art.sourceTitle).slice(0,60)+'...';document.getElementById('chat-ta').focus();}
 function saveArt(){if(!art)return;art.catLabel=document.getElementById('ed-cat').value;art.genTitle=document.getElementById('ed-title').value;art.genSommario=document.getElementById('ed-sommario').value;art.genBody=document.getElementById('ed-corpo').value;save();renderFeed();log('Salvato: '+(art.genTitle||'').slice(0,40)+'...','ok');}
-async function publishArt(){if(!art)return;saveArt();if(!art.genBody){alert('Genera o scrivi il corpo prima di pubblicare');return;}try{const r=await fetch(BUR+'/api/v2/modo/publish',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:String(art.id),titolo:art.genTitle,sommario:art.genSommario,corpo:art.genBody,categoria:art.catLabel,fonte:art.sourceName,sourceUrl:art.sourceUrl,img:art.img,isForecast:art.isForecast,hasAds:art.hasAds,adsKws:art.adsKws||[],wikiKws:art.wikiKws||[],publishedAt:new Date().toISOString()})});const d=await r.json();if(d.ok)log('✓ Pubblicato sul feed MODO','ok');else log('Salvato in locale','info');}catch(e){log('Salvato in locale','info');}art.status='approved';stats.a++;upStats();renderFeed();showFeed();}
+async function publishArt(){if(!art)return;saveArt();
+  const schedTime=document.getElementById('schedule-time')?.value;
+  if(schedTime){
+    const today=new Date().toISOString().slice(0,10);
+    scheduleArt(art.id,today+'T'+schedTime);
+    showFeed();return;
+  }if(!art.genBody){alert('Genera o scrivi il corpo prima di pubblicare');return;}try{const r=await fetch(BUR+'/api/v2/modo/publish',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:String(art.id),titolo:art.genTitle,sommario:art.genSommario,corpo:art.genBody,categoria:art.catLabel,fonte:art.sourceName,sourceUrl:art.sourceUrl,img:art.img,isForecast:art.isForecast,hasAds:art.hasAds,adsKws:art.adsKws||[],wikiKws:art.wikiKws||[],publishedAt:new Date().toISOString()})});const d=await r.json();if(d.ok)log('✓ Pubblicato sul feed MODO','ok');else log('Salvato in locale','info');}catch(e){log('Salvato in locale','info');}art.status='approved';stats.a++;upStats();renderFeed();showFeed();}
 async function generateCurrent(){
   if(!art)return;
   const btn=document.getElementById('btn-gen');
@@ -402,6 +412,28 @@ async function checkTokens(){
   }catch(e){}
 }
 
+async function suggerisciTitoli(){
+  if(!art)return;
+  const groqKey=localStorage.getItem('modo_groq_key');
+  if(!groqKey){alert('Configura prima la chiave AI');return;}
+  log('Generando 3 titoli alternativi...','info');
+  try{
+    const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:200,temperature:0.9,messages:[{role:'system',content:'Sei un titolista italiano. Scrivi esattamente 3 titoli numerati, uno per riga. Solo i titoli, nient altro.'},{role:'user',content:'3 titoli alternativi per: '+(art.genTitle||art.sourceTitle)}]})});
+    const d=await r.json();
+    if(d.error)throw new Error(d.error.message);
+    const txt=(d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||'';
+    const titoli=txt.split('\n').filter(t=>t.trim().length>10).slice(0,3);
+    const scelta=window.prompt('Scegli titolo (1-3) o premi Annulla:\n\n'+titoli.map((t,i)=>i+1+'. '+t).join('\n'));
+    const idx=parseInt(scelta)-1;
+    if(idx>=0&&idx<titoli.length){
+      const t=titoli[idx].replace(/^\d+\.\s*/,'').trim();
+      art.genTitle=t;
+      document.getElementById('ed-title').value=t;
+      log('Titolo aggiornato','ok');
+    }
+  }catch(e){log('Errore: '+e.message,'err');}
+}
+
 function scartaArt(){
   if(!art)return;
   art.status='rejected';
@@ -446,6 +478,40 @@ function eliminaArt(i){
   document.getElementById('cestino-count').textContent=cestino.length;
   renderCestino();
 }
+
+
+// PRIORITÀ AUTOMATICA
+function calcPriority(title, cat){
+  const t=(title||'').toLowerCase();
+  if(['morte','morti','attacco','guerra','terremoto','crisi','emergenza','breaking','arrested','killed','explosion','crash'].some(k=>t.includes(k)))return 5;
+  if(['elezioni','elezione','risultato','sentenza','accordo','accordi','summit','vertice'].some(k=>t.includes(k)))return 4;
+  if(['mercati','spread','bce','fed','pil','inflazione','record','crollo','rimbalzo'].some(k=>t.includes(k)))return 3;
+  if(cat==='Sport'||cat==='Tech')return 2;
+  return 1;
+}
+
+// CODA PUBBLICAZIONE
+let queue=[];
+function scheduleArt(id, time){
+  const a=articles.find(x=>x.id===id);
+  if(!a)return;
+  a.scheduledAt=time;
+  queue.push(id);
+  save();
+  log('Schedulato per '+time,'ok');
+}
+
+// Controlla coda ogni minuto
+setInterval(function(){
+  const now=new Date().toISOString().slice(0,16);
+  queue.forEach(function(id){
+    const a=articles.find(x=>x.id===id);
+    if(a&&a.scheduledAt&&a.scheduledAt<=now&&a.status!=='approved'){
+      a.status='approved';stats.a++;upStats();renderFeed();
+      log('Auto-pubblicato: '+(a.genTitle||a.sourceTitle).slice(0,40),'ok');
+    }
+  });
+},60000);
 
 load();renderCats();renderFeed();
 fetch(BUR+'/api/v2/health').then(function(){log('Backend BUR connesso','ok');}).catch(function(){log('Backend in avvio...','info');});if(localStorage.getItem('modo_groq_key'))checkTokens();
