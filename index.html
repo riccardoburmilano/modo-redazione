@@ -17,7 +17,7 @@
   --g:'Inter',sans-serif;--serif:'Playfair Display',Georgia,serif;
 }
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--g);font-size:14px}
-.app{display:grid;grid-template-columns:200px 1fr 400px;grid-template-rows:48px 1fr;height:100vh;overflow:hidden}
+.app{display:grid;grid-template-columns:280px 1fr 400px;grid-template-rows:48px 1fr;height:100vh;overflow:hidden}
 
 /* TOPBAR */
 .topbar{grid-column:1/-1;background:#fff;border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 18px;gap:16px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
@@ -530,7 +530,7 @@ async function generateCurrent(){
   setStatus('spin','AI in elaborazione...');
   log('Generando: '+art.sourceTitle.slice(0,40)+'...','info');
 
-  const aiPrompt='Sei un giornalista italiano professionista. Rielabora questa notizia come articolo originale per MODO.\n\nFONTE: '+art.sourceName+'\nTITOLO: '+art.sourceTitle+'\nTESTO: '+(art.sourceDesc||'Non disponibile')+'\n\nRispondi SOLO con JSON valido:\n{"titolo":"titolo italiano professionale max 90 caratteri","sommario":"occhiello accattivante max 130 caratteri","corpo":"articolo completo 250-350 parole in italiano, paragrafi separati con \\n\\n, cita fonte alla fine","is_previsione":false,"parole_chiave_ads":[],"parole_chiave_wiki":[]}';
+  const aiPrompt='Sei un giornalista italiano senior con 20 anni di esperienza. Devi scrivere un articolo giornalistico originale e completo per MODO, una testata italiana seria.\n\nNOTIZIA DI PARTENZA:\nFonte: '+art.sourceName+'\nTitolo originale: '+art.sourceTitle+'\nContenuto disponibile: '+(art.sourceDesc||'Non disponibile')+'\n\nISTRUZIONI FONDAMENTALI:\n- Scrivi COMPLETAMENTE con parole tue, non copiare nulla dalla fonte\n- L articolo deve essere lungo almeno 800 parole\n- Struttura: apertura forte (chi, cosa, dove, quando, perché), sviluppo approfondito con contesto storico e geopolitico, analisi delle implicazioni, prospettive future\n- Aggiungi contesto e background che un lettore italiano aprezzerebbe\n- Stile: giornalistico italiano serio, come Corriere della Sera o Sole 24 Ore\n- NON menzionare mai la fonte originale nel testo\n- Paragrafi separati da \\n\\n\n\nRispondi SOLO con JSON valido, zero testo extra:\n{"titolo":"titolo originale accattivante max 90 caratteri","sommario":"occhiello che cattura il lettore max 150 caratteri","corpo":"articolo completo MINIMO 800 parole in italiano, paragrafi separati da \\n\\n","is_previsione":false,"parole_chiave_ads":[],"parole_chiave_wiki":[]}';
 
   try{
     const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
@@ -538,10 +538,10 @@ async function generateCurrent(){
       headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},
       body:JSON.stringify({
         model:'llama-3.3-70b-versatile',
-        max_tokens:1200,
-        temperature:0.35,
+        max_tokens:3000,
+        temperature:0.4,
         messages:[
-          {role:'system',content:'Rispondi SEMPRE e SOLO con JSON valido. Zero testo extra prima o dopo il JSON.'},
+          {role:'system',content:'Sei un giornalista italiano esperto. Rispondi SEMPRE e SOLO con JSON valido. Zero testo extra. Il campo corpo deve essere MINIMO 800 parole.'},
           {role:'user',content:aiPrompt}
         ]
       })
