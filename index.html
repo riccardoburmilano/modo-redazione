@@ -632,9 +632,16 @@ function addMsg(role,text){
 function qc(m){document.getElementById('chat-ta').value=m;sendChat()}
 function ckd(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat()}}
 
+// KEEP-ALIVE — evita sleep Render ogni 8 minuti
+setInterval(function(){
+  fetch(BUR+'/api/v2/health').catch(function(){});
+}, 8*60*1000);
+
 // INIT
 load();renderCats();renderFeed();
 log('Gestionale pronto.'+(articles.length?' '+articles.length+' articoli in sessione.':''));
+// Sveglia subito il backend
+fetch(BUR+'/api/v2/health').then(function(){log('Backend BUR connesso','ok')}).catch(function(){log('Backend in avvio...','info')});
 </script>
 </body>
 </html>
