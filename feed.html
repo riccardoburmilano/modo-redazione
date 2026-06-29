@@ -1,93 +1,612 @@
-// ============================================================
-// BUR OS — Backend Runtime
-// Binary Unified Runtime — Node.js + Express
-// ============================================================
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const { stateRead, stateWrite, logWrite, now } = require('./modules/state');
-const daemon = require('./daemon/valueDaemon');
-const apiRoutes = require('./routes/api');
-const authRoutes = require('./routes/auth');
-const bdeRoutes = require('./routes/bde-routes');
-const modoNewsRoutes = require('./routes/modo-news');
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MODO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f9f8f5;--white:#fff;--s1:#f2f1ed;
+  --b1:rgba(0,0,0,.07);--b2:rgba(0,0,0,.13);
+  --ink:#18171400;--ink:#181714;--t2:#4a4945;--t3:#8a8780;--t4:#c4c2bb;
+  --gold:#b8860b;--gd:rgba(184,134,11,.07);
+  --green:#15602f;--purple:#4c1d95;--red:#991b1b;
+  --g:'Inter',sans-serif;--serif:'Playfair Display',Georgia,serif;
+}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--ink);font-family:var(--g);font-size:15px;line-height:1.6}
 
-const PORT = parseInt(process.env.PORT) || 3000;
-const BUR_VERSION = process.env.GOD_VERSION || '2.0.0';
-const app = express();
+/* ── NAV ── */
+.nav{position:sticky;top:0;z-index:200;background:rgba(249,248,245,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--b1)}
+.nav-inner{max-width:1120px;margin:0 auto;padding:0 24px;height:56px;display:flex;align-items:center;gap:0}
+.nav-logo-wrap{display:flex;align-items:center;gap:10px;margin-right:32px;text-decoration:none;color:inherit}
+.nav-ast{animation:rot 18s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+.nav-logo{font-family:var(--serif);font-size:24px;font-weight:900;letter-spacing:-.03em;color:var(--ink)}
+.nav-cats{display:flex;align-items:center;gap:0;overflow-x:auto;flex:1}
+.nav-cat{font-size:12px;font-weight:500;color:var(--t3);padding:8px 14px;cursor:pointer;border:none;background:none;transition:color .15s;white-space:nowrap;text-decoration:none}
+.nav-cat:hover{color:var(--ink)}
+.nav-cat.on{color:var(--gold);font-weight:600}
+.nav-cat.prev-cat{color:var(--purple)}
+.nav-cat.prev-cat.on{color:var(--purple)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.live-badge{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--green)}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
 
-// ── CORS ─────────────────────────────────────────────────────
-app.use(cors({
-  origin: true,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-device-fingerprint']
-}));
+/* ── HERO ── */
+.hero{max-width:1120px;margin:0 auto;padding:40px 24px 0}
+.hero-eyebrow{font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.hero-grid{display:grid;grid-template-columns:1fr 340px;gap:1px;background:var(--b1)}
+.hero-main{background:var(--white);padding:32px;cursor:pointer;transition:background .12s}
+.hero-main:hover{background:var(--s1)}
+.hero-main-img{width:100%;height:280px;object-fit:cover;margin-bottom:24px}
+.hero-cat{font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;margin-bottom:10px}
+.hero-title{font-family:var(--serif);font-size:32px;font-weight:800;line-height:1.18;letter-spacing:-.02em;margin-bottom:12px}
+.hero-sommario{font-size:15px;color:var(--t2);line-height:1.65;margin-bottom:14px}
+.hero-meta{font-size:11px;color:var(--t3);display:flex;gap:12px}
+.hero-side{display:flex;flex-direction:column;gap:1px;background:var(--b1)}
+.side-card{background:var(--white);padding:20px 22px;cursor:pointer;transition:background .12s;flex:1;display:flex;flex-direction:column;justify-content:center}
+.side-card:hover{background:var(--s1)}
+.side-title{font-family:var(--serif);font-size:16px;font-weight:700;line-height:1.3;margin-bottom:6px}
+.side-meta{font-size:10px;color:var(--t3)}
+.prev-tag{display:inline-flex;align-items:center;gap:3px;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;border:1px solid var(--purple);color:var(--purple);margin-top:6px}
 
-// ── Body parsing — DEVE stare PRIMA delle route ───────────────
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
+/* ── STRIP PREVISIONE DEL GIORNO ── */
+.prev-strip{background:var(--purple);color:#fff;padding:0}
+.prev-strip-inner{max-width:1120px;margin:0 auto;padding:18px 24px;display:flex;align-items:center;gap:20px;cursor:pointer}
+.prev-strip-eye{font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.6);flex-shrink:0}
+.prev-strip-title{font-family:var(--serif);font-size:17px;font-weight:700;flex:1;line-height:1.3}
+.prev-strip-cta{font-size:11px;font-weight:600;color:rgba(255,255,255,.7);flex-shrink:0;border:1px solid rgba(255,255,255,.3);padding:5px 12px;transition:all .15s}
+.prev-strip:hover .prev-strip-cta{background:#fff;color:var(--purple)}
 
-// ── Request logger ────────────────────────────────────────────
-app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-  next();
-});
+/* ── ALBERO CONCETTUALE ── */
+.tree-section{max-width:1120px;margin:32px auto 0;padding:0 24px}
+.section-label{font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--t3);margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.section-label::after{content:'';flex:1;height:1px;background:var(--b1)}
+.tree-wrap{background:var(--white);border:1px solid var(--b1);overflow:hidden}
 
-// ── API Routes ────────────────────────────────────────────────
-app.use('/api/v2', apiRoutes);
-app.use('/api/v2/operantis', authRoutes);
-app.use('/api/v2/operantis', bdeRoutes);
-app.use('/api/v2/modo', modoNewsRoutes);
+/* ── ISCRIZIONE ── */
+.signup-section{background:var(--ink);color:#fff;margin:40px 0 0}
+.signup-inner{max-width:1120px;margin:0 auto;padding:48px 24px;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.signup-title{font-family:var(--serif);font-size:30px;font-weight:800;line-height:1.2;margin-bottom:10px}
+.signup-sub{font-size:14px;color:rgba(255,255,255,.55);line-height:1.65}
+.signup-form{display:flex;flex-direction:column;gap:10px}
+.signup-input{padding:13px 16px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:14px;outline:none;font-family:var(--g);transition:border-color .15s}
+.signup-input::placeholder{color:rgba(255,255,255,.35)}
+.signup-input:focus{border-color:var(--gold)}
+.signup-btn{padding:13px 20px;background:var(--gold);border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:.04em;transition:opacity .15s;text-align:center}
+.signup-btn:hover{opacity:.88}
+.signup-ok{font-size:13px;color:var(--gold);display:none;padding:13px 0}
+.signup-privacy{font-size:10px;color:rgba(255,255,255,.3);line-height:1.5}
 
-// ── Root ─────────────────────────────────────────────────────
-app.get('/', (req, res) => {
-  const s = stateRead();
-  res.json({
-    name: 'BUR OS Backend',
-    version: BUR_VERSION,
-    status: s.system?.status || 'IDLE',
-    mode: s.system?.mode || 'NORMAL',
-    daemon: daemon.isRunning() ? 'RUNNING' : 'STOPPED',
-    uptime: s.metrics?.uptime_start,
-    modules: ['operantis', 'bde', 'treasury', 'reputation', 'nova', 'modo-news']
-  });
-});
+/* ── GRID ARTICOLI ── */
+.grid-section{max-width:1120px;margin:40px auto 0;padding:0 24px}
+.grid-filter{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;align-items:center}
+.grid-filter-btn{font-size:11px;font-weight:500;padding:5px 13px;background:var(--white);border:1px solid var(--b1);color:var(--t3);cursor:pointer;transition:all .12s}
+.grid-filter-btn.on{border-color:var(--gold);color:var(--gold);background:var(--gd)}
+.grid-search{margin-left:auto;display:flex;align-items:center;gap:8px;padding:6px 12px;background:var(--white);border:1px solid var(--b1)}
+.grid-search input{border:none;outline:none;background:transparent;font-size:12px;color:var(--ink);width:160px;font-family:var(--g)}
+.grid-search input::placeholder{color:var(--t4)}
+.articles{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--b1)}
+.art-card{background:var(--white);padding:22px;cursor:pointer;transition:background .12s}
+.art-card:hover{background:var(--s1)}
+.art-card-img{width:100%;height:150px;object-fit:cover;margin-bottom:14px}
+.art-cat{font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px}
+.art-title{font-family:var(--serif);font-size:17px;font-weight:700;line-height:1.3;margin-bottom:7px}
+.art-sommario{font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.art-meta{font-size:10px;color:var(--t3);display:flex;gap:8px;align-items:center}
+.empty-state{grid-column:1/-1;padding:60px;text-align:center;color:var(--t3)}
+.empty-state-title{font-family:var(--serif);font-size:22px;margin-bottom:8px;color:var(--t3)}
+.load-more{text-align:center;padding:32px;display:none}
+.load-more-btn{font-size:12px;font-weight:600;padding:10px 28px;background:none;border:1px solid var(--b2);color:var(--t2);cursor:pointer;transition:all .15s}
+.load-more-btn:hover{border-color:var(--ink);color:var(--ink)}
 
-// ── Health ───────────────────────────────────────────────────
-app.get('/api/v2/health', (req, res) => {
-  res.json({ status: 'ok', version: BUR_VERSION, ts: new Date().toISOString() });
-});
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;display:none;overflow-y:auto;padding:24px}
+.modal-bg.open{display:block}
+.modal{background:#fff;max-width:700px;margin:0 auto;position:relative}
+.modal-close{position:fixed;top:24px;right:24px;width:42px;height:42px;background:#fff;border:1px solid var(--b1);cursor:pointer;font-size:22px;color:var(--t3);display:flex;align-items:center;justify-content:center;z-index:301;transition:color .15s}
+.modal-close:hover{color:var(--ink)}
+.modal-head{padding:36px 40px 0}
+.modal-cat{font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;margin-bottom:12px}
+.modal-title{font-family:var(--serif);font-size:28px;font-weight:800;line-height:1.22;letter-spacing:-.02em;margin-bottom:16px}
+.modal-sommario{font-size:15px;color:var(--t2);line-height:1.65;border-top:1px solid var(--b1);border-bottom:1px solid var(--b1);padding:14px 0;margin-bottom:18px;font-style:italic}
+.modal-meta{font-size:11px;color:var(--t3);display:flex;gap:12px;margin-bottom:0}
+.modal-img{width:100%;max-height:340px;object-fit:cover}
+.modal-body{padding:28px 40px 48px;font-size:16px;color:var(--t2);line-height:1.9}
+.modal-body p{margin-bottom:18px}
+.modal-prev{margin:24px 40px;padding:18px 22px;background:rgba(76,29,149,.05);border:1px solid rgba(76,29,149,.15)}
+.modal-prev-eye{font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--purple);margin-bottom:6px}
 
-// ── 404 ───────────────────────────────────────────────────────
-app.use((req, res) => {
-  res.status(404).json({ error: 'Endpoint not found', path: req.path });
-});
+/* ── FOOTER ── */
+footer{background:#111;color:rgba(255,255,255,.4);padding:36px 24px;margin-top:60px}
+.footer-inner{max-width:1120px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.footer-logo{font-family:var(--serif);font-size:20px;font-weight:900;color:#fff}
+.footer-links{display:flex;gap:20px;font-size:11px}
+.footer-links a{color:rgba(255,255,255,.4);text-decoration:none;transition:color .15s}
+.footer-links a:hover{color:#fff}
+.footer-copy{font-size:11px}
 
-// ── Error handler ─────────────────────────────────────────────
-app.use((err, req, res, next) => {
-  console.error('[BUR OS ERROR]', err.message);
-  res.status(500).json({ error: 'Internal server error', message: err.message });
-});
+/* CATEGORIE COLORI */
+.c-italia{color:#15602f}.c-mondo{color:#1e3a8a}.c-finanza{color:#9a6f00}.c-tech{color:#0f766e}.c-sport{color:#c2410c}.c-previsioni{color:#4c1d95}.c-default{color:var(--t3)}
 
-// ── Boot ──────────────────────────────────────────────────────
-app.listen(PORT, () => {
-  console.log(`[BUR OS] v${BUR_VERSION} — porta ${PORT}`);
-  stateWrite('SYSTEM', { system: { status: 'IDLE', mode: 'NORMAL' } });
-  logWrite('SYSTEM', 'boot', { version: BUR_VERSION }, { port: PORT }, 'SUCCESS');
+@media(max-width:768px){
+  .hero-grid{grid-template-columns:1fr}.hero-side{display:none}
+  .articles{grid-template-columns:1fr}
+  .signup-inner{grid-template-columns:1fr}
+  .nav-cats{display:none}
+  .prev-strip-inner{flex-direction:column;align-items:flex-start;gap:10px}
+}
+</style>
+</head>
+<body>
 
-  if (process.env.GROQ_API_KEY || process.env.ANTHROPIC_API_KEY) {
-    daemon.start();
-    console.log('[BUR OS] VALUE_DAEMON avviato');
-  } else {
-    console.warn('[BUR OS] API KEY mancante — daemon non avviato');
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-logo-wrap" href="#">
+      <svg class="nav-ast" width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <line x1="11" y1="1" x2="11" y2="21" stroke="#b8860b" stroke-width="1.3"/>
+        <line x1="1" y1="11" x2="21" y2="11" stroke="#b8860b" stroke-width="1.3"/>
+        <line x1="3.22" y1="3.22" x2="18.78" y2="18.78" stroke="#b8860b" stroke-width="1.3"/>
+        <line x1="18.78" y1="3.22" x2="3.22" y2="18.78" stroke="#b8860b" stroke-width="1.3"/>
+      </svg>
+      <span class="nav-logo">MODO</span>
+    </a>
+    <nav class="nav-cats">
+      <button class="nav-cat on" onclick="filterCat('tutti')">Tutti</button>
+      <button class="nav-cat" onclick="filterCat('Italia')">Italia</button>
+      <button class="nav-cat" onclick="filterCat('Mondo')">Mondo</button>
+      <button class="nav-cat" onclick="filterCat('Finanza')">Finanza</button>
+      <button class="nav-cat" onclick="filterCat('Tech')">Tech</button>
+      <button class="nav-cat" onclick="filterCat('Sport')">Sport</button>
+      <button class="nav-cat prev-cat" onclick="filterCat('Previsioni')">⚡ Previsioni</button>
+    </nav>
+    <div class="nav-right">
+      <div class="live-badge"><span class="live-dot"></span>Live</div>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow" id="hero-eye">Ultime notizie</div>
+  <div class="hero-grid" id="hero-grid">
+    <div style="background:#fff;padding:60px;display:flex;align-items:center;justify-content:center;color:var(--t4)">
+      <div style="text-align:center">
+        <svg style="animation:rot 8s linear infinite;margin-bottom:16px" width="32" height="32" viewBox="0 0 32 32" fill="none">
+          <line x1="16" y1="2" x2="16" y2="30" stroke="#b8860b" stroke-width="1.5"/>
+          <line x1="2" y1="16" x2="30" y2="16" stroke="#b8860b" stroke-width="1.5"/>
+          <line x1="4.69" y1="4.69" x2="27.31" y2="27.31" stroke="#b8860b" stroke-width="1.5"/>
+          <line x1="27.31" y1="4.69" x2="4.69" y2="27.31" stroke="#b8860b" stroke-width="1.5"/>
+        </svg>
+        <div style="font-family:var(--serif);font-size:16px;color:var(--t3)">Caricamento notizie...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STRIP PREVISIONE -->
+<div class="prev-strip" id="prev-strip" style="display:none" onclick="openPrev()">
+  <div class="prev-strip-inner">
+    <div class="prev-strip-eye">⚡ Previsione MODO</div>
+    <div class="prev-strip-title" id="prev-strip-title"></div>
+    <div class="prev-strip-cta">Leggi →</div>
+  </div>
+</div>
+
+<!-- ALBERO CONCETTUALE -->
+<div class="tree-section">
+  <div class="section-label">In evidenza per argomento</div>
+  <div class="tree-wrap" id="tree-wrap"></div>
+</div>
+
+<!-- ISCRIZIONE -->
+<div class="signup-section">
+  <div class="signup-inner">
+    <div>
+      <div class="signup-title">Le previsioni MODO.<br>Ogni mattina.</div>
+      <div class="signup-sub">Analisi su sport, mercati, politica e attualità. Non le ultime notizie — quelle che arrivano prima.</div>
+    </div>
+    <div class="signup-form" id="signup-form">
+      <input class="signup-input" type="email" id="signup-email" placeholder="La tua email">
+      <button class="signup-btn" onclick="signup()">Iscriviti alle previsioni →</button>
+      <div class="signup-privacy">Niente spam. Solo previsioni. Disiscrizione in un click.</div>
+      <div class="signup-ok" id="signup-ok">✓ Iscritto. Ci vediamo domani mattina.</div>
+    </div>
+  </div>
+</div>
+
+<!-- GRID ARTICOLI -->
+<div class="grid-section">
+  <div class="section-label">Tutti gli articoli</div>
+  <div class="grid-filter">
+    <button class="grid-filter-btn on" onclick="filterCat('tutti')">Tutti</button>
+    <button class="grid-filter-btn" onclick="filterCat('Italia')">Italia</button>
+    <button class="grid-filter-btn" onclick="filterCat('Mondo')">Mondo</button>
+    <button class="grid-filter-btn" onclick="filterCat('Finanza')">Finanza</button>
+    <button class="grid-filter-btn" onclick="filterCat('Tech')">Tech</button>
+    <button class="grid-filter-btn" onclick="filterCat('Sport')">Sport</button>
+    <button class="grid-filter-btn" onclick="filterCat('Previsioni')">⚡ Previsioni</button>
+    <div class="grid-search">
+      <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="4.5"/><line x1="9.5" y1="9.5" x2="13" y2="13"/></svg>
+      <input type="text" placeholder="Cerca..." oninput="search(this.value)">
+    </div>
+  </div>
+  <div class="articles" id="articles-grid"></div>
+  <div class="load-more" id="load-more">
+    <button class="load-more-btn" onclick="loadMore()">Carica altri articoli</button>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-logo">MODO</div>
+    <div class="footer-links">
+      <a href="#">Chi siamo</a>
+      <a href="#">Previsioni</a>
+      <a href="#">Contatti</a>
+    </div>
+    <div class="footer-copy">© 2026 MODO · Giornale italiano AI-native</div>
+  </div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal-bg" onclick="closeMod(event)">
+  <button class="modal-close" onclick="closeMod()">×</button>
+  <div class="modal" id="modal">
+    <div class="modal-head">
+      <div class="modal-cat" id="m-cat"></div>
+      <div class="modal-title" id="m-title"></div>
+      <div class="modal-sommario" id="m-sommario"></div>
+      <div class="modal-meta" id="m-meta"></div>
+    </div>
+    <img id="m-img" style="display:none" class="modal-img" onerror="this.style.display='none'">
+    <div class="modal-body" id="m-body"></div>
+  </div>
+</div>
+
+<script>
+const BUR = 'https://god-core-backend.onrender.com';
+let all = [], filtered = [], page = 0, activeCat = 'tutti', prevArt = null;
+const PER_PAGE = 12;
+
+function catClass(c){
+  return {'Italia':'c-italia','Mondo':'c-mondo','Finanza':'c-finanza','Tech':'c-tech','Sport':'c-sport','Previsioni':'c-previsioni'}[c]||'c-default';
+}
+function rel(iso){
+  if(!iso)return '';
+  const m=Math.round((Date.now()-new Date(iso))/60000);
+  if(m<1)return 'ora';if(m<60)return m+' min fa';
+  const h=Math.round(m/60);if(h<24)return h+'h fa';
+  return Math.round(h/24)+'g fa';
+}
+
+// ── CARICA SOLO ARTICOLI PUBBLICATI ───────────────────────────
+async function load(){
+  try{
+    const r = await fetch(BUR+'/api/v2/modo/published?limit=100');
+    const d = await r.json();
+    if(d.ok && d.articles && d.articles.length){
+      all = d.articles.map(a=>({
+        id:a.id,
+        cat:a.categoria||'Mondo',
+        title:a.titolo,
+        sommario:a.sommario||'',
+        body:a.corpo||'',
+        img:a.img||null,
+        fonte:a.fonte||'MODO',
+        date:a.published_at,
+        isForecast:a.is_forecast||false,
+        sourceUrl:a.source_url||''
+      }));
+      render();
+    } else {
+      // Nessun articolo pubblicato
+      document.getElementById('hero-grid').innerHTML =
+        '<div style="background:#fff;padding:60px;text-align:center;color:var(--t3)"><div style="font-family:var(--serif);font-size:20px;margin-bottom:8px">Nessun articolo pubblicato</div><div style="font-size:13px">Gli articoli approvati dal gestionale appariranno qui.</div></div>';
+    }
+  }catch(e){
+    console.error('Errore caricamento:', e);
   }
+}
 
-  console.log('[BUR OS] BDE Economy Engine attivo');
-  console.log('[BUR OS] MODO News Aggregator attivo');
-});
+function render(){
+  filtered = activeCat==='tutti' ? [...all] : all.filter(a=>a.cat===activeCat);
+  page = 0;
+  renderHero();
+  renderPrev();
+  renderTree();
+  renderGrid();
+}
 
-process.on('SIGTERM', () => { daemon.stop(); process.exit(0); });
-process.on('SIGINT', () => { daemon.stop(); process.exit(0); });
+// ── HERO ───────────────────────────────────────────────────────
+function renderHero(){
+  const arts = filtered.filter(a=>!a.isForecast).slice(0,4);
+  if(!arts.length){
+    document.getElementById('hero-grid').innerHTML='<div style="background:#fff;padding:60px;text-align:center;color:var(--t4)"><div style="font-family:var(--serif);font-size:18px">Nessuna notizia in questa categoria</div></div>';
+    return;
+  }
+  const main = arts[0];
+  const sides = arts.slice(1);
+  document.getElementById('hero-grid').innerHTML =
+    '<div class="hero-main" onclick="openArt(\''+main.id+'\')">'
+    +(main.img?'<img class="hero-main-img" src="'+main.img+'" alt="">':'')
+    +'<div class="hero-cat '+catClass(main.cat)+'">'+main.cat+'</div>'
+    +'<div class="hero-title">'+main.title+'</div>'
+    +'<div class="hero-sommario">'+main.sommario+'</div>'
+    +'<div class="hero-meta"><span>'+main.fonte+'</span><span>'+rel(main.date)+'</span></div>'
+    +(main.isForecast?'<div class="prev-tag">⚡ Previsione</div>':'')
+    +'</div>'
+    +'<div class="hero-side" style="background:var(--b1)">'
+    +sides.map(a=>'<div class="side-card" onclick="openArt(\''+a.id+'\')">'
+      +'<div class="hero-cat '+catClass(a.cat)+'">'+a.cat+'</div>'
+      +'<div class="side-title">'+a.title+'</div>'
+      +'<div class="side-meta">'+a.fonte+' · '+rel(a.date)+'</div>'
+      +(a.isForecast?'<div class="prev-tag">⚡</div>':'')
+      +'</div>').join('')
+    +'</div>';
+}
 
-module.exports = app;
+// ── STRIP PREVISIONE ───────────────────────────────────────────
+function renderPrev(){
+  prevArt = all.find(a=>a.isForecast);
+  const strip = document.getElementById('prev-strip');
+  if(prevArt){
+    document.getElementById('prev-strip-title').textContent = prevArt.title;
+    strip.style.display = 'block';
+  } else {
+    strip.style.display = 'none';
+  }
+}
+function openPrev(){if(prevArt)openArt(prevArt.id);}
+
+// ── ALBERO ─────────────────────────────────────────────────────
+function renderTree(){
+  const wrap = document.getElementById('tree-wrap');
+  if(!wrap||!all.length){wrap.innerHTML='';return;}
+
+  const cats = {};
+  filtered.slice(0,40).forEach(a=>{
+    if(!cats[a.cat])cats[a.cat]=[];
+    if(cats[a.cat].length<4)cats[a.cat].push(a);
+  });
+  const catList = Object.keys(cats);
+  if(!catList.length){wrap.innerHTML='';return;}
+
+  const COLORS = {
+    'Italia':{s:'#15602f',f:'#f0fdf4',d:'#22c55e'},
+    'Mondo':{s:'#1e3a8a',f:'#eff6ff',d:'#3b82f6'},
+    'Finanza':{s:'#9a6f00',f:'#fefce8',d:'#eab308'},
+    'Tech':{s:'#0f766e',f:'#f0fdfa',d:'#14b8a6'},
+    'Sport':{s:'#c2410c',f:'#fff7ed',d:'#f97316'},
+    'Previsioni':{s:'#4c1d95',f:'#faf5ff',d:'#a855f7'},
+  };
+  const DEF = {s:'#374151',f:'#f9fafb',d:'#9ca3af'};
+
+  const W = wrap.offsetWidth||1072;
+  const cols = [[],[]];
+  catList.forEach((c,i)=>cols[i%2].push(c));
+  const colW = Math.floor((W-1)/2);
+  const LEAF_H = 52, GAP = 8, ROOT_H = 34, ROOT_W = 100, PAD = 20;
+
+  let totalH = PAD;
+  cols.forEach(col=>{
+    let h = PAD;
+    col.forEach(cat=>{
+      h += ROOT_H + 10 + cats[cat].length*(LEAF_H+GAP) + 24;
+    });
+    totalH = Math.max(totalH, h);
+  });
+  totalH += PAD;
+
+  const ns = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(ns,'svg');
+  svg.setAttribute('viewBox','0 0 '+W+' '+totalH);
+  svg.setAttribute('height', String(totalH));
+  svg.style.display='block';svg.style.width='100%';
+
+  [0,1].forEach(ci=>{
+    const ox = ci*(colW+1);
+    let y = PAD;
+    cols[ci].forEach(cat=>{
+      const col = COLORS[cat]||DEF;
+      const cx = ox + colW/2;
+
+      // Root
+      const rx = ox + (colW-ROOT_W)/2;
+      const rr = document.createElementNS(ns,'rect');
+      rr.setAttribute('x',String(rx));rr.setAttribute('y',String(y));
+      rr.setAttribute('width',String(ROOT_W));rr.setAttribute('height',String(ROOT_H));
+      rr.setAttribute('rx','2');rr.setAttribute('fill',col.f);
+      rr.setAttribute('stroke',col.s);rr.setAttribute('stroke-width','1.5');
+      svg.appendChild(rr);
+
+      const dc = document.createElementNS(ns,'circle');
+      dc.setAttribute('cx',String(rx+13));dc.setAttribute('cy',String(y+ROOT_H/2));
+      dc.setAttribute('r','4');dc.setAttribute('fill',col.d);
+      svg.appendChild(dc);
+
+      const rt = document.createElementNS(ns,'text');
+      rt.setAttribute('x',String(rx+24));rt.setAttribute('y',String(y+ROOT_H/2+4));
+      rt.setAttribute('font-family','Inter,sans-serif');rt.setAttribute('font-size','10');
+      rt.setAttribute('font-weight','700');rt.setAttribute('letter-spacing','0.1em');
+      rt.setAttribute('fill',col.s);rt.textContent=cat.toUpperCase();
+      svg.appendChild(rt);
+
+      y += ROOT_H + 10;
+
+      const branchY = y + cats[cat].length*(LEAF_H+GAP) - GAP;
+      const vl = document.createElementNS(ns,'line');
+      vl.setAttribute('x1',String(cx));vl.setAttribute('y1',String(y-2));
+      vl.setAttribute('x2',String(cx));vl.setAttribute('y2',String(branchY));
+      vl.setAttribute('stroke',col.s);vl.setAttribute('stroke-width','0.8');
+      vl.setAttribute('stroke-dasharray','3,3');vl.setAttribute('opacity','0.35');
+      svg.appendChild(vl);
+
+      cats[cat].forEach((a,ai)=>{
+        const ly = y + ai*(LEAF_H+GAP);
+        const lx = ox + 12;
+        const lw = colW - 24;
+        const now = Date.now();
+        const age = Math.min(1,(now-new Date(a.date))/86400000);
+        const op = Math.max(0.5,1-age*0.45);
+
+        const hl = document.createElementNS(ns,'line');
+        hl.setAttribute('x1',String(cx));hl.setAttribute('y1',String(ly+LEAF_H/2));
+        hl.setAttribute('x2',String(lx+6));hl.setAttribute('y2',String(ly+LEAF_H/2));
+        hl.setAttribute('stroke',col.s);hl.setAttribute('stroke-width','0.7');
+        hl.setAttribute('opacity',String(op*0.3));
+        svg.appendChild(hl);
+
+        const g = document.createElementNS(ns,'g');
+        g.style.cursor='pointer';
+        g.setAttribute('opacity',String(op));
+
+        const lr = document.createElementNS(ns,'rect');
+        lr.setAttribute('x',String(lx));lr.setAttribute('y',String(ly));
+        lr.setAttribute('width',String(lw));lr.setAttribute('height',String(LEAF_H));
+        lr.setAttribute('rx','2');lr.setAttribute('fill','#fff');
+        lr.setAttribute('stroke',col.s);lr.setAttribute('stroke-width','0.4');
+        lr.setAttribute('stroke-opacity','0.25');
+        g.appendChild(lr);
+
+        const bar = document.createElementNS(ns,'rect');
+        bar.setAttribute('x',String(lx));bar.setAttribute('y',String(ly));
+        bar.setAttribute('width','3');bar.setAttribute('height',String(LEAF_H));
+        bar.setAttribute('rx','1.5');bar.setAttribute('fill',col.d);
+        g.appendChild(bar);
+
+        const title = a.title||'';
+        const maxChars = Math.floor(lw/7.5);
+        const line1 = title.slice(0,maxChars);
+        const line2 = title.slice(maxChars,maxChars*2);
+
+        const t1 = document.createElementNS(ns,'text');
+        t1.setAttribute('x',String(lx+12));t1.setAttribute('y',String(ly+18));
+        t1.setAttribute('font-family','Playfair Display,Georgia,serif');
+        t1.setAttribute('font-size','11.5');t1.setAttribute('font-weight','700');
+        t1.setAttribute('fill',col.s);t1.textContent=line1;
+        g.appendChild(t1);
+
+        if(line2){
+          const t2 = document.createElementNS(ns,'text');
+          t2.setAttribute('x',String(lx+12));t2.setAttribute('y',String(ly+32));
+          t2.setAttribute('font-family','Playfair Display,Georgia,serif');
+          t2.setAttribute('font-size','11.5');t2.setAttribute('font-weight','700');
+          t2.setAttribute('fill',col.s);t2.textContent=line2.slice(0,maxChars);
+          g.appendChild(t2);
+        }
+
+        const mt = document.createElementNS(ns,'text');
+        mt.setAttribute('x',String(lx+12));mt.setAttribute('y',String(ly+LEAF_H-8));
+        mt.setAttribute('font-family','Inter,sans-serif');mt.setAttribute('font-size','9');
+        mt.setAttribute('fill','#9ca3af');
+        mt.textContent = rel(a.date)+(a.isForecast?' · ⚡':'');
+        g.appendChild(mt);
+
+        const aid = a.id;
+        g.addEventListener('click',()=>openArt(aid));
+        svg.appendChild(g);
+      });
+
+      y += cats[cat].length*(LEAF_H+GAP) + 24;
+    });
+  });
+
+  // Linea divisoria centrale
+  const div = document.createElementNS(ns,'line');
+  div.setAttribute('x1',String(colW));div.setAttribute('y1','0');
+  div.setAttribute('x2',String(colW));div.setAttribute('y2',String(totalH));
+  div.setAttribute('stroke','var(--b1)');div.setAttribute('stroke-width','1');
+  svg.appendChild(div);
+
+  wrap.innerHTML='';wrap.appendChild(svg);
+}
+
+// ── GRID ───────────────────────────────────────────────────────
+function renderGrid(){
+  const grid = document.getElementById('articles-grid');
+  const chunk = filtered.slice(page*PER_PAGE,(page+1)*PER_PAGE);
+  if(!chunk.length && page===0){
+    grid.innerHTML='<div class="empty-state"><div class="empty-state-title">Nessun articolo</div><div style="font-size:13px;color:var(--t4)">Non ci sono articoli pubblicati in questa sezione.</div></div>';
+    document.getElementById('load-more').style.display='none';
+    return;
+  }
+  const html = chunk.map(a=>
+    '<div class="art-card" onclick="openArt(\''+a.id+'\')">'
+    +(a.img?'<img class="art-card-img" src="'+a.img+'" alt="" onerror="this.style.display=\'none\'">':'')
+    +'<div class="art-cat '+catClass(a.cat)+'">'+a.cat+'</div>'
+    +'<div class="art-title">'+a.title+'</div>'
+    +'<div class="art-sommario">'+a.sommario+'</div>'
+    +'<div class="art-meta"><span>'+a.fonte+'</span><span>'+rel(a.date)+'</span>'
+    +(a.isForecast?'<span class="prev-tag" style="padding:1px 5px;font-size:8px">⚡</span>':'')
+    +'</div>'
+    +'</div>'
+  ).join('');
+  if(page===0)grid.innerHTML=html; else grid.innerHTML+=html;
+  document.getElementById('load-more').style.display=filtered.length>(page+1)*PER_PAGE?'block':'none';
+}
+function loadMore(){page++;renderGrid();}
+
+// ── FILTRI ─────────────────────────────────────────────────────
+function filterCat(cat){
+  activeCat=cat;
+  document.querySelectorAll('.nav-cat,.grid-filter-btn').forEach(b=>{
+    const txt=b.textContent.trim().replace('⚡ ','');
+    b.classList.toggle('on',txt===cat||(cat==='tutti'&&txt==='Tutti'));
+  });
+  render();
+}
+function search(q){
+  const query=q.toLowerCase().trim();
+  filtered=query?all.filter(a=>(a.title+' '+a.sommario+' '+a.body+' '+a.cat).toLowerCase().includes(query)):(activeCat==='tutti'?all:all.filter(a=>a.cat===activeCat));
+  page=0;renderGrid();
+}
+
+// ── MODAL ──────────────────────────────────────────────────────
+function openArt(id){
+  const a=all.find(x=>x.id===id||x.id===String(id));
+  if(!a)return;
+  document.getElementById('m-cat').className='modal-cat '+catClass(a.cat);
+  document.getElementById('m-cat').textContent=a.cat;
+  document.getElementById('m-title').textContent=a.title;
+  document.getElementById('m-sommario').textContent=a.sommario;
+  document.getElementById('m-meta').innerHTML='<span>'+a.fonte+'</span><span>'+rel(a.date)+'</span>'+(a.isForecast?'<span class="prev-tag">⚡ Previsione MODO</span>':'');
+  const img=document.getElementById('m-img');
+  if(a.img){img.src=a.img;img.style.display='block';}else img.style.display='none';
+  const body=document.getElementById('m-body');
+  body.innerHTML=(a.body||'').split('\n\n').map(p=>'<p>'+p+'</p>').join('');
+  document.getElementById('modal-bg').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeMod(e){
+  if(e&&e.target!==document.getElementById('modal-bg')&&!e.target.classList.contains('modal-close'))return;
+  document.getElementById('modal-bg').classList.remove('open');
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMod({target:document.getElementById('modal-bg')});});
+
+// ── ISCRIZIONE ─────────────────────────────────────────────────
+function signup(){
+  const email=document.getElementById('signup-email').value.trim();
+  if(!email||!email.includes('@')||!email.includes('.'))return;
+  // Salva email
+  const emails=JSON.parse(localStorage.getItem('modo_subscribers')||'[]');
+  if(!emails.includes(email)){emails.push(email);localStorage.setItem('modo_subscribers',JSON.stringify(emails));}
+  document.getElementById('signup-email').style.display='none';
+  document.querySelector('.signup-btn').style.display='none';
+  document.querySelector('.signup-privacy').style.display='none';
+  document.getElementById('signup-ok').style.display='block';
+}
+
+// ── INIT ───────────────────────────────────────────────────────
+load();
+// Ricarica ogni 5 minuti per articoli nuovi pubblicati
+setInterval(load, 5*60*1000);
+</script>
+</body>
+</html>
