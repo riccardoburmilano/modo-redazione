@@ -571,6 +571,7 @@ function vote(id,choice,reward,e){e.stopPropagation();
 
 function filterCat(cat){
   activeCat=cat;
+  activeStatus='aperte';
   document.querySelectorAll('.nav-cat,.sidebar-item').forEach(b=>{
     const txt=b.textContent.trim().replace(/[⚽📈🏛🌍⚡◈★]\s*/,'').replace(/\s*\d+$/,'').trim();
     b.classList.toggle('on',txt===cat||(cat==='tutti'&&['Tutti','tutti','◈'].some(x=>txt.includes(x))));
@@ -631,10 +632,92 @@ function setupKey(){
   return false;
 }
 
+// ── TOKEN UTENTE ──────────────────────────────────────────────
+function getToken(){
+  let t=localStorage.getItem('quota_token');
+  if(!t){
+    // Genera token ref se arriva da link privato
+    const ref=new URLSearchParams(window.location.search).get('ref');
+    t='u_'+(ref?ref+'_':'')+Math.random().toString(36).slice(2,10)+Date.now().toString(36);
+    localStorage.setItem('quota_token',t);
+    // Registra ref bonus
+    if(ref)fetch(BUR+'/api/v2/quota/private/'+ref).catch(()=>{});
+  }
+  return t;
+}
+
+const TOKEN=getToken();
+
+// ── CARICA STATO UTENTE DAL BACKEND ───────────────────────────
+async function loadUser(){
+  try{
+    const r=await fetch(BUR+'/api/v2/quota/user/'+TOKEN);
+    const d=await r.json();
+    if(d.ok){
+      credits=d.crediti;
+      // Carica voti precedenti
+      if(d.votes)Object.assign(votes,d.votes);
+      save();
+    }
+  }catch(e){}
+}
+
+// ── CARICA CARD DAL BACKEND ───────────────────────────────────
+async function loadCards(){
+  try{
+    const r=await fetch(BUR+'/api/v2/quota/cards?limit=20');
+    const d=await r.json();
+    if(d.ok&&d.cards&&d.cards.length){
+      d.cards.forEach(card=>{
+        if(!CARDS.find(c=>c.id===card.id)){
+          CARDS.push({
+            id:card.id,cat:card.categoria,
+            question:card.domanda,context:card.contesto,
+            pctYes:card.pct_si,
+            votes:(card.votes_si||0)+(card.votes_no||0),
+            deadline:new Date(card.deadline).getTime(),
+            reward:card.reward,status:card.status
+          });
+        }
+      });
+      render();
+    }
+  }catch(e){}
+}
+
+// Override vote per salvare su backend
+const _origVote=vote;
+window.vote=async function(id,choice,reward,e){
+  e.stopPropagation();
+  if(votes[id])return;
+  try{
+    const r=await fetch(BUR+'/api/v2/quota/vote',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({card_id:id,scelta:choice,user_token:TOKEN})
+    });
+    const d=await r.json();
+    if(d.ok){credits=d.crediti;}
+  }catch(e){}
+  votes[id]=choice;credits+=5;save();render();
+  toast('⚡ +5 cr · +'+reward+' cr se azzecchi');
+};
+
+window.voteDet=async function(id,choice,reward){
+  if(votes[id])return;
+  try{
+    await fetch(BUR+'/api/v2/quota/vote',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({card_id:id,scelta:choice,user_token:TOKEN})
+    });
+  }catch(e){}
+  votes[id]=choice;credits+=5;save();render();openCard(id);
+  toast('⚡ +5 cr · +'+reward+' cr se azzecchi');
+};
+
 // INIT
 save();render();
-setTimeout(()=>{if(setupKey())generateFromRSS();},2000);
-setInterval(()=>{if(localStorage.getItem('quota_groq_key'))generateFromRSS();},5*60*1000);
+loadUser().then(()=>loadCards());
+setInterval(loadCards,3*60*1000);
 </script>
 
 <style>
