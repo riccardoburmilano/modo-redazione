@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QUOTA</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0a;--s1:#111;--s2:#181818;--s3:#222;
+  --b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.12);
+  --gold:#f0c040;--gold-d:rgba(240,192,64,.1);
+  --green:#00d084;--green-d:rgba(0,208,132,.08);
+  --red:#ff4757;--red-d:rgba(255,71,87,.08);
+  --blue:#3d8ef0;--purple:#a855f7;
+  --text:#f0f0ee;--t2:#999;--t3:#555;
+  --g:'Inter',sans-serif;--sg:'Space Grotesk',sans-serif;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--g);overflow-x:hidden}
+
+/* ── NAV ── */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;background:rgba(10,10,10,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 20px;gap:14px}
+.nav-logo-wrap{display:flex;align-items:center;gap:8px}
+.nav-ast{animation:rot 16s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+.nav-logo{font-family:var(--sg);font-size:20px;font-weight:800;letter-spacing:-.02em;color:var(--text)}
+.nav-logo span{color:var(--gold)}
+.nav-cats{display:flex;gap:2px;margin-left:8px}
+.nav-cat{font-size:11px;font-weight:600;color:var(--t3);padding:5px 12px;cursor:pointer;border:none;background:none;border-radius:2px;transition:all .15s;letter-spacing:.04em;text-transform:uppercase}
+.nav-cat:hover{color:var(--t2)}
+.nav-cat.on{color:var(--gold);background:var(--gold-d)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.nav-credits{font-family:var(--sg);font-size:13px;font-weight:700;color:var(--gold);display:flex;align-items:center;gap:5px}
+.nav-live{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--green);letter-spacing:.08em;text-transform:uppercase}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* ── LAYOUT ── */
+.app{display:grid;grid-template-columns:200px 1fr;min-height:100vh;padding-top:56px}
+
+/* ── SIDEBAR ── */
+.sidebar{background:var(--s1);border-right:1px solid var(--b1);padding:20px 0;position:sticky;top:56px;height:calc(100vh - 56px);display:flex;flex-direction:column;overflow-y:auto}
+.sidebar-section{padding:0 14px;margin-bottom:20px}
+.sidebar-label{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);padding:0 8px;margin-bottom:6px}
+.sidebar-item{display:flex;align-items:center;gap:8px;padding:8px;border-radius:3px;cursor:pointer;transition:all .12s;border:none;background:none;color:var(--t2);font-size:12px;font-weight:500;width:100%;text-align:left}
+.sidebar-item:hover{background:var(--b1);color:var(--text)}
+.sidebar-item.on{background:var(--gold-d);color:var(--gold)}
+.sidebar-item-icon{font-size:14px;width:20px;text-align:center}
+.sidebar-item-count{margin-left:auto;font-size:10px;font-weight:700;color:var(--t3);background:var(--s3);padding:1px 6px;border-radius:10px}
+.sidebar-divider{height:1px;background:var(--b1);margin:8px 14px}
+.sidebar-bottom{margin-top:auto;padding:14px}
+.sidebar-stat{display:flex;flex-direction:column;gap:3px;padding:12px;background:var(--s2);border:1px solid var(--b1);margin-bottom:8px}
+.sidebar-stat-n{font-family:var(--sg);font-size:20px;font-weight:800;color:var(--gold);line-height:1}
+.sidebar-stat-l{font-size:9px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase}
+
+/* ── MAIN ── */
+.main{padding:20px;display:flex;flex-direction:column;gap:16px}
+
+/* ── HEADER SEZIONE ── */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.section-title{font-family:var(--sg);font-size:13px;font-weight:700;color:var(--t2);letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.section-title::before{content:'';width:3px;height:13px;background:var(--gold);display:inline-block}
+.section-count{font-size:11px;color:var(--t3)}
+
+/* ── CARD ── */
+.cards-wrap{display:flex;flex-direction:column;gap:10px}
+
+.card{background:var(--s1);border:1px solid var(--b1);overflow:hidden;cursor:pointer;transition:all .2s;animation:fadeIn .4s ease forwards;opacity:0;transform:translateY(8px)}
+@keyframes fadeIn{to{opacity:1;transform:translateY(0)}}
+.card:hover{border-color:var(--b2);background:var(--s2);transform:translateY(-1px);box-shadow:0 8px 32px rgba(0,0,0,.4)}
+
+.card-inner{padding:18px 20px}
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.card-cat-wrap{display:flex;align-items:center;gap:6px}
+.card-cat{font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.cat-sport{color:#f97316}.cat-finanza{color:var(--gold)}.cat-politica{color:var(--purple)}.cat-mondo{color:var(--blue)}.cat-tech{color:#14b8a6}
+.card-time{font-size:10px;color:var(--t3);display:flex;align-items:center;gap:4px}
+.card-question{font-family:var(--sg);font-size:17px;font-weight:700;line-height:1.3;color:var(--text);margin-bottom:6px;letter-spacing:-.01em}
+.card-context{font-size:12px;color:var(--t3);line-height:1.55;margin-bottom:16px}
+
+/* Barra sfida */
+.card-bar-wrap{margin-bottom:14px}
+.card-bar-labels{display:flex;justify-content:space-between;margin-bottom:6px}
+.card-bar-label{font-size:11px;font-weight:700}
+.card-bar-label.yes{color:var(--green)}
+.card-bar-label.no{color:var(--red)}
+.card-bar{height:6px;background:var(--s3);border-radius:3px;overflow:hidden;position:relative}
+.card-bar-fill-yes{height:100%;background:var(--green);border-radius:3px;transition:width 1s ease}
+.card-bar-fill-no{position:absolute;top:0;right:0;height:100%;background:var(--red);border-radius:3px;transition:width 1s ease}
+.card-bar-pcts{display:flex;justify-content:space-between;margin-top:5px}
+.card-bar-pct{font-family:var(--sg);font-size:13px;font-weight:800}
+.card-bar-pct.yes{color:var(--green)}
+.card-bar-pct.no{color:var(--red)}
+
+/* Countdown */
+.card-countdown{display:flex;align-items:center;gap:6px;margin-bottom:14px}
+.countdown-label{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3)}
+.countdown-time{font-family:var(--sg);font-size:13px;font-weight:700;color:var(--gold)}
+
+/* Voto */
+.card-vote{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.vote-btn{padding:10px;border:1px solid transparent;font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;text-align:center;letter-spacing:.04em;font-family:var(--sg)}
+.vote-btn.yes{background:var(--green-d);border-color:rgba(0,208,132,.2);color:var(--green)}
+.vote-btn.yes:hover{background:var(--green);color:#000}
+.vote-btn.no{background:var(--red-d);border-color:rgba(255,71,87,.2);color:var(--red)}
+.vote-btn.no:hover{background:var(--red);color:#fff}
+.vote-btn.voted-yes{background:var(--green);color:#000;border-color:var(--green)}
+.vote-btn.voted-no{background:var(--red);color:#fff;border-color:var(--red)}
+
+/* Card meta */
+.card-meta{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--b1)}
+.card-meta-votes{font-size:10px;color:var(--t3)}
+.card-meta-credits{font-size:10px;color:var(--gold);margin-left:auto;display:flex;align-items:center;gap:4px}
+
+/* Card FEATURED */
+.card.featured{border-color:rgba(240,192,64,.2);background:linear-gradient(135deg,var(--s1) 0%,rgba(240,192,64,.04) 100%)}
+.card.featured .card-question{font-size:20px}
+.featured-badge{font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);background:var(--gold-d);border:1px solid rgba(240,192,64,.2);padding:2px 8px;display:inline-flex;align-items:center;gap:4px}
+
+/* Empty */
+.empty{padding:48px;text-align:center;color:var(--t3)}
+.empty-title{font-family:var(--sg);font-size:18px;margin-bottom:8px;color:var(--t2)}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:20px;background:var(--s2);border:1px solid var(--b2);padding:10px 16px;font-size:12px;color:var(--text);z-index:999;opacity:0;transition:opacity .25s;pointer-events:none;font-family:var(--sg)}
+.toast.show{opacity:1}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+
+@media(max-width:768px){
+  .app{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .nav-cats{display:none}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo-wrap">
+    <svg class="nav-ast" width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <line x1="10" y1="1" x2="10" y2="19" stroke="#f0c040" stroke-width="1.2"/>
+      <line x1="1" y1="10" x2="19" y2="10" stroke="#f0c040" stroke-width="1.2"/>
+      <line x1="2.93" y1="2.93" x2="17.07" y2="17.07" stroke="#f0c040" stroke-width="1.2"/>
+      <line x1="17.07" y1="2.93" x2="2.93" y2="17.07" stroke="#f0c040" stroke-width="1.2"/>
+    </svg>
+    <div class="nav-logo">QUOTA<span>·</span></div>
+  </div>
+  <div class="nav-cats">
+    <button class="nav-cat on" onclick="filterCat('tutti')">Tutti</button>
+    <button class="nav-cat" onclick="filterCat('Sport')">Sport</button>
+    <button class="nav-cat" onclick="filterCat('Finanza')">Finanza</button>
+    <button class="nav-cat" onclick="filterCat('Politica')">Politica</button>
+    <button class="nav-cat" onclick="filterCat('Mondo')">Mondo</button>
+  </div>
+  <div class="nav-right">
+    <div class="nav-credits">⚡ <span id="nav-credits">0</span> cr</div>
+    <div class="nav-live"><span class="live-dot"></span>Live</div>
+  </div>
+</nav>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Sezioni</div>
+      <button class="sidebar-item on" onclick="filterCat('tutti')">
+        <span class="sidebar-item-icon">◈</span> Tutti
+        <span class="sidebar-item-count" id="count-tutti">0</span>
+      </button>
+      <button class="sidebar-item" onclick="filterCat('Sport')">
+        <span class="sidebar-item-icon">⚽</span> Sport
+        <span class="sidebar-item-count" id="count-Sport">0</span>
+      </button>
+      <button class="sidebar-item" onclick="filterCat('Finanza')">
+        <span class="sidebar-item-icon">📈</span> Finanza
+        <span class="sidebar-item-count" id="count-Finanza">0</span>
+      </button>
+      <button class="sidebar-item" onclick="filterCat('Politica')">
+        <span class="sidebar-item-icon">🏛</span> Politica
+        <span class="sidebar-item-count" id="count-Politica">0</span>
+      </button>
+      <button class="sidebar-item" onclick="filterCat('Mondo')">
+        <span class="sidebar-item-icon">🌍</span> Mondo
+        <span class="sidebar-item-count" id="count-Mondo">0</span>
+      </button>
+      <button class="sidebar-item" onclick="filterCat('Tech')">
+        <span class="sidebar-item-icon">⚡</span> Tech
+        <span class="sidebar-item-count" id="count-Tech">0</span>
+      </button>
+    </div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Stato</div>
+      <button class="sidebar-item" onclick="filterStatus('aperte')">
+        <span class="sidebar-item-icon">⏳</span> Aperte
+      </button>
+      <button class="sidebar-item" onclick="filterStatus('chiuse')">
+        <span class="sidebar-item-icon">✓</span> Chiuse
+      </button>
+      <button class="sidebar-item" onclick="filterStatus('mie')">
+        <span class="sidebar-item-icon">★</span> Le mie
+      </button>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="sidebar-stat">
+        <div class="sidebar-stat-n" id="sb-credits">0</div>
+        <div class="sidebar-stat-l">Crediti QUOTA</div>
+      </div>
+      <div class="sidebar-stat">
+        <div class="sidebar-stat-n" id="sb-accuracy">—%</div>
+        <div class="sidebar-stat-l">La tua accuratezza</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main" id="main">
+    <div class="section-header">
+      <div class="section-title" id="section-title">In corso</div>
+      <div class="section-count" id="section-count"></div>
+    </div>
+    <div class="cards-wrap" id="cards-wrap">
+      <!-- cards qui -->
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATO ──────────────────────────────────────────────────────
+let credits = parseInt(localStorage.getItem('quota_credits')||'100');
+let votes = JSON.parse(localStorage.getItem('quota_votes')||'{}');
+let activeCat = 'tutti', activeStatus = 'aperte';
+
+// ── CARD DATI — partono con Wimbledon ─────────────────────────
+const CARDS = [
+  {
+    id:'wim1', cat:'Sport', featured:true,
+    question:'Sinner difende il titolo a Wimbledon 2026?',
+    context:'Sinner è testa di serie n.1 e campione in carica. Alcaraz ha dato forfait per infortunio al polso. Il campo è aperto.',
+    pctYes:71, votes:1240,
+    deadline: new Date('2026-07-12T17:00:00').getTime(),
+    creditsReward:50, status:'aperta'
+  },
+  {
+    id:'wim2', cat:'Sport',
+    question:'Sinner raggiungerà almeno la semifinale?',
+    context:'Da campione in carica e numero 1, Sinner parte nettamente favorito. Ma l\'erba può sorprendere.',
+    pctYes:84, votes:890,
+    deadline: new Date('2026-07-09T17:00:00').getTime(),
+    creditsReward:20, status:'aperta'
+  },
+  {
+    id:'wim3', cat:'Sport',
+    question:'Un italiano raggiungerà la finale maschile?',
+    context:'Sinner, Musetti, Cobolli e Darderi nel tabellone. La più forte presenza italiana di sempre a Wimbledon.',
+    pctYes:76, votes:654,
+    deadline: new Date('2026-07-11T17:00:00').getTime(),
+    creditsReward:30, status:'aperta'
+  },
+  {
+    id:'fin1', cat:'Finanza',
+    question:'Il BTP 10Y chiuderà sopra 3.5% questa settimana?',
+    context:'Lo spread BTP-Bund è in zona 120bp. La BCE ha segnalato pausa. I mercati sono cauti.',
+    pctYes:43, votes:321,
+    deadline: new Date('2026-07-04T17:30:00').getTime(),
+    creditsReward:25, status:'aperta'
+  },
+  {
+    id:'fin2', cat:'Finanza',
+    question:'Wall Street chiude la settimana in positivo?',
+    context:'S&P 500 in zona record. Dati occupazione USA in uscita venerdì. La Fed resta a guardare.',
+    pctYes:58, votes:445,
+    deadline: new Date('2026-07-04T22:00:00').getTime(),
+    creditsReward:20, status:'aperta'
+  },
+  {
+    id:'pol1', cat:'Politica',
+    question:'Il governo Meloni supera il 40% nei sondaggi entro luglio?',
+    context:'FdI è stabile al 29%. La coalizione di centrodestra oscilla tra 43-46%. Estate solitamente favorevole al governo.',
+    pctYes:38, votes:287,
+    deadline: new Date('2026-07-31T23:59:00').getTime(),
+    creditsReward:35, status:'aperta'
+  },
+  {
+    id:'mon1', cat:'Mondo',
+    question:'Ci sarà un cessate il fuoco in Medio Oriente entro 30 giorni?',
+    context:'I negoziati sono in corso. Le pressioni internazionali aumentano. La storia dice che questi accordi slittano.',
+    pctYes:22, votes:892,
+    deadline: new Date('2026-08-01T23:59:00').getTime(),
+    creditsReward:60, status:'aperta'
+  },
+  {
+    id:'tec1', cat:'Tech',
+    question:'Apple annuncerà un prodotto AI standalone entro settembre?',
+    context:'Rumors su un dispositivo AI dedicato circolano da mesi. WWDC ha dato indizi. Tim Cook ha evitato la domanda.',
+    pctYes:31, votes:543,
+    deadline: new Date('2026-09-30T23:59:00').getTime(),
+    creditsReward:40, status:'aperta'
+  },
+];
+
+// ── UTILS ──────────────────────────────────────────────────────
+function toast(m){
+  const t=document.getElementById('toast');
+  t.textContent=m;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+function countdown(deadline){
+  const diff=deadline-Date.now();
+  if(diff<=0)return'Scaduta';
+  const d=Math.floor(diff/86400000);
+  const h=Math.floor((diff%86400000)/3600000);
+  const m=Math.floor((diff%3600000)/60000);
+  if(d>0)return d+'g '+h+'h';
+  if(h>0)return h+'h '+m+'m';
+  return m+'m';
+}
+
+function updateCredits(){
+  document.getElementById('nav-credits').textContent=credits;
+  document.getElementById('sb-credits').textContent=credits;
+  localStorage.setItem('quota_credits',credits);
+}
+
+function updateAccuracy(){
+  const myVotes=Object.keys(votes);
+  if(!myVotes.length){document.getElementById('sb-accuracy').textContent='—%';return;}
+  // Per ora mostra solo quanti voti ha dato
+  document.getElementById('sb-accuracy').textContent=myVotes.length+' voti';
+}
+
+function updateCounts(){
+  const cats=['Sport','Finanza','Politica','Mondo','Tech'];
+  const filtered=CARDS.filter(c=>activeStatus==='aperte'?c.status==='aperta':c.status!=='aperta');
+  document.getElementById('count-tutti').textContent=filtered.length;
+  cats.forEach(cat=>{
+    const el=document.getElementById('count-'+cat);
+    if(el)el.textContent=filtered.filter(c=>c.cat===cat).length;
+  });
+}
+
+// ── RENDER ────────────────────────────────────────────────────
+function render(){
+  let cards=[...CARDS];
+  if(activeCat!=='tutti')cards=cards.filter(c=>c.cat===activeCat);
+  if(activeStatus==='mie')cards=cards.filter(c=>votes[c.id]);
+
+  updateCounts();
+
+  const wrap=document.getElementById('cards-wrap');
+  if(!cards.length){
+    wrap.innerHTML='<div class="empty"><div class="empty-title">Nessuna quota in questa sezione</div><div style="font-size:13px;color:var(--t3)">Torna presto — nuove quote ogni giorno.</div></div>';
+    return;
+  }
+
+  // Featured prima
+  cards.sort((a,b)=>(b.featured?1:0)-(a.featured?1:0));
+
+  wrap.innerHTML=cards.map((c,i)=>renderCard(c,i)).join('');
+
+  // Aggiorna countdown ogni minuto
+  clearInterval(wrap._timer);
+  wrap._timer=setInterval(()=>{
+    cards.forEach(c=>{
+      const el=document.getElementById('cd-'+c.id);
+      if(el)el.textContent=countdown(c.deadline);
+    });
+  },60000);
+}
+
+function renderCard(c,i){
+  const myVote=votes[c.id];
+  const pctNo=100-c.pctYes;
+  const delay=i*80;
+
+  return `<div class="card${c.featured?' featured':''}" style="animation-delay:${delay}ms">
+    <div class="card-inner">
+      <div class="card-top">
+        <div class="card-cat-wrap">
+          ${c.featured?'<span class="featured-badge">⚡ In evidenza</span>':''}
+          <span class="card-cat cat-${c.cat.toLowerCase()}">${c.cat}</span>
+        </div>
+        <div class="card-time">⏱ <span id="cd-${c.id}">${countdown(c.deadline)}</span></div>
+      </div>
+
+      <div class="card-question">${c.question}</div>
+      <div class="card-context">${c.context}</div>
+
+      <div class="card-bar-wrap">
+        <div class="card-bar-labels">
+          <span class="card-bar-label yes">Sì</span>
+          <span class="card-bar-label no">No</span>
+        </div>
+        <div class="card-bar">
+          <div class="card-bar-fill-yes" style="width:${c.pctYes}%"></div>
+          <div class="card-bar-fill-no" style="width:${pctNo}%"></div>
+        </div>
+        <div class="card-bar-pcts">
+          <span class="card-bar-pct yes">${c.pctYes}%</span>
+          <span class="card-bar-pct no">${pctNo}%</span>
+        </div>
+      </div>
+
+      ${!myVote?`
+      <div class="card-vote">
+        <button class="vote-btn yes" onclick="vote('${c.id}','si',${c.creditsReward},event)">✓ Sì — ${c.pctYes}%</button>
+        <button class="vote-btn no" onclick="vote('${c.id}','no',${c.creditsReward},event)">✗ No — ${pctNo}%</button>
+      </div>`:
+      `<div class="card-vote">
+        <button class="vote-btn ${myVote==='si'?'voted-yes':'yes'}" style="opacity:${myVote==='si'?1:.3}" disabled>✓ Sì</button>
+        <button class="vote-btn ${myVote==='no'?'voted-no':'no'}" style="opacity:${myVote==='no'?1:.3}" disabled>✗ No</button>
+      </div>`}
+
+      <div class="card-meta">
+        <span class="card-meta-votes">${(c.votes+(myVote?1:0)).toLocaleString('it-IT')} voti</span>
+        ${myVote?`<span style="font-size:10px;color:var(--green)">✓ Hai votato ${myVote==='si'?'Sì':'No'}</span>`:''}
+        <span class="card-meta-credits">+${c.creditsReward} cr se azzecchi</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── VOTO ─────────────────────────────────────────────────────
+function vote(id,choice,reward,e){
+  e.stopPropagation();
+  if(votes[id])return;
+  votes[id]=choice;
+  localStorage.setItem('quota_votes',JSON.stringify(votes));
+  // Piccolo reward per partecipazione
+  credits+=5;
+  updateCredits();
+  updateAccuracy();
+  toast('Voto registrato! +5 cr per la partecipazione. +'+reward+' cr se azzecchi.');
+  render();
+}
+
+// ── FILTRI ───────────────────────────────────────────────────
+function filterCat(cat){
+  activeCat=cat;
+  document.querySelectorAll('.nav-cat,.sidebar-item').forEach(b=>{
+    const txt=b.textContent.trim().replace(/[⚽📈🏛🌍⚡◈★⏳✓]\s*/,'').replace(/\s+\d+$/,'').trim();
+    b.classList.toggle('on',txt===cat||(cat==='tutti'&&(txt==='Tutti'||txt==='tutti')));
+  });
+  document.getElementById('section-title').textContent=cat==='tutti'?'In corso':cat;
+  render();
+}
+
+function filterStatus(status){
+  activeStatus=status;
+  render();
+}
+
+// ── AGGIUNTA CARD NUOVA (fade-in) ─────────────────────────────
+// Simula arrivo nuova card ogni 3 minuti
+function simulateNewCard(){
+  const nuove=[
+    {id:'live'+Date.now(),cat:'Sport',question:'Musetti supera il terzo turno a Wimbledon?',context:'Musetti ha mostrato ottima forma sull\'erba. Il suo avversario è più basso nel ranking.',pctYes:62,votes:12,deadline:new Date('2026-07-04T18:00:00').getTime(),creditsReward:25,status:'aperta'},
+    {id:'live2'+Date.now(),cat:'Finanza',question:'L\'euro chiude sopra 1.10 contro dollaro oggi?',context:'EUR/USD in area 1.085. Dati macro USA in uscita nel pomeriggio.',pctYes:41,votes:87,deadline:new Date(Date.now()+14400000).getTime(),creditsReward:20,status:'aperta'},
+  ];
+  const nuova=nuove[Math.floor(Math.random()*nuove.length)];
+  if(!CARDS.find(c=>c.id===nuova.id)){
+    CARDS.unshift(nuova);
+    render();
+    toast('⚡ Nuova quota disponibile: '+nuova.question.slice(0,40)+'...');
+  }
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+updateCredits();
+updateAccuracy();
+render();
+
+// Simula nuove card ogni 3 minuti
+setTimeout(simulateNewCard, 3*60*1000);
+setInterval(simulateNewCard, 3*60*1000);
+</script>
+</body>
+</html>
