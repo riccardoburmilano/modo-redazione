@@ -404,7 +404,7 @@ async function generateBatch(){
   const groqKey=localStorage.getItem('quota_groq_key');
   if(!groqKey){
     const k=window.prompt('Groq API key:');
-    if(!k){btn.disabled=false;btn.textContent='⚡ Genera quote da RSS';return;}
+    if(!k){btn.disabled=false;btn.textContent='⚡ Genera quote da RSS';renderFeed();return;}
     localStorage.setItem('quota_groq_key',k.trim());
   }
 
@@ -473,7 +473,7 @@ function renderFeed(){
   if(activeTab==='live')filtered=filtered.filter(q=>q.status==='published');
   // Ordina per hype desc
   filtered.sort((a,b)=>b.hype-a.hype);
-  if(!filtered.length){empty.style.display='flex';list.innerHTML='';return;}
+  if(!filtered.length){if(empty)empty.style.display='flex';list.innerHTML='';return;}
   empty.style.display='none';
 
   const hypeColor=h=>h>=85?'#ff3d5a':h>=70?'#ff8c00':h>=50?'#f5c842':'#4f8ef7';
