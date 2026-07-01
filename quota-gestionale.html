@@ -189,7 +189,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--g
           <input class="ed-input sm" id="ed-ctx" type="text" placeholder="Breve contesto per l'utente...">
         </div>
         <div class="ed-field">
-          <div class="ed-label">Probabilità SÌ</div>
+          <div class="ed-label">Prior probabilità SÌ (si muoverà con i voti)</div>
           <div class="pct-row">
             <div class="pct-yes" id="pct-yes-big">50%</div>
             <input type="range" class="pct-slider" id="pct-slider" min="5" max="95" value="50" oninput="updatePct(this.value)">
@@ -217,7 +217,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--g
         </div>
       </div>
       <div class="ed-bottom">
-        <button class="ed-reject" onclick="rejectQ()">✕ Scarta</button>
+        <button class="ed-reject" onclick="rejectQ()">✕ Scarta</button><button class="ed-btn" onclick="resolveQ('si')" style="color:var(--green);border-color:rgba(0,232,122,.2)">✓ Chiudi: SÌ</button><button class="ed-btn" onclick="resolveQ('no')" style="color:var(--red);border-color:rgba(255,61,90,.2)">✗ Chiudi: NO</button>
         <button class="ed-btn" onclick="previewQ()">👁 Anteprima</button>
         <button class="ed-save" onclick="saveQ()">Salva</button>
         <button class="ed-pub" onclick="publishQ()">✓ Pubblica</button>
@@ -317,6 +317,8 @@ function openQ(id){
   document.getElementById('ed-src').value=x.sourceUrl||'';
   document.getElementById('ed-reward').value=x.reward||25;
   document.getElementById('ed-factors').value=x.factors||'';
+  const aibox=document.getElementById('ai-box');
+  if(x.motivazione_ai){aibox.classList.add('show');aibox.textContent='📊 Analisi AI: '+x.motivazione_ai;}else{aibox.classList.remove('show');}
   const dl=x.deadline?new Date(x.deadline).toISOString().slice(0,16):'';
   document.getElementById('ed-deadline').value=dl;
   updatePct(x.pctYes||50);
@@ -406,7 +408,7 @@ async function generateQuote(){
       const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
         method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+localStorage.getItem('quota_groq_key')},
         body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:300,temperature:0.6,messages:[
-          {role:'system',content:'Trasforma notizie in domande predittive sì/no per un prediction market italiano. Rispondi SOLO con JSON: {"domanda":"max 80 caratteri","contesto":"max 100 caratteri","pct_si":50,"categoria":"Sport|Finanza|Politica|Mondo|Tech","ore":24,"reward":20}'},
+          {role:'system',content:'Sei un editor di QUOTA, prediction market italiano. Trasforma la notizia in una domanda predittiva INTRIGANTE e SCOMMETTIBILE. La domanda deve: 1) essere verificabile con una data precisa 2) creare tensione tra due possibilità reali 3) usare numeri o soglie specifiche quando possibile (es: "sopra il 3%", "entro 7 giorni"). NON inventare dati. NON mettere percentuali. Rispondi SOLO con JSON: {"domanda":"domanda max 90 caratteri - deve essere intrigante","contesto":"contesto che spiega perché è rilevante, max 120 caratteri","motivazione_ai":"analisi breve del perché questa previsione è interessante, max 150 caratteri","categoria":"Sport|Finanza|Politica|Mondo|Tech","ore":24,"reward":20}'},
           {role:'user',content:rss.sourceTitle+'. '+(rss.sourceDesc||'')}
         ]})
       });
@@ -417,6 +419,7 @@ async function generateQuote(){
       if(!m)continue;
       const g=JSON.parse(m[0]);
       rss.question=g.domanda||'';
+      rss.motivazione_ai=g.motivazione_ai||'';
       rss.context=g.contesto||'';
       rss.pctYes=Math.min(90,Math.max(10,g.pct_si||50));
       rss.cat=g.categoria||rss.cat;
@@ -441,14 +444,14 @@ async function aiSuggestPct(){
     const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},
       body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:150,temperature:0.4,messages:[
-        {role:'system',content:'Sei un analista di prediction market. Suggerisci la probabilità % per una domanda predittiva. Rispondi SOLO con JSON: {"pct":70,"motivazione":"max 80 caratteri"}'},
+        {role:'system',content:'Sei un analista quantitativo. Stima la probabilità di base (prior) per questa previsione basandoti su dati storici e contesto. Questa sarà la % di partenza - poi il mercato la farà muovere. Rispondi SOLO con JSON: {"pct":70,"motivazione":"spiegazione max 100 caratteri","range_min":55,"range_max":80}'},
         {role:'user',content:'Domanda: '+q.question+'. Contesto: '+q.context}
       ]})
     });
     const d=await r.json();
     const txt=d.choices?.[0]?.message?.content||'{}';
     const m=txt.match(/\{[\s\S]*\}/);
-    if(m){const g=JSON.parse(m[0]);updatePct(g.pct||50);box.textContent='AI suggerisce '+g.pct+'% · '+g.motivazione;}
+    if(m){const g=JSON.parse(m[0]);updatePct(g.pct||50);box.classList.add('show');box.textContent='Prior AI: '+g.pct+'% (range '+g.range_min+'-'+g.range_max+'%) · '+g.motivazione+' · La % reale si calibrerà con i voti della community.';}
   }catch(e){box.textContent='Errore: '+e.message;}
 }
 
@@ -470,6 +473,17 @@ async function aiSuggestFactors(){
     ta.value=d.choices?.[0]?.message?.content||'';
     if(q)q.factors=ta.value;
   }catch(e){ta.value='Errore: '+e.message;}
+}
+
+async function resolveQ(esito){
+  if(!q)return;
+  if(!confirm('Chiudi questa quota con esito: '+esito.toUpperCase()+'?'))return;
+  try{
+    const r=await fetch(BUR+'/api/v2/quota/resolve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({card_id:q.id,esito})});
+    const d=await r.json();
+    if(d.ok){log('✓ Quota chiusa. Vincitori: '+d.vincitori+' (+'+d.reward_distribuito+' cr totali)','ok');q.status='rejected';upStats();renderFeed();showFeed();}
+    else log('Errore: '+d.error,'err');
+  }catch(e){log('Errore resolve: '+e.message,'err');}
 }
 
 function previewQ(){
