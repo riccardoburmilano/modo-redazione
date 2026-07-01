@@ -3,229 +3,187 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QUOTA · Il mercato cognitivo</title>
+<title>QUOTA</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
   --bg:#06060e;--s1:#0d0d1a;--s2:#141428;
   --b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.11);
-  --gold:#f5c842;--gd:rgba(245,200,66,.09);--gg:rgba(245,200,66,.05);
-  --green:#00e87a;--red:#ff3d5a;--orange:#ff8c00;--blue:#4f8ef7;--purple:#a855f7;
+  --gold:#f5c842;--gd:rgba(245,200,66,.09);
+  --green:#00e87a;--red:#ff3d5a;--orange:#ff8c00;
+  --purple:#a855f7;--blue:#4f8ef7;
   --text:#f0efe8;--t2:#909090;--t3:#404040;
-  --card:rgba(14,14,24,.94);--cb:rgba(255,255,255,.07);
-  --sh:0 20px 60px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06);
   --g:'Inter',sans-serif;--sg:'Space Grotesk',sans-serif;
 }
 html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--g);-webkit-font-smoothing:antialiased;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 70% 50% at 15% 10%,rgba(80,30,140,.22),transparent 55%),radial-gradient(ellipse 50% 40% at 85% 85%,rgba(20,50,140,.16),transparent 55%),radial-gradient(ellipse 30% 30% at 50% 50%,rgba(245,200,66,.03),transparent 60%);pointer-events:none}
+body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 70% 50% at 15% 10%,rgba(80,30,140,.2),transparent 55%),radial-gradient(ellipse 50% 40% at 85% 85%,rgba(20,50,120,.15),transparent 55%);pointer-events:none}
 
-/* ── TICKER TG ── */
-.ticker{position:fixed;top:0;left:0;right:0;z-index:1000;height:28px;background:var(--red);display:flex;align-items:center;overflow:hidden;box-shadow:0 2px 12px rgba(255,61,90,.4)}
-.ticker-label{flex-shrink:0;background:rgba(0,0,0,.3);padding:0 14px;height:100%;display:flex;align-items:center;font-size:9px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#fff;white-space:nowrap;border-right:1px solid rgba(255,255,255,.2)}
-.ticker-track{flex:1;overflow:hidden;position:relative}
-.ticker-inner{display:flex;gap:48px;animation:tickScroll 40s linear infinite;white-space:nowrap;padding-left:100%}
-@keyframes tickScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
-.ticker-item{font-size:11px;font-weight:600;color:#fff;display:flex;align-items:center;gap:8px;flex-shrink:0}
-.ticker-item::after{content:'·';opacity:.4}
-.ticker-dot{width:5px;height:5px;border-radius:50%;background:#fff;opacity:.6}
+/* TICKER */
+.ticker{position:fixed;top:0;left:0;right:0;z-index:1000;height:26px;background:var(--red);display:flex;align-items:center;overflow:hidden}
+.ticker-lbl{flex-shrink:0;background:rgba(0,0,0,.3);padding:0 12px;height:100%;display:flex;align-items:center;font-size:8px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#fff;border-right:1px solid rgba(255,255,255,.2)}
+.ticker-track{flex:1;overflow:hidden}
+.ticker-inner{display:flex;gap:40px;animation:tick 50s linear infinite;white-space:nowrap;padding-left:100%}
+@keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.ti{font-size:10px;font-weight:600;color:#fff;flex-shrink:0;display:flex;align-items:center;gap:6px}
+.ti::after{content:'·';opacity:.4}
 
-/* ── NAV ── */
-.nav{position:fixed;top:28px;left:0;right:0;z-index:200;height:56px;background:rgba(6,6,14,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 18px;gap:12px}
-.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
-.nav-ast{animation:rot 18s linear infinite;filter:drop-shadow(0 0 6px rgba(245,200,66,.35))}
+/* NAV */
+.nav{position:fixed;top:26px;left:0;right:0;z-index:200;height:54px;background:rgba(6,6,14,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 18px;gap:12px}
+.nav-ast{animation:rot 18s linear infinite;filter:drop-shadow(0 0 5px rgba(245,200,66,.4))}
 @keyframes rot{to{transform:rotate(360deg)}}
-.nav-name{font-family:var(--sg);font-size:21px;font-weight:800;background:linear-gradient(135deg,#fff,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-logo{font-family:var(--sg);font-size:20px;font-weight:800;background:linear-gradient(135deg,#fff,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none}
 .nav-cats{display:flex;gap:1px;margin-left:10px}
 .nav-cat{font-size:10px;font-weight:700;color:var(--t3);padding:5px 12px;border:none;background:none;cursor:pointer;border-radius:20px;transition:all .18s;letter-spacing:.05em;text-transform:uppercase}
 .nav-cat:hover{color:var(--t2)}
 .nav-cat.on{color:var(--gold);background:var(--gd);border:1px solid rgba(245,200,66,.18)}
 .nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
-.nav-qr{font-family:var(--sg);font-size:12px;font-weight:700;color:var(--gold);background:var(--gd);border:1px solid rgba(245,200,66,.15);padding:5px 12px;border-radius:20px;cursor:pointer;transition:all .2s}
-.nav-qr:hover{background:rgba(245,200,66,.15)}
-.nav-live{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:700;color:var(--green);letter-spacing:.1em;text-transform:uppercase}
+.nav-qr{font-family:var(--sg);font-size:12px;font-weight:700;color:var(--gold);background:var(--gd);border:1px solid rgba(245,200,66,.15);padding:4px 12px;border-radius:20px;cursor:pointer}
+.nav-squad{font-size:12px;font-weight:700;color:var(--purple);background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);padding:4px 12px;border-radius:20px;cursor:pointer;text-decoration:none}
 .ldot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 7px var(--green);animation:pulse 2s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
-.notif-btn{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid var(--b1);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .2s;position:relative}
-.notif-btn:hover{background:rgba(255,255,255,.1)}
-.notif-badge{position:absolute;top:-3px;right:-3px;width:15px;height:15px;border-radius:50%;background:var(--red);font-size:8px;font-weight:800;color:#fff;display:none;align-items:center;justify-content:center}
-.notif-badge.show{display:flex}
+.nav-live{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:700;color:var(--green);letter-spacing:.1em;text-transform:uppercase}
 
-/* ── LAYOUT ── */
-.app{display:grid;grid-template-columns:190px 1fr;min-height:100vh;padding-top:84px;position:relative;z-index:1}
+/* LAYOUT */
+.app{display:grid;grid-template-columns:180px 1fr;min-height:100vh;padding-top:80px;position:relative;z-index:1}
 
-/* ── SIDEBAR ── */
-.sidebar{background:rgba(8,8,18,.7);border-right:1px solid var(--b1);padding:16px 0;position:sticky;top:84px;height:calc(100vh - 84px);display:flex;flex-direction:column;overflow-y:auto}
-.sb-lbl{font-size:8px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);padding:0 14px;margin-bottom:5px}
-.sb-item{display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:11px;font-weight:500;color:var(--t2);cursor:pointer;border:none;background:none;width:100%;text-align:left;border-left:2px solid transparent;transition:all .15s}
+/* SIDEBAR */
+.sidebar{background:rgba(8,8,18,.7);border-right:1px solid var(--b1);padding:14px 0;position:sticky;top:80px;height:calc(100vh - 80px);display:flex;flex-direction:column;overflow-y:auto}
+.sb-lbl{font-size:8px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);padding:0 12px;margin-bottom:5px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:8px 12px;font-size:11px;font-weight:500;color:var(--t2);cursor:pointer;border:none;background:none;width:100%;text-align:left;border-left:2px solid transparent;transition:all .15s}
 .sb-item:hover{color:var(--text);background:rgba(255,255,255,.03)}
 .sb-item.on{color:var(--gold);background:var(--gd);border-left-color:var(--gold)}
 .sb-ico{font-size:13px;width:16px;text-align:center}
 .sb-cnt{margin-left:auto;font-size:9px;font-weight:700;color:var(--t3);background:rgba(255,255,255,.06);padding:1px 5px;border-radius:6px}
-.sb-div{height:1px;background:var(--b1);margin:8px 14px}
-.sb-bot{margin-top:auto;padding:12px 14px}
-.sb-qr-box{background:var(--gd);border:1px solid rgba(245,200,66,.12);border-radius:8px;padding:12px;margin-bottom:6px;text-align:center}
+.sb-div{height:1px;background:var(--b1);margin:8px 12px}
+.sb-bot{margin-top:auto;padding:12px}
+.sb-qr-box{background:var(--gd);border:1px solid rgba(245,200,66,.12);border-radius:8px;padding:10px;margin-bottom:6px;text-align:center}
 .sb-qr-n{font-family:var(--sg);font-size:20px;font-weight:900;color:var(--gold);line-height:1}
 .sb-qr-l{font-size:8px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
-.sb-pct{font-size:11px;color:var(--t2);text-align:center;margin-top:4px}
-.sb-fascia{font-size:10px;font-weight:600;text-align:center;padding:6px;border-radius:6px;margin-top:4px}
-.sb-streak{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:var(--t2);margin-top:6px}
-.sb-streak span{color:var(--gold);font-weight:700;font-family:var(--sg)}
+.sb-pct{font-size:10px;color:var(--t2);text-align:center;margin-top:3px}
+.sb-fascia{font-size:10px;font-weight:600;text-align:center;padding:5px;border-radius:5px;margin-top:3px}
+.sb-streak{font-size:10px;color:var(--t2);text-align:center;margin-top:4px}
 
-/* ── MAIN ── */
-.main{padding:16px;display:flex;flex-direction:column;gap:8px;min-width:0}
-.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+/* MAIN */
+.main{padding:16px;display:flex;flex-direction:column;gap:12px}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
 .sec-title{font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--t3);display:flex;align-items:center;gap:7px}
 .sec-title::before{content:'';width:2px;height:10px;background:var(--gold);border-radius:1px;box-shadow:0 0 5px rgba(245,200,66,.4)}
 
-/* ── FLASH EVENT ── */
-.flash-overlay{position:fixed;inset:0;z-index:400;background:rgba(255,61,90,.08);pointer-events:none;opacity:0;transition:opacity .3s}
-.flash-overlay.active{opacity:1;animation:flashPulse 1s ease-in-out infinite}
-@keyframes flashPulse{0%,100%{opacity:1}50%{opacity:.3}}
-.flash-card{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);z-index:500;width:min(460px,90vw);background:rgba(12,6,18,.98);border:2px solid var(--red);border-radius:16px;box-shadow:0 0 60px rgba(255,61,90,.5),0 32px 80px rgba(0,0,0,.9);display:none;animation:flashIn .3s cubic-bezier(.34,1.4,.64,1) forwards}
-.flash-card.show{display:block;transform:translate(-50%,-50%) scale(1)}
-@keyframes flashIn{from{transform:translate(-50%,-50%) scale(.85);opacity:0}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
-.fc-header{background:var(--red);padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
-.fc-badge{font-size:9px;font-weight:900;letter-spacing:.2em;text-transform:uppercase;color:#fff;display:flex;align-items:center;gap:6px}
-.fc-rdot{width:6px;height:6px;border-radius:50%;background:#fff;animation:pulse .8s ease-in-out infinite}
-.fc-timer-big{font-family:var(--sg);font-size:28px;font-weight:900;color:#fff;text-shadow:0 0 20px rgba(255,255,255,.5)}
-.fc-body{padding:20px}
+/* ── EVENT CARD ── */
+.event-card{border-radius:16px;overflow:hidden;cursor:pointer;transition:all .3s cubic-bezier(.34,1.1,.64,1);position:relative;box-shadow:0 20px 60px rgba(0,0,0,.8);margin-bottom:10px;animation:fadeUp .5s ease forwards;opacity:0}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+.event-card:hover{transform:translateY(-3px) scale(1.005);box-shadow:0 32px 80px rgba(0,0,0,.9)}
+
+/* HERO IMMAGINE */
+.ec-hero{height:200px;position:relative;overflow:hidden}
+.ec-bg{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform .4s ease}
+.event-card:hover .ec-bg{transform:scale(1.04)}
+.ec-overlay{position:absolute;inset:0;background:linear-gradient(0deg,rgba(6,6,14,.98) 0%,rgba(6,6,14,.7) 40%,rgba(6,6,14,.2) 100%)}
+.ec-top-badges{position:absolute;top:14px;left:14px;right:14px;display:flex;align-items:center;justify-content:space-between}
+.ec-cat-badge{font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;padding:4px 10px;border-radius:20px;backdrop-filter:blur(8px)}
+.ec-timer-badge{font-family:var(--sg);font-size:12px;font-weight:800;color:#fff;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,.15)}
+.ec-hype{position:absolute;top:14px;right:130px;font-size:9px;font-weight:800;color:#fff;background:rgba(255,140,0,.6);backdrop-filter:blur(8px);padding:3px 9px;border-radius:20px;display:flex;align-items:center;gap:4px}
+.ec-bottom{position:absolute;bottom:0;left:0;right:0;padding:16px}
+.ec-event-name{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:5px}
+.ec-title{font-family:var(--sg);font-size:22px;font-weight:900;line-height:1.2;letter-spacing:-.02em;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.8)}
+.ec-subtitle{font-size:12px;color:rgba(255,255,255,.5);margin-top:4px}
+
+/* SCOMMESSE */
+.ec-body{background:rgba(10,10,20,.97);border:1px solid rgba(255,255,255,.07);border-top:none;padding:0}
+
+/* PREVIEW SCOMMESSE (card chiusa) */
+.ec-preview{padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.ec-preview-row{display:flex;align-items:center;gap:10px}
+.ep-q{flex:1;font-size:12px;color:var(--t2);line-height:1.3}
+.ep-opts{display:flex;gap:4px;flex-shrink:0}
+.ep-opt{padding:4px 9px;border-radius:6px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid var(--b2);background:rgba(255,255,255,.04);color:var(--t2);transition:all .15s;font-family:var(--sg)}
+.ep-opt:hover{border-color:rgba(245,200,66,.3);color:var(--gold);background:var(--gd)}
+.ep-opt.sel{border-color:var(--gold);color:var(--gold);background:var(--gd)}
+.ep-opt.sel-g{border-color:var(--green);color:var(--green);background:rgba(0,232,122,.08)}
+.ep-opt:disabled{opacity:.3;cursor:default}
+.ec-more{padding:10px 16px 14px;font-size:10px;color:var(--t3);display:flex;align-items:center;justify-content:space-between}
+.ec-more-btn{font-size:10px;font-weight:700;color:var(--purple);background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.15);padding:5px 12px;border-radius:20px;cursor:pointer;font-family:var(--sg);transition:all .2s}
+.ec-more-btn:hover{background:rgba(168,85,247,.15)}
+.ec-footer{padding:10px 16px;border-top:1px solid rgba(255,255,255,.05);display:flex;align-items:center;gap:10px;background:rgba(0,0,0,.2)}
+.ec-placed{font-size:10px;color:var(--green)}
+.ec-qr-max{font-family:var(--sg);font-size:11px;font-weight:700;color:var(--gold);margin-left:auto}
+.ec-submit{padding:7px 16px;background:var(--gold);border:none;color:#000;font-size:11px;font-weight:800;border-radius:8px;cursor:pointer;font-family:var(--sg);transition:all .2s}
+.ec-submit:hover{opacity:.88}
+
+/* HURRY STRIP */
+.hurry-strip{display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(255,61,90,.06);border-bottom:1px solid rgba(255,61,90,.12)}
+.hs-dot{width:5px;height:5px;border-radius:50%;background:var(--red);animation:pulse .9s ease-in-out infinite;flex-shrink:0}
+.hs-txt{font-size:10px;font-weight:700;color:var(--red);flex:1}
+.hs-timer{font-family:var(--sg);font-size:14px;font-weight:900;color:var(--red);text-shadow:0 0 12px rgba(255,61,90,.4)}
+
+/* FLASH CARD */
+.flash-card{position:fixed;inset:0;z-index:500;background:rgba(4,4,12,.92);backdrop-filter:blur(16px);display:none;align-items:center;justify-content:center;padding:20px}
+.flash-card.open{display:flex}
+.fc-box{background:rgba(10,10,20,.99);border:2px solid var(--red);border-radius:20px;width:min(440px,94vw);box-shadow:0 0 80px rgba(255,61,90,.4),0 32px 80px rgba(0,0,0,.9);animation:fcIn .35s cubic-bezier(.34,1.4,.64,1)}
+@keyframes fcIn{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.fc-head{background:var(--red);padding:12px 16px;display:flex;align-items:center;justify-content:space-between}
+.fc-badge{font-size:9px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#fff;display:flex;align-items:center;gap:5px}
+.fc-rdot{width:5px;height:5px;border-radius:50%;background:#fff;animation:pulse .8s ease-in-out infinite}
+.fc-big-timer{font-family:var(--sg);font-size:32px;font-weight:900;color:#fff;text-shadow:0 0 20px rgba(255,255,255,.5)}
+.fc-body{padding:22px}
 .fc-cat{font-size:8px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;margin-bottom:8px}
 .fc-q{font-family:var(--sg);font-size:20px;font-weight:800;line-height:1.28;letter-spacing:-.02em;margin-bottom:10px}
-.fc-ctx{font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:16px;padding:10px;background:rgba(255,61,90,.06);border-radius:6px;border-left:2px solid rgba(255,61,90,.3)}
-.fc-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.fc-btn{padding:14px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:var(--sg);border:1px solid transparent;transition:all .2s}
+.fc-ctx{font-size:11px;color:var(--t2);line-height:1.6;margin-bottom:16px;padding:10px;background:rgba(255,61,90,.06);border-left:2px solid rgba(255,61,90,.3);border-radius:0 6px 6px 0}
+.fc-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.fc-btn{padding:13px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--sg);border:1px solid transparent;transition:all .2s}
 .fc-btn.yes{background:rgba(0,232,122,.1);border-color:rgba(0,232,122,.2);color:var(--green)}
 .fc-btn.yes:hover{background:var(--green);color:#000;box-shadow:0 8px 24px rgba(0,232,122,.4)}
 .fc-btn.no{background:rgba(255,61,90,.1);border-color:rgba(255,61,90,.2);color:var(--red)}
-.fc-btn.no:hover{background:var(--red);color:#fff;box-shadow:0 8px 24px rgba(255,61,90,.4)}
-.fc-skip{width:100%;padding:8px;background:rgba(255,255,255,.04);border:1px solid var(--b1);color:var(--t3);font-size:11px;cursor:pointer;border-radius:6px;transition:all .2s}
-.fc-skip:hover{color:var(--t2)}
+.fc-btn.no:hover{background:var(--red);color:#fff}
+.fc-skip{width:100%;padding:7px;background:rgba(255,255,255,.04);border:1px solid var(--b1);color:var(--t3);font-size:10px;cursor:pointer;border-radius:6px;transition:all .2s}
 
-/* ── HURRY UP CARD ── */
-.card-h{background:var(--card);border:1px solid rgba(255,61,90,.18);border-radius:14px;overflow:hidden;box-shadow:var(--sh);position:relative;cursor:pointer;transition:all .25s;margin-bottom:8px}
-.card-h::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent)}
-.card-h:hover{transform:translateY(-2px);box-shadow:0 28px 70px rgba(0,0,0,.85)}
-.ch-top{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px}
-.hurry-badge{display:flex;align-items:center;gap:5px;font-size:8px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:var(--red);background:rgba(255,61,90,.1);border:1px solid rgba(255,61,90,.2);padding:3px 9px;border-radius:20px}
-.rdot{width:4px;height:4px;border-radius:50%;background:var(--red);animation:pulse .9s ease-in-out infinite}
-.ch-timer{font-family:var(--sg);font-size:18px;font-weight:900;color:var(--red);text-shadow:0 0 16px rgba(255,61,90,.5);letter-spacing:.02em}
-.ch-body{padding:0 16px 14px}
-.ch-cat{font-size:8px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;margin-bottom:6px}
-.ch-q{font-family:var(--sg);font-size:17px;font-weight:800;line-height:1.28;letter-spacing:-.02em;margin-bottom:8px}
-.ch-info{font-size:11px;color:var(--t2);line-height:1.6;margin-bottom:12px;padding:8px 10px;background:rgba(255,255,255,.04);border-radius:6px;border-left:2px solid rgba(255,61,90,.25)}
-.ch-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
-.ch-btn{padding:11px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--sg);border:1px solid transparent;transition:all .2s;position:relative}
-.ch-btn.yes{background:rgba(0,232,122,.08);border-color:rgba(0,232,122,.18);color:var(--green)}
-.ch-btn.yes:hover:not(:disabled){background:var(--green);color:#000;box-shadow:0 8px 20px rgba(0,232,122,.35);transform:scale(1.02)}
-.ch-btn.no{background:rgba(255,61,90,.08);border-color:rgba(255,61,90,.18);color:var(--red)}
-.ch-btn.no:hover:not(:disabled){background:var(--red);color:#fff;box-shadow:0 8px 20px rgba(255,61,90,.35);transform:scale(1.02)}
-.ch-btn:disabled{opacity:.3;cursor:default;transform:none!important}
-.ch-btn.voted-y{background:var(--green);color:#000}
-.ch-btn.voted-n{background:var(--red);color:#fff}
-.ch-actions{display:flex;gap:6px;margin-top:8px}
-.ch-action{flex:1;padding:7px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;font-family:var(--sg);border:1px solid var(--b1);background:rgba(255,255,255,.04);color:var(--t2);transition:all .18s;text-align:center}
-.ch-action:hover{border-color:var(--b2);color:var(--text)}
-.ch-action.double{border-color:rgba(245,200,66,.2);color:var(--gold)}
-.ch-action.double:hover{background:var(--gd)}
-.ch-action.contra{border-color:rgba(168,85,247,.2);color:var(--purple)}
-.ch-action.contra:hover{background:rgba(168,85,247,.08)}
-.ch-meta{display:flex;align-items:center;gap:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05);font-size:9px;color:var(--t3)}
-.ch-qr{margin-left:auto;color:var(--gold);font-weight:700;font-family:var(--sg);font-size:10px}
+/* MODAL FULL */
+.modal-bg{position:fixed;inset:0;z-index:600;background:rgba(4,4,12,.92);backdrop-filter:blur(16px);display:none;overflow-y:auto;padding:20px}
+.modal-bg.open{display:block}
+.modal-wrap{max-width:680px;margin:0 auto;padding-bottom:40px}
+.modal-close-btn{position:fixed;top:20px;right:20px;width:40px;height:40px;background:rgba(255,255,255,.08);border:1px solid var(--b2);border-radius:50%;color:#fff;font-size:20px;cursor:pointer;z-index:601;display:flex;align-items:center;justify-content:center}
 
-/* ── DEEP BET CARD ── */
-.card-d{background:var(--card);border:1px solid var(--cb);border-radius:14px;overflow:hidden;box-shadow:var(--sh);cursor:pointer;transition:all .25s;margin-bottom:8px;position:relative}
-.card-d::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
-.card-d:hover{transform:translateY(-2px);border-color:rgba(245,200,66,.12)}
-.card-d.featured::after{content:'⭐ In evidenza';position:absolute;top:14px;right:14px;font-size:9px;font-weight:800;letter-spacing:.1em;color:var(--gold);background:var(--gd);border:1px solid rgba(245,200,66,.2);padding:3px 8px;border-radius:10px}
-.cd-hero{padding:18px 18px 12px}
-.cd-top{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.cd-deep-badge{font-size:8px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);background:var(--gd);border:1px solid rgba(245,200,66,.18);padding:3px 9px;border-radius:20px}
-.cd-cat{font-size:8px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
-.cd-q{font-family:var(--sg);font-size:18px;font-weight:800;line-height:1.28;letter-spacing:-.02em;margin-bottom:8px}
-.cd-ctx{font-size:11px;color:var(--t2);line-height:1.6;margin-bottom:12px;padding-left:9px;border-left:2px solid rgba(255,255,255,.07)}
-.cd-cd{display:inline-flex;align-items:center;gap:5px;font-family:var(--sg);font-size:11px;font-weight:700;color:var(--gold);background:var(--gd);border:1px solid rgba(245,200,66,.15);padding:4px 11px;border-radius:20px;margin-bottom:12px}
-.cd-bets{border-top:1px solid var(--b1)}
-.cd-bet{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.04)}
-.cd-bet:last-child{border-bottom:none}
-.cd-bet-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:7px;display:flex;align-items:center;justify-content:space-between}
-.cd-bet-qr{font-family:var(--sg);font-size:9px;font-weight:700;color:var(--gold)}
-.cd-opts{display:flex;flex-wrap:wrap;gap:5px}
-.cd-opt{padding:6px 12px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--b2);background:rgba(255,255,255,.04);color:var(--t2);transition:all .18s;font-family:var(--sg)}
-.cd-opt:hover:not(:disabled){border-color:rgba(245,200,66,.25);color:var(--gold);background:var(--gd)}
-.cd-opt.sel{border-color:var(--gold);color:var(--gold);background:var(--gd);box-shadow:0 0 10px rgba(245,200,66,.12)}
-.cd-opt:disabled{opacity:.3;cursor:default}
-.cd-foot{padding:12px 18px;background:rgba(0,0,0,.2);display:flex;align-items:center;gap:8px}
-.cd-submit{flex:1;padding:11px;background:var(--gold);border:none;color:#000;font-size:12px;font-weight:800;cursor:pointer;border-radius:8px;font-family:var(--sg);transition:all .2s}
-.cd-submit:hover{opacity:.88}
-.cd-submit:disabled{opacity:.3;cursor:default}
-.cd-tot-qr{font-family:var(--sg);font-size:12px;font-weight:700;color:var(--gold)}
+/* NOTIF */
+.notif-stack{position:fixed;top:88px;right:14px;z-index:300;display:flex;flex-direction:column;gap:7px;pointer-events:none;max-width:270px}
+.notif{background:rgba(12,12,22,.97);border:1px solid var(--b2);border-radius:10px;padding:10px 13px;pointer-events:all;animation:nIn .3s cubic-bezier(.34,1.3,.64,1);cursor:pointer;box-shadow:0 12px 36px rgba(0,0,0,.6);backdrop-filter:blur(16px)}
+@keyframes nIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.notif.out{animation:nOut .2s ease forwards}
+@keyframes nOut{to{transform:translateX(110%);opacity:0}}
+.n-top{display:flex;align-items:center;gap:7px;margin-bottom:4px}
+.n-icon{font-size:14px}
+.n-title{font-family:var(--sg);font-size:11px;font-weight:700;flex:1}
+.n-x{background:none;border:none;color:var(--t3);font-size:14px;cursor:pointer;line-height:1}
+.n-body{font-size:10px;color:var(--t2);line-height:1.5}
 
-/* ── NOTIFICHE IN OVERLAY ── */
-.notif-stack{position:fixed;top:92px;right:16px;z-index:300;display:flex;flex-direction:column;gap:8px;pointer-events:none}
-.notif-item{background:rgba(14,14,24,.97);border:1px solid var(--b2);border-radius:12px;padding:12px 14px;width:280px;box-shadow:0 16px 48px rgba(0,0,0,.7);backdrop-filter:blur(16px);pointer-events:all;animation:notifIn .35s cubic-bezier(.34,1.4,.64,1) forwards;cursor:pointer}
-@keyframes notifIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
-.notif-item.out{animation:notifOut .25s ease forwards}
-@keyframes notifOut{to{transform:translateX(110%);opacity:0}}
-.ni-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
-.ni-icon{font-size:16px}
-.ni-title{font-family:var(--sg);font-size:12px;font-weight:700;flex:1}
-.ni-close{font-size:14px;color:var(--t3);cursor:pointer;background:none;border:none;color:var(--t3)}
-.ni-body{font-size:11px;color:var(--t2);line-height:1.5}
-
-/* ── PROFILO MODAL ── */
-.prof-bg{position:fixed;inset:0;z-index:600;background:rgba(4,4,12,.9);backdrop-filter:blur(16px);display:none;align-items:center;justify-content:center}
+/* PROFILO */
+.prof-bg{position:fixed;inset:0;z-index:700;background:rgba(4,4,12,.9);backdrop-filter:blur(16px);display:none;align-items:center;justify-content:center}
 .prof-bg.open{display:flex}
-.prof-box{background:rgba(14,14,24,.98);border:1px solid var(--b2);border-radius:20px;padding:28px;width:340px;max-width:90vw;box-shadow:0 32px 80px rgba(0,0,0,.9)}
-.prof-ast-wrap{text-align:center;margin-bottom:16px}
-.prof-ast{animation:rot 16s linear infinite}
-.prof-name{font-family:var(--sg);font-size:24px;font-weight:900;text-align:center;background:linear-gradient(135deg,#fff,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
-.prof-fascia-big{text-align:center;font-size:14px;font-weight:700;margin-bottom:20px}
-.prof-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
-.pg-box{background:rgba(255,255,255,.04);border:1px solid var(--b1);border-radius:10px;padding:12px;text-align:center}
-.pg-n{font-family:var(--sg);font-size:22px;font-weight:900;color:var(--gold);line-height:1}
+.prof-box{background:rgba(12,12,22,.98);border:1px solid var(--b2);border-radius:20px;padding:26px;width:min(340px,92vw);box-shadow:0 32px 80px rgba(0,0,0,.9)}
+.prof-ast{animation:rot 16s linear infinite;display:block;margin:0 auto 14px}
+.prof-name{font-family:var(--sg);font-size:22px;font-weight:900;text-align:center;background:linear-gradient(135deg,#fff,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+.prof-fascia{text-align:center;font-size:13px;font-weight:700;margin-bottom:18px}
+.prof-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:14px}
+.pg{background:rgba(255,255,255,.04);border:1px solid var(--b1);border-radius:8px;padding:11px;text-align:center}
+.pg-n{font-family:var(--sg);font-size:20px;font-weight:900;color:var(--gold);line-height:1}
 .pg-l{font-size:8px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-top:3px}
-.prof-bar-wrap{margin-bottom:14px}
-.prof-bar-lbl{font-size:9px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;display:flex;justify-content:space-between}
-.prof-bar{height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
-.prof-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),#00e87a);border-radius:3px;transition:width 1s}
-.prof-ranks{display:flex;flex-direction:column;gap:4px;margin-bottom:16px}
-.pr-row{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:6px;font-size:11px}
-.pr-row.active{background:var(--gd);border:1px solid rgba(245,200,66,.15)}
-.pr-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.pr-name{flex:1;font-weight:500}
-.pr-req{font-size:9px;color:var(--t3)}
-.prof-close{width:100%;padding:11px;background:rgba(255,255,255,.06);border:1px solid var(--b1);border-radius:10px;color:var(--text);font-family:var(--sg);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:4px}
+.prof-bar-wrap{margin-bottom:12px}
+.prof-bar-row{display:flex;justify-content:space-between;font-size:9px;color:var(--t3);margin-bottom:5px}
+.prof-bar{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+.prof-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--green));border-radius:3px;transition:width 1s}
+.prof-fascia-list{display:flex;flex-direction:column;gap:3px;margin-bottom:14px}
+.pfl-row{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:5px;font-size:10px}
+.pfl-row.active{background:var(--gd);border:1px solid rgba(245,200,66,.12)}
+.pfl-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.pfl-name{flex:1;font-weight:500}
+.pfl-req{font-size:9px;color:var(--t3)}
+.prof-close{width:100%;padding:10px;background:rgba(255,255,255,.06);border:1px solid var(--b1);border-radius:8px;color:var(--text);font-family:var(--sg);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s}
 .prof-close:hover{background:rgba(255,255,255,.1)}
 
-/* ── TOAST ── */
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(10px);background:rgba(14,14,24,.97);border:1px solid var(--b2);border-radius:12px;padding:10px 18px;font-size:12px;font-weight:600;color:var(--text);z-index:999;opacity:0;transition:all .3s;pointer-events:none;backdrop-filter:blur(16px);box-shadow:0 16px 48px rgba(0,0,0,.6);font-family:var(--sg);white-space:nowrap}
+/* TOAST */
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(8px);background:rgba(12,12,22,.97);border:1px solid var(--b2);border-radius:10px;padding:9px 16px;font-size:11px;font-weight:600;color:var(--text);z-index:999;opacity:0;transition:all .28s;pointer-events:none;backdrop-filter:blur(16px);font-family:var(--sg)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* ── CHAIN BET BANNER ── */
-.chain-banner{display:none;background:linear-gradient(135deg,rgba(168,85,247,.15),rgba(80,30,140,.2));border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:all .2s}
-.chain-banner.show{display:flex;align-items:center;gap:12px;animation:fadeUp .4s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.chain-banner:hover{background:linear-gradient(135deg,rgba(168,85,247,.2),rgba(80,30,140,.25))}
-.cb-icon{font-size:28px}
-.cb-text{flex:1}
-.cb-title{font-family:var(--sg);font-size:14px;font-weight:800;color:var(--purple);margin-bottom:3px}
-.cb-sub{font-size:11px;color:rgba(168,85,247,.7)}
-.cb-arrow{font-size:20px;color:var(--purple)}
-
-/* ── SENTIMENT WAR ── */
-.sentiment-war{background:var(--card);border:1px solid var(--b1);border-radius:12px;padding:14px 16px;margin-bottom:8px}
-.sw-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
-.sw-title{font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--t3)}
-.sw-timer{font-family:var(--sg);font-size:11px;font-weight:700;color:var(--gold)}
-.sw-bars{display:flex;flex-direction:column;gap:6px}
-.sw-row{display:flex;align-items:center;gap:8px}
-.sw-cat{font-size:10px;font-weight:600;width:60px;color:var(--t2);flex-shrink:0}
-.sw-bar-wrap{flex:1;height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
-.sw-bar{height:100%;border-radius:3px;transition:width 1s}
-.sw-pct{font-family:var(--sg);font-size:10px;font-weight:700;width:32px;text-align:right;flex-shrink:0}
-
-/* SCROLLBAR */
 ::-webkit-scrollbar{width:3px}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px}
 
@@ -233,163 +191,128 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
   .app{grid-template-columns:1fr}
   .sidebar{display:none}
   .nav-cats{display:none}
-  .ticker{display:none}
-  .nav{top:0}
-  .app{padding-top:56px}
+  .ticker,.nav{position:fixed}
 }
 </style>
 </head>
 <body>
 
-<!-- TICKER TG -->
+<!-- TICKER -->
 <div class="ticker">
-  <div class="ticker-label">⚡ QUOTA LIVE</div>
-  <div class="ticker-track">
-    <div class="ticker-inner" id="ticker-inner"></div>
-  </div>
+  <div class="ticker-lbl">⚡ LIVE</div>
+  <div class="ticker-track"><div class="ticker-inner" id="ticker"></div></div>
 </div>
 
 <!-- NAV -->
 <nav class="nav">
-  <a class="nav-logo" href="index-quota.html">
-    <svg class="nav-ast" width="20" height="20" viewBox="0 0 20 20" fill="none">
+  <a href="index-quota.html" style="display:flex;align-items:center;gap:8px;text-decoration:none">
+    <svg class="nav-ast" width="19" height="19" viewBox="0 0 20 20" fill="none">
       <line x1="10" y1="1" x2="10" y2="19" stroke="#f5c842" stroke-width="1.2"/>
       <line x1="1" y1="10" x2="19" y2="10" stroke="#f5c842" stroke-width="1.2"/>
       <line x1="2.93" y1="2.93" x2="17.07" y2="17.07" stroke="#f5c842" stroke-width="1.2"/>
       <line x1="17.07" y1="2.93" x2="2.93" y2="17.07" stroke="#f5c842" stroke-width="1.2"/>
     </svg>
-    <span class="nav-name">QUOTA</span>
+    <span class="nav-logo">QUOTA</span>
   </a>
   <div class="nav-cats">
     <button class="nav-cat on" onclick="filterCat('tutti')">Tutti</button>
-    <button class="nav-cat" onclick="filterCat('Sport')">Sport</button>
-    <button class="nav-cat" onclick="filterCat('Finanza')">Finanza</button>
-    <button class="nav-cat" onclick="filterCat('Politica')">Politica</button>
-    <button class="nav-cat" onclick="filterCat('Mondo')">Mondo</button>
+    <button class="nav-cat" onclick="filterCat('Sport')">⚽ Sport</button>
+    <button class="nav-cat" onclick="filterCat('Finanza')">📈 Finanza</button>
+    <button class="nav-cat" onclick="filterCat('Politica')">🏛 Politica</button>
   </div>
   <div class="nav-right">
     <div class="nav-qr" onclick="openProf()">🎯 <span id="nav-qr">Top 60%</span></div>
-    <button class="notif-btn" onclick="toggleNotifs()" title="Notifiche">
-      🔔
-      <span class="notif-badge" id="notif-badge">0</span>
-    </button>
+    <a class="nav-squad" href="squad.html">👥 Squad</a>
     <div class="nav-live"><span class="ldot"></span>Live</div>
   </div>
 </nav>
 
 <div class="app">
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div style="padding:12px 0">
-      <div class="sb-lbl">Tipo</div>
-      <button class="sb-item on" onclick="filterType('tutti')"><span class="sb-ico">◈</span>Tutte<span class="sb-cnt" id="cnt-t">0</span></button>
-      <button class="sb-item" onclick="filterType('hurry')"><span class="sb-ico" style="color:var(--red)">🔴</span>Hurry Up<span class="sb-cnt" id="cnt-h">0</span></button>
-      <button class="sb-item" onclick="filterType('deep')"><span class="sb-ico" style="color:var(--gold)">⭐</span>Deep Bet<span class="sb-cnt" id="cnt-d">0</span></button>
-      <div class="sb-div"></div>
       <div class="sb-lbl">Categoria</div>
-      <button class="sb-item" onclick="filterCat('Sport')"><span class="sb-ico">⚽</span>Sport</button>
-      <button class="sb-item" onclick="filterCat('Finanza')"><span class="sb-ico">📈</span>Finanza</button>
-      <button class="sb-item" onclick="filterCat('Politica')"><span class="sb-ico">🏛</span>Politica</button>
-      <button class="sb-item" onclick="filterCat('Mondo')"><span class="sb-ico">🌍</span>Mondo</button>
-      <button class="sb-item" onclick="filterCat('Tech')"><span class="sb-ico">⚡</span>Tech</button>
+      <button class="sb-item on" onclick="filterCat('tutti')"><span class="sb-ico">◈</span>Tutti<span class="sb-cnt" id="cnt-t">0</span></button>
+      <button class="sb-item" onclick="filterCat('Sport')"><span class="sb-ico">⚽</span>Sport<span class="sb-cnt" id="cnt-s">0</span></button>
+      <button class="sb-item" onclick="filterCat('Finanza')"><span class="sb-ico">📈</span>Finanza<span class="sb-cnt" id="cnt-f">0</span></button>
+      <button class="sb-item" onclick="filterCat('Politica')"><span class="sb-ico">🏛</span>Politica<span class="sb-cnt" id="cnt-p">0</span></button>
+      <div class="sb-div"></div>
+      <div class="sb-lbl">Tipo</div>
+      <button class="sb-item" onclick="filterType('hurry')"><span class="sb-ico" style="color:var(--red)">🔴</span>Hurry Up</button>
+      <button class="sb-item" onclick="filterType('deep')"><span class="sb-ico" style="color:var(--gold)">⭐</span>Deep Bet</button>
       <div class="sb-div"></div>
       <button class="sb-item" onclick="filterMiei()"><span class="sb-ico">★</span>I miei</button>
-      <button class="sb-item" onclick="filterContra()"><span class="sb-ico" style="color:var(--purple)">↺</span>Contrarian</button>
+      <button class="sb-item" onclick="location.href='squad.html'"><span class="sb-ico" style="color:var(--purple)">👥</span>Squad</button>
     </div>
     <div class="sb-bot">
       <div class="sb-qr-box">
         <div class="sb-qr-n" id="sb-qr">400</div>
         <div class="sb-qr-l">QUOTA Rating</div>
       </div>
-      <div class="sb-pct" id="sb-pct">Top 60% della community</div>
+      <div class="sb-pct" id="sb-pct">Top 60%</div>
       <div class="sb-fascia" id="sb-fascia">🌑 Neutrino</div>
-      <div class="sb-streak">🔥 Streak: <span id="sb-streak">0</span> giorni</div>
+      <div class="sb-streak" id="sb-streak">🔥 Streak: 0 giorni</div>
     </div>
   </aside>
 
-  <!-- MAIN -->
-  <main class="main" id="main-content">
-
-    <!-- CHAIN BET BANNER -->
-    <div class="chain-banner" id="chain-banner" onclick="openChain()">
-      <div class="cb-icon">🔗</div>
-      <div class="cb-text">
-        <div class="cb-title">Chain Bet sbloccato!</div>
-        <div class="cb-sub">Hai 3 previsioni giuste di fila — accedi alla scommessa esclusiva</div>
-      </div>
-      <div class="cb-arrow">→</div>
-    </div>
-
-    <!-- SENTIMENT WAR -->
-    <div class="sentiment-war">
-      <div class="sw-head">
-        <div class="sw-title">⚔️ Sentiment War · Chi azzecca di più oggi?</div>
-        <div class="sw-timer" id="sw-timer">Aggiorna tra 58m</div>
-      </div>
-      <div class="sw-bars" id="sw-bars"></div>
-    </div>
-
-    <!-- SEZIONI -->
+  <main class="main" id="main">
     <div class="sec-head">
-      <div class="sec-title">🔴 Hurry Up · Scadono presto</div>
+      <div class="sec-title" id="sec-title">📅 Calendario eventi · Questa settimana</div>
     </div>
-    <div id="hurry-wrap"></div>
-
-    <div class="sec-head" style="margin-top:4px">
-      <div class="sec-title">⭐ Deep Bet · Scommesse lunghe</div>
-    </div>
-    <div id="deep-wrap"></div>
+    <div id="cards-wrap"></div>
   </main>
 </div>
 
-<!-- NOTIFICHE STACK -->
-<div class="notif-stack" id="notif-stack"></div>
-
-<!-- FLASH OVERLAY -->
-<div class="flash-overlay" id="flash-overlay"></div>
-
-<!-- FLASH CARD -->
+<!-- FLASH -->
 <div class="flash-card" id="flash-card">
-  <div class="fc-header">
-    <div class="fc-badge"><span class="fc-rdot"></span>FLASH EVENT · QUOTA ESCLUSIVA</div>
-    <div class="fc-timer-big" id="fc-timer">90</div>
-  </div>
-  <div class="fc-body">
-    <div class="fc-cat" id="fc-cat"></div>
-    <div class="fc-q" id="fc-q"></div>
-    <div class="fc-ctx" id="fc-ctx"></div>
-    <div class="fc-btns">
-      <button class="fc-btn yes" id="fc-yes" onclick="voteFlash('si')">✓ Sì</button>
-      <button class="fc-btn no" id="fc-no" onclick="voteFlash('no')">✗ No</button>
+  <div class="fc-box">
+    <div class="fc-head">
+      <div class="fc-badge"><span class="fc-rdot"></span>⚡ FLASH EVENT · QUOTA ESCLUSIVA</div>
+      <div class="fc-big-timer" id="fc-timer">90</div>
     </div>
-    <button class="fc-skip" onclick="closeFlash()">Salta questa quota →</button>
+    <div class="fc-body">
+      <div class="fc-cat" id="fc-cat"></div>
+      <div class="fc-q" id="fc-q"></div>
+      <div class="fc-ctx" id="fc-ctx"></div>
+      <div class="fc-btns">
+        <button class="fc-btn yes" onclick="voteFlash('si')">✓ Sì</button>
+        <button class="fc-btn no" onclick="voteFlash('no')">✗ No</button>
+      </div>
+      <button class="fc-skip" onclick="closeFlash()">Salta →</button>
+    </div>
   </div>
 </div>
+
+<!-- MODAL FULL -->
+<div class="modal-bg" id="modal-bg" onclick="closeMod(event)">
+  <button class="modal-close-btn" onclick="closeMod()">×</button>
+  <div class="modal-wrap" id="modal-wrap"></div>
+</div>
+
+<!-- NOTIFICHE -->
+<div class="notif-stack" id="notif-stack"></div>
 
 <!-- PROFILO -->
 <div class="prof-bg" id="prof-bg" onclick="closeProf(event)">
   <div class="prof-box">
-    <div class="prof-ast-wrap">
-      <svg class="prof-ast" width="28" height="28" viewBox="0 0 20 20" fill="none">
-        <line x1="10" y1="1" x2="10" y2="19" stroke="#f5c842" stroke-width="1.2"/>
-        <line x1="1" y1="10" x2="19" y2="10" stroke="#f5c842" stroke-width="1.2"/>
-        <line x1="2.93" y1="2.93" x2="17.07" y2="17.07" stroke="#f5c842" stroke-width="1.2"/>
-        <line x1="17.07" y1="2.93" x2="2.93" y2="17.07" stroke="#f5c842" stroke-width="1.2"/>
-      </svg>
-    </div>
+    <svg class="prof-ast" width="26" height="26" viewBox="0 0 20 20" fill="none">
+      <line x1="10" y1="1" x2="10" y2="19" stroke="#f5c842" stroke-width="1.2"/>
+      <line x1="1" y1="10" x2="19" y2="10" stroke="#f5c842" stroke-width="1.2"/>
+      <line x1="2.93" y1="2.93" x2="17.07" y2="17.07" stroke="#f5c842" stroke-width="1.2"/>
+      <line x1="17.07" y1="2.93" x2="2.93" y2="17.07" stroke="#f5c842" stroke-width="1.2"/>
+    </svg>
     <div class="prof-name">QUOTA</div>
-    <div class="prof-fascia-big" id="pf-fascia">🌑 Neutrino</div>
+    <div class="prof-fascia" id="pf-fascia">🌑 Neutrino</div>
     <div class="prof-grid">
-      <div class="pg-box"><div class="pg-n" id="pf-qr">400</div><div class="pg-l">QR Rating</div></div>
-      <div class="pg-box"><div class="pg-n" id="pf-pct">Top 60%</div><div class="pg-l">Percentile</div></div>
-      <div class="pg-box"><div class="pg-n" id="pf-voti">0</div><div class="pg-l">Voti dati</div></div>
-      <div class="pg-box"><div class="pg-n" id="pf-acc">—%</div><div class="pg-l">Accuratezza</div></div>
+      <div class="pg"><div class="pg-n" id="pf-qr">400</div><div class="pg-l">QR Rating</div></div>
+      <div class="pg"><div class="pg-n" id="pf-pct">Top 60%</div><div class="pg-l">Percentile</div></div>
+      <div class="pg"><div class="pg-n" id="pf-voti">0</div><div class="pg-l">Voti</div></div>
+      <div class="pg"><div class="pg-n" id="pf-acc">—%</div><div class="pg-l">Accuratezza</div></div>
     </div>
     <div class="prof-bar-wrap">
-      <div class="prof-bar-lbl"><span>Progressione fascia</span><span id="pf-next"></span></div>
+      <div class="prof-bar-row"><span>Progressione</span><span id="pf-next"></span></div>
       <div class="prof-bar"><div class="prof-bar-fill" id="pf-bar" style="width:40%"></div></div>
     </div>
-    <div class="prof-ranks" id="pf-ranks"></div>
+    <div class="prof-fascia-list" id="pf-list"></div>
     <button class="prof-close" onclick="closeProf()">Chiudi</button>
   </div>
 </div>
@@ -401,11 +324,11 @@ const BUR='https://god-core-backend.onrender.com';
 
 // ── RATING ENGINE ─────────────────────────────────────────────
 const FL=[
-  {n:'🌑 Neutrino',   p:0,  max:40, c:'#a0a09a', rb:0},
-  {n:'🔵 Orbiter',    p:40, max:70, c:'#60a5fa', rb:5},
-  {n:'💜 Pulsar',     p:70, max:85, c:'#c084fc', rb:15},
-  {n:'⭐ Quasar',     p:85, max:95, c:'#f5c842', rb:30},
-  {n:'✦ Singolarità', p:95, max:100,c:'#00e87a', rb:50},
+  {n:'🌑 Neutrino',   p:0,  mx:40, c:'#a0a09a'},
+  {n:'🔵 Orbiter',    p:40, mx:70, c:'#60a5fa'},
+  {n:'💜 Pulsar',     p:70, mx:85, c:'#c084fc'},
+  {n:'⭐ Quasar',     p:85, mx:95, c:'#f5c842'},
+  {n:'✦ Singolarità', p:95, mx:100,c:'#00e87a'},
 ];
 let qr=parseFloat(localStorage.getItem('q_qr')||'400');
 let votes=JSON.parse(localStorage.getItem('qvotes')||'{}');
@@ -413,9 +336,6 @@ let dvotes=JSON.parse(localStorage.getItem('qdvotes')||'{}');
 let vtot=parseInt(localStorage.getItem('q_vtot')||'0');
 let azz=parseInt(localStorage.getItem('q_azz')||'0');
 let streak=parseInt(localStorage.getItem('q_st')||'0');
-let doubleDown=JSON.parse(localStorage.getItem('q_dd')||'{}');
-let contraVotes=JSON.parse(localStorage.getItem('q_contra')||'{}');
-let notifCount=0;
 
 function getPct(q){return Math.min(99,Math.max(1,Math.round((q/1000)*100)));}
 function getFascia(p){return FL.slice().reverse().find(f=>p>=f.p)||FL[0];}
@@ -423,379 +343,331 @@ function getFascia(p){return FL.slice().reverse().find(f=>p>=f.p)||FL[0];}
 function decay(){
   const last=parseInt(localStorage.getItem('q_ldt')||Date.now());
   const dm=Math.floor((Date.now()-last)/86400000);
-  if(dm>=2){const pen=(dm-1)*8;qr=Math.max(0,qr-pen);save();}
+  if(dm>=2){qr=Math.max(0,qr-(dm-1)*8);save();}
 }
 function checkStreak(){
   const today=new Date().toDateString();
   const last=localStorage.getItem('q_ld');
   const yest=new Date(Date.now()-86400000).toDateString();
   if(last===today)return;
-  if(last===yest){streak++;if(streak===7){qr=Math.min(1000,qr+30);pushNotif('🔥','Streak 7 giorni!','Bonus +30 QR. Continua così.');}if(streak===3){document.getElementById('chain-banner').classList.add('show');}}
-  else if(last&&last!==yest){qr=Math.max(0,qr-15);streak=1;pushNotif('💔','Streak rotta','-15 QR. Torna ogni giorno per non perdere posizioni.');}
-  else{streak=1;}
-  localStorage.setItem('q_st',streak);localStorage.setItem('q_ld',today);localStorage.setItem('q_ldt',Date.now());
+  if(last===yest){streak++;if(streak===7){qr=Math.min(1000,qr+30);push('🔥','Streak 7 giorni!','+30 QR bonus');}}
+  else if(last&&last!==yest){qr=Math.max(0,qr-15);streak=1;push('💔','Streak rotta','-15 QR. Torna ogni giorno!');}
+  else streak=1;
+  localStorage.setItem('q_st',streak);
+  localStorage.setItem('q_ld',today);
+  localStorage.setItem('q_ldt',Date.now());
 }
 function save(){
   localStorage.setItem('q_qr',qr.toFixed(1));
   localStorage.setItem('qvotes',JSON.stringify(votes));
   localStorage.setItem('qdvotes',JSON.stringify(dvotes));
   localStorage.setItem('q_vtot',vtot);
-  localStorage.setItem('q_azz',azz);
-  localStorage.setItem('q_dd',JSON.stringify(doubleDown));
-  localStorage.setItem('q_contra',JSON.stringify(contraVotes));
   const pct=getPct(qr);const f=getFascia(pct);
   const nq=document.getElementById('nav-qr');if(nq)nq.textContent='Top '+(100-pct)+'%';
   const sq=document.getElementById('sb-qr');if(sq)sq.textContent=Math.round(qr);
-  const sp=document.getElementById('sb-pct');if(sp)sp.textContent='Top '+(100-pct)+'% della community';
-  const sf=document.getElementById('sb-fascia');if(sf){sf.textContent=f.n;sf.style.color=f.c;sf.style.background='rgba('+hexToRgb(f.c)+',.08)';}
-  const ss=document.getElementById('sb-streak');if(ss)ss.textContent=streak;
+  const sp=document.getElementById('sb-pct');if(sp)sp.textContent='Top '+(100-pct)+'%';
+  const sf=document.getElementById('sb-fascia');if(sf){sf.textContent=f.n;sf.style.color=f.c;sf.style.background='rgba('+hexRgb(f.c)+',.08)';}
+  const ss=document.getElementById('sb-streak');if(ss)ss.textContent='🔥 Streak: '+streak+' giorni';
 }
-function hexToRgb(h){const r=parseInt(h.slice(1,3),16);const g=parseInt(h.slice(3,5),16);const b=parseInt(h.slice(5,7),16);return r+','+g+','+b;}
-function toast(m){
-  const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');
-  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2800);
-}
-
-// ── NOTIFICHE ─────────────────────────────────────────────────
-function pushNotif(icon,title,body,onClick){
-  notifCount++;
-  const badge=document.getElementById('notif-badge');
-  badge.textContent=notifCount;badge.classList.add('show');
-  const stack=document.getElementById('notif-stack');
-  const el=document.createElement('div');
-  el.className='notif-item';
-  el.innerHTML=`<div class="ni-top"><span class="ni-icon">${icon}</span><span class="ni-title">${title}</span><button class="ni-close" onclick="this.closest('.notif-item').remove()">×</button></div><div class="ni-body">${body}</div>`;
-  el.onclick=onClick||null;
-  stack.appendChild(el);
-  setTimeout(()=>{el.classList.add('out');setTimeout(()=>el.remove(),300);},6000);
-  if(Notification.permission==='granted'){new Notification('QUOTA · '+title,{body,icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><text y="28" font-size="28">⚡</text></svg>'});}
-}
-function toggleNotifs(){
-  notifCount=0;
-  const badge=document.getElementById('notif-badge');
-  badge.textContent='0';badge.classList.remove('show');
-  Notification.requestPermission();
+function hexRgb(h){const r=parseInt(h.slice(1,3),16);const g=parseInt(h.slice(3,5),16);const b=parseInt(h.slice(5,7),16);return r+','+g+','+b;}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2800);}
+function push(icon,title,body){
+  const s=document.getElementById('notif-stack');
+  const el=document.createElement('div');el.className='notif';
+  el.innerHTML=`<div class="n-top"><span class="n-icon">${icon}</span><span class="n-title">${title}</span><button class="n-x" onclick="this.closest('.notif').remove()">×</button></div><div class="n-body">${body}</div>`;
+  s.appendChild(el);
+  setTimeout(()=>{el.classList.add('out');setTimeout(()=>el.remove(),250);},5000);
 }
 
-// ── DATI ──────────────────────────────────────────────────────
-const catColor=c=>({Sport:'#fb923c',Finanza:'#f5c842',Politica:'#a855f7',Mondo:'#4f8ef7',Tech:'#2dd4bf'}[c]||'#a0a09a');
-
-const HURRY=[
-  {id:'h1',cat:'Sport',q:'Sinner vince il primo set contro Musetti?',info:'Sinner 71% vincente nei primi set negli ultimi 20 match. Musetti ottima forma erba.',deadline:Date.now()+4*3600000,qr:12,hype:95},
-  {id:'h2',cat:'Finanza',q:'Il BTP 10Y chiude sopra 3.45% oggi?',info:'Apertura 3.41%. Asta BOT ore 11:00. Dati inflazione USA alle 14:30.',deadline:Date.now()+6*3600000,qr:15,hype:88},
-  {id:'h3',cat:'Politica',q:'Meloni commenta i dazi USA nelle prossime 3 ore?',info:'Vertice G7 in corso. Conferenza stampa prevista alle 16:00.',deadline:Date.now()+3*3600000,qr:10,hype:82},
-  {id:'h4',cat:'Sport',q:'La Juventus segna nel primo tempo stasera?',info:'Juve segnato primo tempo nel 68% delle ultime 15 partite casalinghe.',deadline:Date.now()+8*3600000,qr:9,hype:91},
-];
-
-const DEEP=[
-  {id:'d1',cat:'Sport',featured:true,
-   q:'Lautaro Martínez sarà capocannoniere Serie A 2026-27?',
-   ctx:'24 gol la scorsa stagione. Inter favorita Scudetto. Rivali: Vlahovic, Osimhen.',
-   deadline:new Date('2027-05-30').getTime(),qr_max:180,
-   bets:[
-     {id:'gol',lbl:'Gol in campionato',qr:30,opts:['0-10','11-15','16-20','21-25','26-30','31+']},
-     {id:'assist',lbl:'Assist stagione',qr:20,opts:['0-4','5-8','9-12','13+']},
-     {id:'capo',lbl:'Sarà capocannoniere?',qr:40,opts:['Sì','No']},
-     {id:'scudetto',lbl:'Inter vince lo Scudetto?',qr:30,opts:['Sì','No']},
-     {id:'rinnovo',lbl:'Rinnova con l\'Inter entro luglio 2027?',qr:25,opts:['Sì','No','Già rinnovato']},
-     {id:'pallone',lbl:'Top 5 Pallone d\'Oro?',qr:35,opts:['Sì','No']},
-   ]},
-  {id:'d2',cat:'Politica',
-   q:'Chi vincerà le prossime elezioni politiche italiane?',
-   ctx:'Governo Meloni al 3° anno. Sondaggi: FdI 29%, PD 22%, M5S 14%. Elezioni entro 2027.',
-   deadline:new Date('2027-06-01').getTime(),qr_max:200,
-   bets:[
-     {id:'vince',lbl:'Chi vince le elezioni?',qr:60,opts:['Centrodestra','Centrosinistra','Nessuna maggioranza','Altri']},
-     {id:'premier',lbl:'Chi sarà premier?',qr:50,opts:['Meloni','Schlein','Conte','Altro']},
-     {id:'coali',lbl:'Il centrodestra mantiene la maggioranza?',qr:40,opts:['Sì con stessa coalizione','Sì con cambiamenti','No']},
-     {id:'fdipct',lbl:'FdI % alle elezioni?',qr:30,opts:['Sotto 25%','25-29%','30-35%','Oltre 35%']},
-     {id:'m5s',lbl:'M5S supera il 15%?',qr:20,opts:['Sì','No']},
-   ]},
-  {id:'d3',cat:'Sport',
-   q:'Chi vincerà il Mondiale 2026?',
-   ctx:'USA/Canada/Messico ospitano. Argentina campione. Francia, Brasile, Inghilterra favorite.',
-   deadline:new Date('2026-07-19').getTime(),qr_max:220,
-   bets:[
-     {id:'vince',lbl:'Paese vincitore',qr:70,opts:['Francia','Brasile','Argentina','Inghilterra','Spagna','Germania','Portogallo','Altro']},
-     {id:'capo',lbl:'Capocannoniere',qr:50,opts:['Mbappé','Ronaldo','Bellingham','Vinicius','Otro']},
-     {id:'italia',lbl:'Italia supera i quarti?',qr:35,opts:['Sì','No','Non si qualifica']},
-     {id:'gol',lbl:'Gol totali torneo',qr:35,opts:['<150','150-179','180-210','>210']},
-     {id:'sorpresa',lbl:'Una semi-finalista fuori dalle top 8?',qr:30,opts:['Sì','No']},
-   ]},
-  {id:'d4',cat:'Finanza',
-   q:'La BCE taglia i tassi sotto il 2% entro fine 2026?',
-   ctx:'Tassi attuali 2.5%. Lagarde cauta. Inflazione EU in calo. Mercati prezzano 2 tagli.',
-   deadline:new Date('2026-12-31').getTime(),qr_max:130,
-   bets:[
-     {id:'taglio',lbl:'Taglia sotto 2% entro dicembre?',qr:45,opts:['Sì','No']},
-     {id:'quante',lbl:'Tagli totali nel 2026',qr:30,opts:['0','1','2','3','4+']},
-     {id:'spread',lbl:'Spread BTP-Bund sotto 100bp a fine anno?',qr:30,opts:['Sì','No']},
-     {id:'euro',lbl:'EUR/USD sopra 1.15 a dicembre?',qr:25,opts:['Sì','No']},
-   ]},
-];
-
-// Flash events
-const FLASH_EVENTS=[
-  {id:'f1',cat:'Sport',q:'Sinner fa un ace nei prossimi 2 minuti?',ctx:'In campo ora al 3° set. 8 ace totali finora.',qr:20},
-  {id:'f2',cat:'Finanza',q:'Il Nasdaq apre in positivo tra 5 minuti?',ctx:'Futures +0.3%. Apertura mercati USA tra breve.',qr:18},
-  {id:'f3',cat:'Politica',q:'Il comunicato del G7 menziona l\'AI?',ctx:'Il comunicato finale viene letto tra 2 minuti.',qr:15},
-];
-
-// ── TICKER ────────────────────────────────────────────────────
-const TICKER_ITEMS=[
-  '⚡ Sinner 71% vince Wimbledon secondo QUOTA',
-  '📈 BTP 10Y: spread in calo a 118bp',
-  '⚽ Lautaro capocannoniere: QUOTA dice 34%',
-  '🗳️ Elezioni italiane: centrodestra favorito al 58%',
-  '🌍 Mondiale 2026: Francia in testa con 24%',
-  '💜 Top Contrarian questa settimana: +340 QR',
-  '🔥 Streak record: 23 giorni — utente @mk_trader',
-  '⭐ Quasar questa settimana: 847 utenti',
-  '⚡ Flash Event tra pochi minuti — rimani connesso',
-  '📊 Sentiment War: Sport batte Finanza 62% vs 38%',
-];
-function initTicker(){
-  const inner=document.getElementById('ticker-inner');
-  const items=[...TICKER_ITEMS,...TICKER_ITEMS].map(t=>`<span class="ticker-item"><span class="ticker-dot"></span>${t}</span>`).join('');
-  inner.innerHTML=items;
+// ── IMMAGINI PER CATEGORIA ────────────────────────────────────
+// Unsplash photos per categoria — gratuite, nessuna API key
+const BG={
+  tennis:'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=800&q=80',
+  calcio:'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80',
+  formula1:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
+  basket:'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=800&q=80',
+  finanza:'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80',
+  borsa:'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&q=80',
+  politica:'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=800&q=80',
+  sport:'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=800&q=80',
+  default:'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80',
+};
+function getBg(event){
+  const e=(event||'').toLowerCase();
+  if(e.includes('wimbledon')||e.includes('tennis')||e.includes('atp')||e.includes('sinner'))return BG.tennis;
+  if(e.includes('formula')||e.includes('f1')||e.includes('gp '))return BG.formula1;
+  if(e.includes('inter')||e.includes('juve')||e.includes('milan')||e.includes('calcio')||e.includes('serie a')||e.includes('champions')||e.includes('mondiali'))return BG.calcio;
+  if(e.includes('basket')||e.includes('nba'))return BG.basket;
+  if(e.includes('bce')||e.includes('fed')||e.includes('btp')||e.includes('spread')||e.includes('tassi'))return BG.borsa;
+  if(e.includes('finanza')||e.includes('borsa')||e.includes('cpi')||e.includes('nfp')||e.includes('pil'))return BG.finanza;
+  if(e.includes('elezioni')||e.includes('politica')||e.includes('governo')||e.includes('meloni'))return BG.politica;
+  return BG.sport;
 }
-
-// ── SENTIMENT WAR ─────────────────────────────────────────────
-const SW_DATA=[
-  {cat:'Sport',   acc:68, c:'#fb923c'},
-  {cat:'Finanza', acc:54, c:'#f5c842'},
-  {cat:'Politica',acc:41, c:'#a855f7'},
-  {cat:'Mondo',   acc:59, c:'#4f8ef7'},
-];
-function renderSentimentWar(){
-  const bars=document.getElementById('sw-bars');
-  bars.innerHTML=SW_DATA.map(s=>`
-    <div class="sw-row">
-      <div class="sw-cat">${s.cat}</div>
-      <div class="sw-bar-wrap"><div class="sw-bar" style="width:${s.acc}%;background:${s.c}"></div></div>
-      <div class="sw-pct" style="color:${s.c}">${s.acc}%</div>
-    </div>`).join('');
-  // Aggiorna ogni 10 minuti con micro-variazioni
-  setInterval(()=>{
-    SW_DATA.forEach(s=>{s.acc=Math.min(99,Math.max(1,s.acc+(Math.random()-.5)*3|0));});
-    renderSentimentWar();
-  },10*60*1000);
-}
+function getCatColor(cat){return{Sport:'#fb923c',Finanza:'#f5c842',Politica:'#a855f7'}[cat]||'#60a5fa';}
+function getCatBg(cat){return{Sport:'rgba(251,146,60,.15)',Finanza:'rgba(245,200,66,.12)',Politica:'rgba(168,85,247,.15)'}[cat]||'rgba(96,165,250,.12)';}
 
 // ── COUNTDOWN ─────────────────────────────────────────────────
 function cd(dl){
   const d=dl-Date.now();
   if(d<=0)return'SCADUTA';
-  const h=Math.floor(d/3600000);const m=Math.floor((d%3600000)/60000);const s=Math.floor((d%60000)/1000);
-  if(h>72)return Math.floor(h/24)+'g '+h%24+'h';
+  const days=Math.floor(d/86400000);
+  const h=Math.floor((d%86400000)/3600000);
+  const m=Math.floor((d%3600000)/60000);
+  const s=Math.floor((d%60000)/1000);
+  if(days>0)return days+'g '+h+'h';
   if(h>0)return h+'h '+m+'m';
-  return m+'m '+s+'s';
+  if(m>0)return m+'m '+s+'s';
+  return s+'s';
 }
 
-// ── RENDER HURRY ─────────────────────────────────────────────
-function renderHurry(cards){
-  const wrap=document.getElementById('hurry-wrap');
-  wrap.innerHTML=cards.map((c,i)=>{
-    const mv=votes[c.id];const dd=doubleDown[c.id];const cv=contraVotes[c.id];
-    const isContra=cv&&!mv;
-    return `<div class="card-h" style="animation-delay:${i*50}ms" onclick="openHurryDetail('${c.id}')">
-      <div class="ch-top">
-        <div class="hurry-badge"><span class="rdot"></span>HURRY UP${c.hype>=90?' · 🔥 HYPE':''}</div>
-        <div class="ch-timer" id="cd-${c.id}">${cd(c.deadline)}</div>
-      </div>
-      <div class="ch-body">
-        <div class="ch-cat" style="color:${catColor(c.cat)}">${c.cat}</div>
-        <div class="ch-q">${c.q}</div>
-        <div class="ch-info">${c.info}</div>
-        <div class="ch-btns">
-          <button class="ch-btn yes${mv==='si'?' voted-y':''}" onclick="event.stopPropagation();voteH('${c.id}','si',${c.qr})" ${mv||isContra?'disabled':''}>
-            ✓ Sì${mv==='si'?' ✓':''}${dd?'  ×2':''}
-          </button>
-          <button class="ch-btn no${mv==='no'?' voted-n':''}" onclick="event.stopPropagation();voteH('${c.id}','no',${c.qr})" ${mv||isContra?'disabled':''}>
-            ✗ No${mv==='no'?' ✓':''}${dd?'  ×2':''}
-          </button>
-        </div>
-        ${mv?`<div class="ch-actions">
-          ${!dd?`<button class="ch-action double" onclick="event.stopPropagation();doubleDownH('${c.id}',${c.qr})">⚡ Double Down ×2 QR</button>`:'<div class="ch-action" style="opacity:.4">Double Down usato</div>'}
-          <button class="ch-action" onclick="event.stopPropagation();exitH('${c.id}')">↩ Exit anticipato</button>
-        </div>`:`<div class="ch-actions">
-          <button class="ch-action contra" onclick="event.stopPropagation();contraH('${c.id}',${c.qr})">↺ Contra ${isContra?'✓':''} · +${c.qr*2} QR se vinci</button>
-        </div>`}
-        <div class="ch-meta">
-          <span>${c.hype}% hype</span>
-          ${mv?`<span style="color:var(--green)">✓ Votato ${mv==='si'?'Sì':'No'}</span>`:''}
-          ${cv?`<span style="color:var(--purple)">↺ Contrarian</span>`:''}
-          <span class="ch-qr">+${c.qr}${dd?'×2':''} QR</span>
-        </div>
-      </div>
-    </div>`;
-  }).join('');
+// ── EVENTI CALENDARIO ─────────────────────────────────────────
+const EVENTS=[
+  {
+    id:'wim26',cat:'Sport',type:'deep',hype:96,
+    eventName:'Wimbledon 2026 · Finale Maschile',
+    title:'Sinner può difendere il titolo?',
+    subtitle:'13 luglio 2026 · Centre Court · ore 14:00',
+    deadline:new Date('2026-07-13T14:00:00').getTime(),
+    bets:[
+      {id:'vince',q:'Chi vince il titolo?',opts:['Sinner','Medvedev','Fritz','Altro']},
+      {id:'ace_sinner',q:'Sinner fa più di 12 ace in finale?',opts:['Sì','No']},
+      {id:'set',q:'Quanti set dura la finale?',opts:['3 set','4 set','5 set']},
+      {id:'durata',q:'Partita dura più di 3 ore?',opts:['Sì','No']},
+      {id:'primo_set',q:'Sinner vince il primo set?',opts:['Sì','No']},
+      {id:'break',q:'Più di 8 break totali in partita?',opts:['Sì','No']},
+      {id:'pubblico',q:'Il pubblico fa i buu a Sinner?',opts:['Sì','No']},
+      {id:'rain',q:'Ci sarà una sospensione per pioggia?',opts:['Sì','No']},
+      {id:'errori',q:'Più di 40 errori gratuiti totali?',opts:['Sì','No']},
+      {id:'ranking',q:'Sinner resterà n.1 dopo Wimbledon?',opts:['Sì','No']},
+    ]
+  },
+  {
+    id:'bce_luglio',cat:'Finanza',type:'hurry',hype:89,
+    eventName:'BCE · Decisione Tassi · Luglio 2026',
+    title:'La BCE taglia ancora?',
+    subtitle:'17 luglio 2026 · Francoforte · ore 14:15',
+    deadline:new Date('2026-07-17T14:15:00').getTime(),
+    bets:[
+      {id:'taglio',q:'La BCE taglia i tassi?',opts:['Sì -25bp','Sì -50bp','No, pausa']},
+      {id:'spread',q:'Spread BTP-Bund chiude sotto 110bp oggi?',opts:['Sì','No']},
+      {id:'euro',q:'EUR/USD sale sopra 1.10 dopo la BCE?',opts:['Sì','No']},
+      {id:'lagarde',q:'Lagarde menziona "inflazione sotto controllo"?',opts:['Sì','No']},
+      {id:'borsa',q:'Piazza Affari chiude in positivo oggi?',opts:['Sì, oltre +1%','Sì, sotto +1%','No, negativo']},
+    ]
+  },
+  {
+    id:'inter_real',cat:'Sport',type:'deep',hype:94,
+    eventName:'Champions League · Semifinale',
+    title:'Inter vs Real Madrid · Chi va in finale?',
+    subtitle:'22 luglio 2026 · San Siro · ore 21:00',
+    deadline:new Date('2026-07-22T21:00:00').getTime(),
+    bets:[
+      {id:'vince',q:'Chi vince la partita?',opts:['Inter','Real Madrid','Pareggio']},
+      {id:'primo_gol',q:'Chi segna per primo?',opts:['Inter','Real Madrid']},
+      {id:'lautaro',q:'Lautaro segna?',opts:['Sì','No']},
+      {id:'mbappe',q:'Mbappé segna?',opts:['Sì','No']},
+      {id:'gol_tot',q:'Totale gol nella partita?',opts:['0-1','2-3','4+']},
+      {id:'espulsione',q:'Ci sarà un\'espulsione?',opts:['Sì','No']},
+      {id:'rigore',q:'Ci sarà almeno un rigore?',opts:['Sì','No']},
+      {id:'var',q:'Il VAR annulla almeno un gol?',opts:['Sì','No']},
+      {id:'tempi_supp',q:'Si va ai supplementari?',opts:['Sì','No']},
+      {id:'finale',q:'Chi va in finale?',opts:['Inter','Real Madrid']},
+    ]
+  },
+  {
+    id:'nfp_luglio',cat:'Finanza',type:'hurry',hype:82,
+    eventName:'NFP Jobs Report · USA · Luglio 2026',
+    title:'Quanti posti di lavoro ha creato l\'America?',
+    subtitle:'4 luglio 2026 · Washington · ore 14:30',
+    deadline:new Date('2026-07-04T14:30:00').getTime(),
+    bets:[
+      {id:'nfp',q:'NFP sopra 200k nuovi posti?',opts:['Sì','No']},
+      {id:'disoccupazione',q:'Disoccupazione USA sotto 4%?',opts:['Sì','No']},
+      {id:'dollaro',q:'Dollaro si rafforza dopo il dato?',opts:['Sì','No']},
+      {id:'fed',q:'Il dato aumenta le probabilità di taglio Fed?',opts:['Sì','No']},
+    ]
+  },
+  {
+    id:'f1_silverstone',cat:'Sport',type:'deep',hype:88,
+    eventName:'Formula 1 · GP Gran Bretagna 2026',
+    title:'Chi vince a Silverstone?',
+    subtitle:'6 luglio 2026 · Silverstone · ore 15:00',
+    deadline:new Date('2026-07-06T15:00:00').getTime(),
+    bets:[
+      {id:'vince',q:'Chi vince il GP?',opts:['Verstappen','Hamilton','Leclerc','Norris','Altro']},
+      {id:'safety_car',q:'Ci sarà la Safety Car?',opts:['Sì','No']},
+      {id:'pioggia',q:'Gara bagnata?',opts:['Sì, pioggia','No, asciutto']},
+      {id:'sorpasso_finale',q:'Sorpasso decisivo negli ultimi 5 giri?',opts:['Sì','No']},
+      {id:'ritiro',q:'Almeno 3 ritiri in gara?',opts:['Sì','No']},
+      {id:'record',q:'Nuovo record sul giro veloce?',opts:['Sì','No']},
+      {id:'gap',q:'Distacco vincitore-secondo sotto 5 secondi?',opts:['Sì','No']},
+      {id:'pit',q:'Strategia vincente: 1 o 2 pit stop?',opts:['1 pit stop','2 pit stop']},
+    ]
+  },
+];
+
+// ── RENDER EVENTI ─────────────────────────────────────────────
+let activeCat='tutti',activeType='tutti';
+
+function renderCards(){
+  const wrap=document.getElementById('cards-wrap');
+  let events=[...EVENTS];
+  if(activeCat!=='tutti')events=events.filter(e=>e.cat===activeCat);
+  if(activeType==='hurry')events=events.filter(e=>e.type==='hurry');
+  if(activeType==='deep')events=events.filter(e=>e.type==='deep');
+
+  document.getElementById('cnt-t').textContent=EVENTS.length;
+  document.getElementById('cnt-s').textContent=EVENTS.filter(e=>e.cat==='Sport').length;
+  document.getElementById('cnt-f').textContent=EVENTS.filter(e=>e.cat==='Finanza').length;
+  document.getElementById('cnt-p').textContent=EVENTS.filter(e=>e.cat==='Politica').length;
+
+  wrap.innerHTML=events.map((ev,i)=>renderEvent(ev,i)).join('');
 }
 
-// ── RENDER DEEP ───────────────────────────────────────────────
-function renderDeep(cards){
-  const wrap=document.getElementById('deep-wrap');
-  wrap.innerHTML=cards.map((c,i)=>{
-    const dv=dvotes[c.id]||{};
-    const placed=Object.keys(dv).length;
-    const totalQR=c.bets.filter(b=>dv[b.id]).reduce((s,b)=>s+b.qr,0);
-    return `<div class="card-d${c.featured?' featured':''}" style="animation-delay:${100+i*60}ms" onclick="openDeepDetail('${c.id}')">
-      <div class="cd-hero">
-        <div class="cd-top">
-          <span class="cd-deep-badge">⭐ Deep Bet</span>
-          <span class="cd-cat" style="color:${catColor(c.cat)}">${c.cat}</span>
-        </div>
-        <div class="cd-q">${c.q}</div>
-        <div class="cd-ctx">${c.ctx}</div>
-        <div class="cd-cd">⏳ ${cd(c.deadline)}</div>
-        ${placed>0?`<div style="font-size:10px;color:var(--green)">✓ ${placed}/${c.bets.length} piazzate · +${totalQR} QR in gioco</div>`:`<div style="font-size:10px;color:var(--t3)">${c.bets.length} scommesse · fino a +${c.qr_max} QR</div>`}
+function renderEvent(ev,idx){
+  const dv=dvotes[ev.id]||{};
+  const placed=Object.keys(dv).length;
+  const totalBets=ev.bets.length;
+  const bgUrl=getBg(ev.title+' '+ev.eventName);
+  const catColor=getCatColor(ev.cat);
+  const catBg=getCatBg(ev.cat);
+  const isHurry=ev.type==='hurry';
+  const delay=idx*70;
+  const timeLeft=cd(ev.deadline);
+  const isUrgent=ev.deadline-Date.now()<3600000;
+
+  // Preview: mostra prime 3 scommesse
+  const previewBets=ev.bets.slice(0,3);
+  const moreBets=totalBets-3;
+
+  return `<div class="event-card" style="animation-delay:${delay}ms" id="ev-${ev.id}">
+    <!-- HERO -->
+    <div class="ec-hero">
+      <div class="ec-bg" style="background-image:url('${bgUrl}')"></div>
+      <div class="ec-overlay"></div>
+      <div class="ec-top-badges">
+        <span class="ec-cat-badge" style="color:${catColor};background:${catBg};border:1px solid ${catColor}30">${ev.cat}</span>
+        ${ev.hype>=85?`<span class="ec-hype">🔥 ${ev.hype} hype</span>`:''}
+        <span class="ec-timer-badge" id="cd-${ev.id}" style="${isUrgent?'color:var(--red);background:rgba(255,61,90,.3)':''}">${timeLeft}</span>
       </div>
-      <div class="cd-bets">
-        ${c.bets.slice(0,2).map(b=>{
+      <div class="ec-bottom">
+        <div class="ec-event-name">${ev.eventName}</div>
+        <div class="ec-title">${ev.title}</div>
+        <div class="ec-subtitle">${ev.subtitle}</div>
+      </div>
+    </div>
+
+    <!-- HURRY STRIP -->
+    ${isHurry?`<div class="hurry-strip"><span class="hs-dot"></span><span class="hs-txt">🔴 HURRY UP · Quota rapida · Scade presto</span><span class="hs-timer" id="hs-${ev.id}">${timeLeft}</span></div>`:''}
+
+    <!-- BODY -->
+    <div class="ec-body">
+      <div class="ec-preview">
+        ${previewBets.map(b=>{
           const sel=dv[b.id];
-          return `<div class="cd-bet">
-            <div class="cd-bet-lbl">${b.lbl}<span class="cd-bet-qr">+${b.qr} QR</span></div>
-            <div class="cd-opts">
-              ${b.opts.map(o=>`<button class="cd-opt${sel===o?' sel':''}" onclick="event.stopPropagation();selectOpt('${c.id}','${b.id}','${o}')" ${sel&&sel!==o?'disabled':''}>${o}</button>`).join('')}
+          return `<div class="ec-preview-row">
+            <div class="ep-q">${b.q}</div>
+            <div class="ep-opts">
+              ${b.opts.slice(0,2).map(o=>`<button class="ep-opt${sel===o?' sel':''}" onclick="selectBet(event,'${ev.id}','${b.id}','${o}')" ${sel&&sel!==o?'disabled':''}>${o}</button>`).join('')}
+              ${b.opts.length>2?`<button class="ep-opt" onclick="openEvent('${ev.id}')">+${b.opts.length-2}</button>`:''}
             </div>
           </div>`;
         }).join('')}
-        ${c.bets.length>2?`<div style="padding:8px 18px;font-size:10px;color:var(--t3)">+${c.bets.length-2} altre scommesse →</div>`:''}
       </div>
-      <div class="cd-foot">
-        ${placed>0?
-          `<div style="font-size:11px;color:var(--green)">✓ ${placed}/${c.bets.length} piazzate</div><div class="cd-tot-qr">+${totalQR} QR</div>`:
-          `<button class="cd-submit" onclick="event.stopPropagation();openDeepDetail('${c.id}')">Piazza le scommesse →</button><div class="cd-tot-qr">+${c.qr_max} QR max</div>`}
+      <div class="ec-more">
+        <span style="color:var(--t3)">${placed}/${totalBets} scommesse piazzate${placed>0?' · ✓':''}</span>
+        <button class="ec-more-btn" onclick="openEvent('${ev.id}')">
+          ${moreBets>0?`+${moreBets} altre scommesse →`:'Vedi tutto →'}
+        </button>
+      </div>
+      <div class="ec-footer">
+        ${placed>0?`<span class="ec-placed">✓ ${placed} scommesse in gioco</span>`:'<span style="font-size:10px;color:var(--t3)">Piazza le tue scommesse</span>'}
+        <span class="ec-qr-max">fino a +${totalBets*15} QR</span>
+        ${placed>0&&placed<totalBets?`<button class="ec-submit" onclick="openEvent('${ev.id}')">Completa →</button>`:placed===0?`<button class="ec-submit" onclick="openEvent('${ev.id}')">Scommetti →</button>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── SELECT BET INLINE ─────────────────────────────────────────
+function selectBet(e,evId,betId,opt){
+  e.stopPropagation();
+  if(!dvotes[evId])dvotes[evId]={};
+  if(dvotes[evId][betId]===opt)delete dvotes[evId][betId];
+  else{if(!dvotes[evId][betId]){qr=Math.min(1000,qr+2);vtot++;}dvotes[evId][betId]=opt;}
+  checkStreak();save();renderCards();
+  toast('⚡ Scommessa registrata');
+}
+
+// ── MODAL EVENTO COMPLETO ─────────────────────────────────────
+function openEvent(id){
+  const ev=EVENTS.find(e=>e.id===id);if(!ev)return;
+  const dv=dvotes[ev.id]||{};
+  const bgUrl=getBg(ev.title+' '+ev.eventName);
+  const catColor=getCatColor(ev.cat);
+
+  document.getElementById('modal-wrap').innerHTML=`
+    <!-- HERO -->
+    <div style="height:220px;position:relative;border-radius:16px 16px 0 0;overflow:hidden;margin-bottom:0">
+      <div style="position:absolute;inset:0;background-image:url('${bgUrl}');background-size:cover;background-position:center"></div>
+      <div style="position:absolute;inset:0;background:linear-gradient(0deg,rgba(6,6,14,.98) 0%,rgba(6,6,14,.5) 100%)"></div>
+      <div style="position:absolute;bottom:0;left:0;right:0;padding:20px">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.14em;color:${catColor};margin-bottom:6px">${ev.eventName}</div>
+        <div style="font-family:var(--sg);font-size:22px;font-weight:900;line-height:1.2;letter-spacing:-.02em">${ev.title}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:4px">${ev.subtitle} · <span style="color:var(--gold);font-family:var(--sg);font-weight:700">${cd(ev.deadline)}</span></div>
+      </div>
+    </div>
+
+    <!-- SCOMMESSE COMPLETE -->
+    <div style="background:rgba(10,10,20,.98);border:1px solid rgba(255,255,255,.08);border-radius:0 0 16px 16px;overflow:hidden">
+      <div style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between">
+        <div style="font-family:var(--sg);font-size:12px;font-weight:700;color:var(--t2);letter-spacing:.08em;text-transform:uppercase">${ev.bets.length} scommesse · fino a +${ev.bets.length*15} QR</div>
+        <div style="font-size:10px;color:var(--green)">${Object.keys(dv).length} piazzate</div>
+      </div>
+      ${ev.bets.map((b,bi)=>{
+        const sel=dv[b.id];
+        return `<div style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.04)">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--t3);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between">
+            <span>${b.q}</span>
+            <span style="color:var(--gold);font-family:var(--sg)">+15 QR</span>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px">
+            ${b.opts.map(o=>`<button class="ep-opt${sel===o?' sel':''}" onclick="selectBet(event,'${ev.id}','${b.id}','${o}');updateModal('${ev.id}')" ${sel&&sel!==o?'disabled':''}>${o}</button>`).join('')}
+          </div>
+        </div>`;
+      }).join('')}
+      <div style="padding:14px 18px;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:11px;color:var(--t2)">${Object.keys(dv).length}/${ev.bets.length} scommesse</div>
+        <div style="font-family:var(--sg);font-size:13px;font-weight:800;color:var(--gold)">+${Object.keys(dv).length*15} QR in gioco</div>
       </div>
     </div>`;
-  }).join('');
+
+  document.getElementById('modal-bg').classList.add('open');
+  document.body.style.overflow='hidden';
 }
 
-// ── AZIONI HURRY ──────────────────────────────────────────────
-function voteH(id,choice,qrAmount){
-  if(votes[id])return;
-  votes[id]=choice;vtot++;
-  qr=Math.min(1000,qr+3);
-  checkStreak();save();renderMain();
-  const pct=getPct(qr);
-  toast('⚡ Votato '+choice.toUpperCase()+' · +'+qrAmount+' QR se azzecchi · Top '+(100-pct)+'%');
-  pushNotif('⚡','Voto registrato!','Se azzecchi guadagni +'+qrAmount+' QR e sali in classifica.');
-  localStorage.setItem('q_ldt',Date.now());
+function updateModal(id){openEvent(id);}
+function closeMod(e){
+  if(e&&e.target!==document.getElementById('modal-bg')&&!e.target.classList.contains('modal-close-btn'))return;
+  document.getElementById('modal-bg').classList.remove('open');
+  document.body.style.overflow='';
 }
-
-function doubleDownH(id,qrAmount){
-  if(!votes[id]||doubleDown[id])return;
-  doubleDown[id]=true;save();renderMain();
-  toast('⚡ Double Down! Il tuo QR raddoppia se azzecchi: +'+(qrAmount*2)+' QR');
-  pushNotif('⚡','Double Down attivato!','Hai raddoppiato la posta. +'+(qrAmount*2)+' QR se vinci.');
-}
-
-function exitH(id){
-  if(!votes[id])return;
-  // Exit anticipato: cristallizza 30% del QR potenziale
-  const card=HURRY.find(c=>c.id===id);
-  if(!card)return;
-  const exitQr=Math.round(card.qr*0.3);
-  qr=Math.min(1000,qr+exitQr);
-  delete votes[id];save();renderMain();
-  toast('↩ Exit anticipato: +'+exitQr+' QR cristallizzati');
-}
-
-function contraH(id,qrAmount){
-  if(votes[id]||contraVotes[id])return;
-  contraVotes[id]=true;save();renderMain();
-  toast('↺ Sei il Contrarian! +'+qrAmount*2+' QR se la maggioranza sbaglia');
-  pushNotif('↺','Contrarian attivato!','Stai scommettendo contro la community. Rischio alto, reward alto.');
-}
-
-// ── SELECT DEEP ───────────────────────────────────────────────
-function selectOpt(cardId,betId,opt){
-  if(!dvotes[cardId])dvotes[cardId]={};
-  if(dvotes[cardId][betId]===opt){delete dvotes[cardId][betId];}
-  else{dvotes[cardId][betId]=opt;}
-  checkStreak();save();renderMain();
-  toast('⚡ Scommessa aggiornata');
-}
-
-// ── DETAIL MODALS ─────────────────────────────────────────────
-function openHurryDetail(id){
-  const c=HURRY.find(x=>x.id===id);if(!c)return;
-  const mv=votes[c.id];
-  showModal(`<div style="padding:22px">
-    <div style="font-size:8px;font-weight:800;letter-spacing:.16em;color:${catColor(c.cat)};margin-bottom:8px">${c.cat} · HURRY UP</div>
-    <div style="font-family:var(--sg);font-size:22px;font-weight:800;line-height:1.3;margin-bottom:12px">${c.q}</div>
-    <div style="background:rgba(255,61,90,.06);border:1px solid rgba(255,61,90,.15);border-radius:8px;padding:14px;margin-bottom:16px;font-size:13px;color:var(--t2);line-height:1.65"><div style="font-size:8px;font-weight:700;letter-spacing:.1em;color:var(--red);margin-bottom:6px">📊 INFO DISPONIBILI</div>${c.info}</div>
-    <div style="display:flex;justify-content:space-between;align-items:center;background:var(--gd);border:1px solid rgba(245,200,66,.15);border-radius:8px;padding:12px 16px;margin-bottom:16px">
-      <div><div style="font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em">⏱ Scadenza</div><div style="font-family:var(--sg);font-size:20px;font-weight:900;color:var(--red)">${cd(c.deadline)}</div></div>
-      <div style="text-align:right"><div style="font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em">Premio</div><div style="font-family:var(--sg);font-size:20px;font-weight:900;color:var(--gold)">+${c.qr} QR</div></div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <button class="ch-btn yes${mv==='si'?' voted-y':''}" style="padding:14px;border-radius:10px;font-size:14px" onclick="voteH('${c.id}','si',${c.qr});closeModal()" ${mv?'disabled':''}>✓ Sì</button>
-      <button class="ch-btn no${mv==='no'?' voted-n':''}" style="padding:14px;border-radius:10px;font-size:14px" onclick="voteH('${c.id}','no',${c.qr});closeModal()" ${mv?'disabled':''}>✗ No</button>
-    </div>
-  </div>`);
-}
-
-function openDeepDetail(id){
-  const c=DEEP.find(x=>x.id===id);if(!c)return;
-  const dv=dvotes[c.id]||{};
-  showModal(`
-    <div style="padding:22px 22px 16px">
-      <div style="font-size:8px;font-weight:800;letter-spacing:.16em;color:${catColor(c.cat)};margin-bottom:8px">${c.cat} · DEEP BET</div>
-      <div style="font-family:var(--sg);font-size:22px;font-weight:800;line-height:1.3;margin-bottom:8px">${c.q}</div>
-      <div style="font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:12px;padding-left:9px;border-left:2px solid rgba(255,255,255,.08)">${c.ctx}</div>
-      <div style="display:inline-flex;align-items:center;gap:5px;font-family:var(--sg);font-size:11px;font-weight:700;color:var(--gold);background:var(--gd);border:1px solid rgba(245,200,66,.15);padding:4px 11px;border-radius:20px">⏳ ${cd(c.deadline)} · fino a +${c.qr_max} QR</div>
-    </div>
-    ${c.bets.map(b=>{
-      const sel=dv[b.id];
-      return `<div style="padding:14px 22px;border-top:1px solid rgba(255,255,255,.05)">
-        <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:8px;display:flex;justify-content:space-between">${b.lbl}<span style="color:var(--gold)">+${b.qr} QR</span></div>
-        <div class="cd-opts">${b.opts.map(o=>`<button class="cd-opt${sel===o?' sel':''}" onclick="selectOpt('${c.id}','${b.id}','${o}');updateModal('${c.id}')" ${sel&&sel!==o?'disabled':''}>${o}</button>`).join('')}</div>
-      </div>`;
-    }).join('')}
-    <div style="padding:14px 22px;background:rgba(0,0,0,.2);display:flex;align-items:center;justify-content:space-between">
-      <div style="font-size:11px;color:var(--t2)">${Object.keys(dv).length}/${c.bets.length} scommesse</div>
-      <div style="font-family:var(--sg);font-size:13px;font-weight:800;color:var(--gold)">+${c.bets.filter(b=>dv[b.id]).reduce((s,b)=>s+b.qr,0)} QR in gioco</div>
-    </div>`);
-}
-
-// ── MODAL GENERICO ────────────────────────────────────────────
-let modalEl=null;
-function showModal(html){
-  if(!modalEl){
-    modalEl=document.createElement('div');
-    modalEl.style.cssText='position:fixed;inset:0;z-index:700;background:rgba(4,4,12,.9);backdrop-filter:blur(16px);overflow-y:auto;padding:20px;display:flex;align-items:flex-start;justify-content:center';
-    modalEl.onclick=e=>{if(e.target===modalEl)closeModal();};
-    const closeBtn=document.createElement('button');
-    closeBtn.style.cssText='position:fixed;top:20px;right:20px;width:40px;height:40px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:50%;color:#fff;font-size:20px;cursor:pointer;z-index:701;display:flex;align-items:center;justify-content:center';
-    closeBtn.textContent='×';closeBtn.onclick=closeModal;
-    document.body.appendChild(modalEl);document.body.appendChild(closeBtn);
-    modalEl._close=closeBtn;
-  }
-  const inner=document.createElement('div');
-  inner.style.cssText='background:rgba(14,14,24,.98);border:1px solid rgba(255,255,255,.1);border-radius:16px;width:min(640px,94vw);margin:auto;box-shadow:0 32px 80px rgba(0,0,0,.9);overflow:hidden;animation:flashIn .3s ease';
-  inner.innerHTML=html;
-  modalEl.innerHTML='';modalEl.appendChild(inner);
-  modalEl.style.display='flex';document.body.style.overflow='hidden';
-}
-function closeModal(){if(modalEl){modalEl.style.display='none';if(modalEl._close)modalEl._close.style.display='none';document.body.style.overflow='';}}
-function updateModal(cardId){const c=DEEP.find(x=>x.id===cardId);if(c)openDeepDetail(cardId);}
 
 // ── FLASH EVENT ───────────────────────────────────────────────
-let flashTimer=null,flashActive=null,flashSecs=90;
+const FLASH=[
+  {cat:'Sport',q:'Sinner fa un ace nei prossimi 2 minuti?',ctx:'In campo ora al 3° set. 8 ace totali.'},
+  {cat:'Finanza',q:'Il Nasdaq apre in positivo tra 5 minuti?',ctx:'Futures +0.3%. Apertura USA imminente.'},
+];
+let flashTimer=null,flashSecs=90,flashActive=null;
 function triggerFlash(){
-  if(flashActive)return;
-  const f=FLASH_EVENTS[Math.floor(Math.random()*FLASH_EVENTS.length)];
+  const f=FLASH[Math.floor(Math.random()*FLASH.length)];
   flashActive=f;flashSecs=90;
   document.getElementById('fc-cat').textContent=f.cat;
   document.getElementById('fc-q').textContent=f.q;
   document.getElementById('fc-ctx').textContent=f.ctx;
   document.getElementById('fc-timer').textContent='90';
-  document.getElementById('flash-card').classList.add('show');
-  document.getElementById('flash-overlay').classList.add('active');
-  document.getElementById('fc-yes').disabled=false;
-  document.getElementById('fc-no').disabled=false;
-  pushNotif('⚡','Flash Event!',f.q+' — Hai 90 secondi!');
+  document.getElementById('flash-card').classList.add('open');
+  push('⚡','Flash Event!',f.q+' — Hai 90 secondi!');
   flashTimer=setInterval(()=>{
     flashSecs--;
     document.getElementById('fc-timer').textContent=flashSecs;
@@ -803,99 +675,69 @@ function triggerFlash(){
     if(flashSecs<=10)document.getElementById('fc-timer').style.color='#ff3d5a';
   },1000);
 }
-function voteFlash(choice){
-  if(!flashActive)return;
-  clearInterval(flashTimer);
-  qr=Math.min(1000,qr+5);vtot++;save();
-  toast('⚡ Flash votato! +'+flashActive.qr+' QR se azzecchi!');
-  closeFlash();
-}
-function closeFlash(){
-  clearInterval(flashTimer);flashActive=null;
-  document.getElementById('flash-card').classList.remove('show');
-  document.getElementById('flash-overlay').classList.remove('active');
-  document.getElementById('fc-timer').style.color='#fff';
-}
-// Flash ogni 8-15 minuti
-function scheduleFlash(){setTimeout(()=>{triggerFlash();scheduleFlash();},Math.random()*420000+480000);}
+function voteFlash(c){clearInterval(flashTimer);qr=Math.min(1000,qr+5);vtot++;save();toast('⚡ Flash votato! +5 QR + bonus se azzecchi');closeFlash();}
+function closeFlash(){clearInterval(flashTimer);flashActive=null;document.getElementById('flash-card').classList.remove('open');document.getElementById('fc-timer').style.color='#fff';}
+function scheduleFlash(){setTimeout(()=>{triggerFlash();scheduleFlash();},Math.random()*600000+480000);}
 
-// ── CHAIN BET ─────────────────────────────────────────────────
-function openChain(){
-  showModal(`<div style="padding:22px">
-    <div style="font-family:var(--sg);font-size:10px;font-weight:700;color:var(--purple);margin-bottom:10px;letter-spacing:.1em;text-transform:uppercase">🔗 CHAIN BET ESCLUSIVO · Solo per te</div>
-    <div style="font-family:var(--sg);font-size:20px;font-weight:800;margin-bottom:12px">Hai 3 previsioni giuste di fila. Questo evento è visibile solo a chi è in streak.</div>
-    <div style="background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.2);border-radius:8px;padding:14px;margin-bottom:16px;font-size:13px;color:rgba(168,85,247,.8);line-height:1.6">La Juventus vince e Sinner vince lo stesso giorno?<br><br>Premio: +85 QR (il doppio del normale)</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <button style="padding:14px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);color:var(--purple);font-family:var(--sg)" onclick="toast('⚡ Chain Bet: Sì! +85 QR se azzecchi');closeModal()">✓ Sì · +85 QR</button>
-      <button style="padding:14px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;background:rgba(255,61,90,.08);border:1px solid rgba(255,61,90,.18);color:var(--red);font-family:var(--sg)" onclick="toast('Chain Bet: No piazzato');closeModal()">✗ No · +85 QR</button>
-    </div>
-  </div>`);
+// ── TICKER ────────────────────────────────────────────────────
+function initTicker(){
+  const items=['⚽ Sinner 71% vince Wimbledon — QUOTA','📈 Spread BTP-Bund: 118bp — in calo','⚡ Inter vs Real Madrid: 52% passa Inter','🏎️ GP Silverstone: Verstappen favorito 38%','🔥 Flash Event tra pochi minuti','⭐ Top Quasar questa settimana: 847 QR','💜 Sfida Squad: Milano Traders vs Predatori Roma','🎯 Draft lunedì: 3 previsioni della settimana'];
+  const html=[...items,...items].map(t=>`<span class="ti">${t}</span>`).join('');
+  document.getElementById('ticker').innerHTML=html;
+}
+
+// ── FILTRI ────────────────────────────────────────────────────
+function filterCat(c){
+  activeCat=c;activeType='tutti';
+  document.querySelectorAll('.nav-cat').forEach(b=>b.classList.toggle('on',b.textContent.replace('⚽ ','').replace('📈 ','').replace('🏛 ','')===c||(c==='tutti'&&b.textContent==='Tutti')));
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('on'));
+  document.getElementById('sec-title').textContent=c==='tutti'?'📅 Calendario eventi · Questa settimana':'📅 '+c+' · Questa settimana';
+  renderCards();
+}
+function filterType(t){activeType=t;renderCards();}
+function filterMiei(){
+  activeType='tutti';activeCat='tutti';
+  // Mostra solo eventi con scommesse piazzate
+  const wrap=document.getElementById('cards-wrap');
+  const myEvents=EVENTS.filter(ev=>Object.keys(dvotes[ev.id]||{}).length>0);
+  if(!myEvents.length){wrap.innerHTML='<div style="padding:40px;text-align:center;color:var(--t3);font-size:13px">Nessuna scommessa ancora. <span style="color:var(--gold);cursor:pointer" onclick="filterCat(\'tutti\')">Vai agli eventi →</span></div>';return;}
+  wrap.innerHTML=myEvents.map((ev,i)=>renderEvent(ev,i)).join('');
 }
 
 // ── PROFILO ───────────────────────────────────────────────────
 function openProf(){
-  const pct=getPct(qr);const f=getFascia(pct);const nextF=FL[FL.indexOf(f)+1];
-  const progPct=nextF?Math.round(((pct-f.p)/(nextF.p-f.p))*100):100;
-  document.getElementById('pf-fascia').textContent=f.n;
-  document.getElementById('pf-fascia').style.color=f.c;
+  const pct=getPct(qr);const f=getFascia(pct);const ni=FL.indexOf(f);const nf=FL[ni+1];
+  const prog=nf?Math.round(((pct-f.p)/(nf.p-f.p))*100):100;
+  document.getElementById('pf-fascia').textContent=f.n;document.getElementById('pf-fascia').style.color=f.c;
   document.getElementById('pf-qr').textContent=Math.round(qr);
   document.getElementById('pf-pct').textContent='Top '+(100-pct)+'%';
   document.getElementById('pf-voti').textContent=vtot;
   document.getElementById('pf-acc').textContent=vtot>0?Math.round(azz/vtot*100)+'%':'—%';
-  document.getElementById('pf-bar').style.width=progPct+'%';
-  document.getElementById('pf-next').textContent=nextF?'→ '+nextF.n+' ('+nextF.p+'%)':'MAX';
-  document.getElementById('pf-ranks').innerHTML=FL.map(r=>`
-    <div class="pr-row${r.n===f.n?' active':''}">
-      <div class="pr-dot" style="background:${r.c}"></div>
-      <div class="pr-name" style="color:${r.n===f.n?r.c:'var(--t3)'}">${r.n}</div>
-      <div class="pr-req">Top ${100-r.p}% · ${r.rb}% revenue</div>
+  document.getElementById('pf-bar').style.width=prog+'%';
+  document.getElementById('pf-next').textContent=nf?'→ '+nf.n:'MAX';
+  document.getElementById('pf-list').innerHTML=FL.map(r=>`
+    <div class="pfl-row${r.n===f.n?' active':''}">
+      <div class="pfl-dot" style="background:${r.c}"></div>
+      <div class="pfl-name" style="color:${r.n===f.n?r.c:'var(--t3)'}">${r.n}</div>
+      <div class="pfl-req">Top ${100-r.p}%</div>
     </div>`).join('');
   document.getElementById('prof-bg').classList.add('open');
 }
-function closeProf(e){
-  if(e&&e.target!==document.getElementById('prof-bg'))return;
-  document.getElementById('prof-bg').classList.remove('open');
-}
-
-// ── FILTRI ────────────────────────────────────────────────────
-let activeCat='tutti',activeType='tutti';
-function filterCat(cat){
-  activeCat=cat;activeType='tutti';
-  document.querySelectorAll('.nav-cat').forEach(b=>b.classList.toggle('on',b.textContent===cat||(cat==='tutti'&&b.textContent==='Tutti')));
-  renderMain();
-}
-function filterType(t){activeType=t;renderMain();}
-function filterMiei(){
-  showModal('<div style="padding:22px"><div style="font-family:var(--sg);font-size:18px;font-weight:800;margin-bottom:16px">I miei voti</div>'+
-    HURRY.filter(c=>votes[c.id]).map(c=>`<div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;color:var(--t2)">${c.q}<span style="float:right;color:${votes[c.id]==='si'?'var(--green)':'var(--red)'}">→ ${votes[c.id].toUpperCase()}</span></div>`).join('')+
-    '</div>');
-}
-function filterContra(){
-  showModal('<div style="padding:22px"><div style="font-family:var(--sg);font-size:18px;font-weight:800;color:var(--purple);margin-bottom:8px">↺ Contrarian</div><div style="font-size:12px;color:var(--t2);margin-bottom:16px">Hai scommesso contro la community su '+Object.keys(contraVotes).length+' previsioni.</div><div style="font-size:11px;color:var(--t3)">I Contrarian con ragione guadagnano il doppio del QR normale. Il badge Contrarian è il più raro su QUOTA.</div></div>');
-}
-
-function renderMain(){
-  let h=[...HURRY],d=[...DEEP];
-  if(activeCat!=='tutti'){h=h.filter(c=>c.cat===activeCat);d=d.filter(c=>c.cat===activeCat);}
-  if(activeType==='hurry')d=[];
-  if(activeType==='deep')h=[];
-  document.getElementById('cnt-t').textContent=HURRY.length+DEEP.length;
-  document.getElementById('cnt-h').textContent=HURRY.length;
-  document.getElementById('cnt-d').textContent=DEEP.length;
-  renderHurry(h);renderDeep(d);
-}
+function closeProf(e){if(e&&e.target!==document.getElementById('prof-bg'))return;document.getElementById('prof-bg').classList.remove('open');}
 
 // ── COUNTDOWN LIVE ────────────────────────────────────────────
-setInterval(()=>{HURRY.forEach(c=>{const el=document.getElementById('cd-'+c.id);if(el)el.textContent=cd(c.deadline);});},1000);
+setInterval(()=>{
+  EVENTS.forEach(ev=>{
+    const el=document.getElementById('cd-'+ev.id);if(el)el.textContent=cd(ev.deadline);
+    const hs=document.getElementById('hs-'+ev.id);if(hs)hs.textContent=cd(ev.deadline);
+  });
+},1000);
 
 // ── INIT ──────────────────────────────────────────────────────
 decay();checkStreak();save();
-initTicker();renderSentimentWar();renderMain();
-scheduleFlash();
-// Notifica di benvenuto dopo 3 secondi
-setTimeout(()=>pushNotif('⚡','Benvenuto su QUOTA','Hai 4 Hurry Up in scadenza oggi. Non perderle!'),3000);
-setTimeout(()=>pushNotif('🔥','Flash Event in arrivo','Preparati: tra ~10 minuti arriva un evento lampo.'),8000);
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeFlash();}});
+initTicker();renderCards();scheduleFlash();
+setTimeout(()=>push('⚡','Benvenuto su QUOTA','5 eventi ad alto hype questa settimana. Piazza le tue scommesse!'),2000);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeMod({target:document.getElementById('modal-bg')});closeFlash();}});
 </script>
 </body>
 </html>
