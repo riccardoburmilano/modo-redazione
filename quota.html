@@ -339,7 +339,61 @@ body::before{
   .card.featured .card-question{font-size:18px}
 }
 </style>
-</head>
+
+<style id="extra-css">
+/* LIVE FEED */
+.live-feed{position:fixed;right:0;top:60px;width:280px;height:calc(100vh - 60px);background:rgba(10,10,18,.97);border-left:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;z-index:50;transform:translateX(100%);transition:transform .3s cubic-bezier(.34,1.2,.64,1)}
+.live-feed.open{transform:translateX(0)}
+.lf-head{padding:16px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between}
+.lf-title{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;color:#f0efe8;display:flex;align-items:center;gap:6px}
+.lf-close{background:none;border:none;color:#505050;font-size:18px;cursor:pointer;padding:2px 6px}
+.lf-close:hover{color:#f0efe8}
+.lf-body{flex:1;overflow-y:auto;padding:12px}
+.lf-item{padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);animation:fadeUp .4s ease forwards;opacity:0}
+.lf-item:last-child{border-bottom:none}
+.lf-item-src{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#505050;margin-bottom:4px}
+.lf-item-title{font-size:12px;color:#c0c0ba;line-height:1.45;cursor:pointer;transition:color .15s}
+.lf-item-title:hover{color:#f0efe8}
+.lf-item-time{font-size:9px;color:#383838;margin-top:4px}
+.lf-empty{padding:24px;text-align:center;font-size:12px;color:#383838}
+
+/* TOGGLE FEED BTN */
+.feed-toggle{position:fixed;right:16px;bottom:80px;z-index:100;width:44px;height:44px;border-radius:50%;background:rgba(18,18,28,.95);border:1px solid rgba(255,255,255,.1);color:#f0efe8;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.6);transition:all .2s}
+.feed-toggle:hover{background:rgba(245,200,66,.15);border-color:rgba(245,200,66,.3)}
+.feed-toggle .badge{position:absolute;top:-3px;right:-3px;width:16px;height:16px;border-radius:50%;background:#ff3d5a;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;color:#fff}
+
+/* PROFILO MODAL */
+.prof-bg{position:fixed;inset:0;z-index:600;background:rgba(4,4,12,.88);backdrop-filter:blur(16px);display:none;align-items:center;justify-content:center}
+.prof-bg.open{display:flex}
+.prof-box{background:rgba(18,18,28,.98);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:32px;width:360px;max-width:90vw;box-shadow:0 32px 80px rgba(0,0,0,.8)}
+.prof-ast{animation:rot 16s linear infinite;margin:0 auto 16px;display:block}
+.prof-logo{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:900;text-align:center;background:linear-gradient(135deg,#fff,#f5c842);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+.prof-token{font-size:10px;color:#383838;text-align:center;margin-bottom:24px;letter-spacing:.06em}
+.prof-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.prof-stat{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:14px;text-align:center}
+.prof-stat-n{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:800;color:#f5c842;text-shadow:0 0 20px rgba(245,200,66,.3)}
+.prof-stat-l{font-size:9px;color:#505050;letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
+.prof-fascia{text-align:center;padding:12px;background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.15);border-radius:10px;margin-bottom:20px}
+.prof-fascia-n{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:800;color:#f5c842}
+.prof-fascia-l{font-size:10px;color:#706840;margin-top:3px}
+.prof-close{width:100%;padding:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#f0efe8;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.prof-close:hover{background:rgba(255,255,255,.1)}
+
+/* CARD IMAGE */
+.card-img{width:100%;height:140px;object-fit:cover;border-radius:8px;margin-bottom:14px;display:block}
+.card-img-wrap{position:relative;overflow:hidden;border-radius:8px;margin-bottom:14px}
+.card-img-wrap::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(10,10,18,.8));pointer-events:none}
+
+/* SENTIMENT TICKER */
+.sentiment-tick{display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(255,255,255,.03);border-radius:6px;margin-bottom:14px;font-size:11px;color:#606060}
+.st-dot{width:5px;height:5px;border-radius:50%;animation:pulse 1.5s ease-in-out infinite}
+.st-yes{background:#00e87a;box-shadow:0 0 6px rgba(0,232,122,.5)}
+.st-no{background:#ff3d5a;box-shadow:0 0 6px rgba(255,61,90,.5)}
+
+/* NOTIFICA PUSH BTN */
+.push-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:6px;font-size:10px;color:#606060;cursor:pointer;transition:all .2s;margin-top:8px;width:100%}
+.push-btn:hover{border-color:rgba(245,200,66,.2);color:#f5c842}
+</style></head>
 <body>
 
 <nav class="nav">
@@ -362,7 +416,7 @@ body::before{
   </div>
   <div class="nav-right">
     <div class="nav-credits">⚡ <span id="nav-credits">100</span> cr</div>
-    <div class="nav-live"><span class="live-dot"></span>Live</div>
+    <button onclick="openProf()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:20px;color:#a0a09a;font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;transition:all .2s" onmouseover="this.style.color='#f0efe8'" onmouseout="this.style.color='#a0a09a'">👤 Profilo</button><div class="nav-live"><span class="live-dot"></span>Live</div>
   </div>
 </nav>
 
@@ -874,5 +928,162 @@ function closeDet(e){
   clearInterval(window._dcd);
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDet({target:document.getElementById('d-bg')});});
+</script>
+<!-- LIVE FEED PANEL -->
+<div class="live-feed" id="live-feed">
+  <div class="lf-head">
+    <div class="lf-title"><span class="live-dot"></span>Aggiornamenti live</div>
+    <button class="lf-close" onclick="toggleFeed()">×</button>
+  </div>
+  <div class="lf-body" id="lf-body"><div class="lf-empty">Caricamento...</div></div>
+</div>
+
+<!-- TOGGLE BTN -->
+<button class="feed-toggle" id="feed-toggle-btn" onclick="toggleFeed()" title="Aggiornamenti live">
+  📡
+  <span class="badge" id="feed-badge" style="display:none">0</span>
+</button>
+
+<!-- PROFILO MODAL -->
+<div class="prof-bg" id="prof-bg" onclick="closeProf(event)">
+  <div class="prof-box">
+    <svg class="prof-ast" width="32" height="32" viewBox="0 0 32 32" fill="none">
+      <line x1="16" y1="2" x2="16" y2="30" stroke="#f5c842" stroke-width="1.5"/>
+      <line x1="2" y1="16" x2="30" y2="16" stroke="#f5c842" stroke-width="1.5"/>
+      <line x1="4.69" y1="4.69" x2="27.31" y2="27.31" stroke="#f5c842" stroke-width="1.5"/>
+      <line x1="27.31" y1="4.69" x2="4.69" y2="27.31" stroke="#f5c842" stroke-width="1.5"/>
+    </svg>
+    <div class="prof-logo">QUOTA</div>
+    <div class="prof-token" id="prof-token-txt"></div>
+    <div class="prof-stat-grid">
+      <div class="prof-stat"><div class="prof-stat-n" id="p-cr">0</div><div class="prof-stat-l">Crediti</div></div>
+      <div class="prof-stat"><div class="prof-stat-n" id="p-voti">0</div><div class="prof-stat-l">Voti dati</div></div>
+      <div class="prof-stat"><div class="prof-stat-n" id="p-acc">—%</div><div class="prof-stat-l">Accuratezza</div></div>
+      <div class="prof-stat"><div class="prof-stat-n" id="p-streak">0</div><div class="prof-stat-l">Giorni attivi</div></div>
+    </div>
+    <div class="prof-fascia">
+      <div class="prof-fascia-n" id="p-fascia">Neutrino</div>
+      <div class="prof-fascia-l">Fascia BDE attuale · sali votando ogni giorno</div>
+    </div>
+    <button onclick="requestPush()" class="push-btn">🔔 Ricevi notifiche per nuove quote</button>
+    <button class="prof-close" onclick="closeProf()" style="margin-top:10px">Chiudi</button>
+  </div>
+</div>
+<script>
+// ── LIVE FEED ─────────────────────────────────────────────────
+let feedOpen=false, feedItems=[], newFeedCount=0;
+
+function toggleFeed(){
+  feedOpen=!feedOpen;
+  document.getElementById('live-feed').classList.toggle('open',feedOpen);
+  if(feedOpen){newFeedCount=0;document.getElementById('feed-badge').style.display='none';}
+}
+
+async function loadLiveFeed(){
+  try{
+    const r=await fetch(BUR+'/api/v2/modo/news?limit=12&lang=it');
+    const d=await r.json();
+    if(!d.ok||!d.articles?.length)return;
+    const prev=feedItems.map(i=>i.id);
+    const nuovi=d.articles.filter(a=>!prev.includes(a.id));
+    feedItems=[...d.articles.slice(0,12)];
+    if(nuovi.length&&feedItems.length>0){
+      newFeedCount+=nuovi.length;
+      if(!feedOpen){
+        const badge=document.getElementById('feed-badge');
+        badge.style.display='flex';badge.textContent=Math.min(9,newFeedCount);
+      }
+    }
+    renderFeed();
+  }catch(e){}
+}
+
+function renderFeed(){
+  const body=document.getElementById('lf-body');
+  if(!feedItems.length){body.innerHTML='<div class="lf-empty">Nessun aggiornamento</div>';return;}
+  body.innerHTML=feedItems.map((a,i)=>{
+    const m=Math.round((Date.now()-new Date(a.publishedAt))/60000);
+    const ago=m<1?'ora':m<60?m+'m fa':Math.round(m/60)+'h fa';
+    return '<div class="lf-item" style="animation-delay:'+(i*40)+'ms"><div class="lf-item-src">'+a.sourceName+'</div><div class="lf-item-title" onclick="window.open(\''+a.sourceUrl+'\',\'_blank\')">'+(a.sourceTitle||'').slice(0,90)+'</div><div class="lf-item-time">'+ago+'</div></div>';
+  }).join('');
+}
+
+// Carica feed ogni 2 minuti
+loadLiveFeed();
+setInterval(loadLiveFeed,2*60*1000);
+
+// ── IMMAGINI DA OG:IMAGE ───────────────────────────────────────
+const IMG_FALLBACKS={
+  'Sport':'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600&q=80',
+  'Finanza':'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&q=80',
+  'Politica':'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=600&q=80',
+  'Mondo':'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&q=80',
+  'Tech':'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80',
+};
+
+function getCardImage(card){
+  return card.img || IMG_FALLBACKS[card.cat] || IMG_FALLBACKS['Mondo'];
+}
+
+// ── SENTIMENT LIVE (simula micro-movimenti) ───────────────────
+function animateSentiment(){
+  CARDS.forEach(card=>{
+    if(card.status!=='aperta')return;
+    // Micro-movimento ±1% random ogni 90 secondi
+    const delta=(Math.random()-.5)*1.5;
+    card.pctYes=Math.min(95,Math.max(5,Math.round((card.pctYes+delta)*10)/10));
+  });
+  render();
+}
+setInterval(animateSentiment,90*1000);
+
+// ── PROFILO ───────────────────────────────────────────────────
+function openProf(){
+  const vCount=Object.keys(votes).length;
+  const streak=parseInt(localStorage.getItem('q_streak')||'1');
+  const acc=parseInt(localStorage.getItem('q_acc')||'0');
+  const fascia=credits>500?'Singolarità':credits>300?'Quasar':credits>150?'Pulsar':credits>100?'Orbiter':'Neutrino';
+  document.getElementById('p-cr').textContent=credits;
+  document.getElementById('p-voti').textContent=vCount;
+  document.getElementById('p-acc').textContent=acc?acc+'%':'—%';
+  document.getElementById('p-streak').textContent=streak;
+  document.getElementById('p-fascia').textContent=fascia;
+  document.getElementById('prof-token-txt').textContent='ID: '+TOKEN.slice(0,16)+'...';
+  document.getElementById('prof-bg').classList.add('open');
+}
+function closeProf(e){
+  if(e&&e.target!==document.getElementById('prof-bg'))return;
+  document.getElementById('prof-bg').classList.remove('open');
+}
+
+// ── NOTIFICHE PUSH ────────────────────────────────────────────
+async function requestPush(){
+  if(!('Notification' in window)){alert('Il tuo browser non supporta le notifiche.');return;}
+  const perm=await Notification.requestPermission();
+  if(perm==='granted'){
+    new Notification('QUOTA · Notifiche attive',{body:'Riceverai un avviso per ogni nuova quota disponibile.',icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><text y="28" font-size="28">⚡</text></svg>'});
+    localStorage.setItem('q_push','1');
+    toast('🔔 Notifiche attivate');
+  }
+}
+
+function sendPushIfEnabled(title,body){
+  if(localStorage.getItem('q_push')==='1'&&Notification.permission==='granted'){
+    new Notification('QUOTA · '+title,{body,icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><text y="28" font-size="28">⚡</text></svg>'});
+  }
+}
+
+// ── STREAK GIORNALIERA ────────────────────────────────────────
+function updateStreak(){
+  const today=new Date().toDateString();
+  const last=localStorage.getItem('q_last_day');
+  if(last!==today){
+    const streak=parseInt(localStorage.getItem('q_streak')||'0');
+    const yesterday=new Date(Date.now()-86400000).toDateString();
+    localStorage.setItem('q_streak',last===yesterday?streak+1:1);
+    localStorage.setItem('q_last_day',today);
+  }
+}
+updateStreak();
 </script></body>
 </html>
