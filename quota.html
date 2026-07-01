@@ -3,379 +3,1159 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QUOTA · Il mercato delle previsioni</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+<title>QUOTA</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#080810;--s1:#0f0f1a;--s2:#161625;
-  --b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.1);
-  --gold:#f5c842;--gd:rgba(245,200,66,.1);--gg:rgba(245,200,66,.06);
-  --green:#00e87a;--red:#ff3d5a;--purple:#a855f7;
-  --text:#f0efe8;--t2:#909090;--t3:#404040;
+  --bg:#080810;
+  --gold:#f5c842;--gold2:#e8a800;--gold-glow:rgba(245,200,66,.15);
+  --green:#00e87a;--green-glow:rgba(0,232,122,.12);
+  --red:#ff3d5a;--red-glow:rgba(255,61,90,.12);
+  --blue:#4f8ef7;--purple:#9f6ef5;
+  --text:#f0efe8;--t2:#a0a09a;--t3:#505050;
   --g:'Inter',sans-serif;--sg:'Space Grotesk',sans-serif;
+  --card-bg:rgba(18,18,28,.85);
+  --card-border:rgba(255,255,255,.07);
+  --card-shadow:0 24px 64px rgba(0,0,0,.7),0 4px 16px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.06);
 }
-html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
-body{background:var(--bg);color:var(--text);font-family:var(--g)}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 50% at 20% 10%,rgba(80,30,120,.2),transparent 60%),radial-gradient(ellipse 50% 40% at 80% 90%,rgba(20,50,120,.15),transparent 60%);pointer-events:none;z-index:0}
+
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--g);overflow-x:hidden}
+
+/* BG GRADIENT */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 20%,rgba(80,40,120,.25) 0%,transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%,rgba(30,60,120,.2) 0%,transparent 60%),
+    radial-gradient(ellipse 40% 60% at 50% 50%,rgba(245,200,66,.04) 0%,transparent 70%);
+  pointer-events:none;
+}
 
 /* NAV */
-nav{position:fixed;top:0;left:0;right:0;z-index:100;height:58px;background:rgba(8,8,16,.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 24px;gap:12px}
-.n-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
-.n-ast{animation:rot 18s linear infinite}
+.nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  height:60px;
+  background:rgba(8,8,16,.8);
+  backdrop-filter:blur(20px) saturate(180%);
+  border-bottom:1px solid rgba(255,255,255,.05);
+  display:flex;align-items:center;padding:0 24px;gap:16px;
+}
+.nav-logo-wrap{display:flex;align-items:center;gap:10px;text-decoration:none}
+.nav-ast{animation:rot 20s linear infinite;filter:drop-shadow(0 0 6px rgba(245,200,66,.4))}
 @keyframes rot{to{transform:rotate(360deg)}}
-.n-name{font-family:var(--sg);font-size:20px;font-weight:800;background:linear-gradient(135deg,#fff,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.n-right{margin-left:auto;display:flex;gap:8px}
-.n-btn{padding:8px 18px;font-size:12px;font-weight:700;border-radius:20px;cursor:pointer;transition:all .2s;font-family:var(--sg);border:1px solid transparent}
-.n-btn.ghost{background:transparent;border-color:var(--b2);color:var(--t2)}
-.n-btn.ghost:hover{border-color:var(--b2);color:var(--text)}
-.n-btn.solid{background:var(--gold);color:#000;border-color:var(--gold)}
-.n-btn.solid:hover{opacity:.88}
+.nav-logo{
+  font-family:var(--sg);font-size:22px;font-weight:800;
+  letter-spacing:-.02em;
+  background:linear-gradient(135deg,#fff 0%,var(--gold) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.nav-cats{display:flex;gap:2px;margin-left:12px}
+.nav-cat{
+  font-size:11px;font-weight:600;color:var(--t3);
+  padding:6px 14px;cursor:pointer;border:none;background:none;
+  letter-spacing:.05em;text-transform:uppercase;
+  border-radius:20px;transition:all .2s;
+}
+.nav-cat:hover{color:var(--t2);background:rgba(255,255,255,.04)}
+.nav-cat.on{color:var(--gold);background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.2)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:16px}
+.nav-credits{
+  font-family:var(--sg);font-size:13px;font-weight:700;
+  color:var(--gold);display:flex;align-items:center;gap:6px;
+  padding:6px 14px;
+  background:rgba(245,200,66,.08);
+  border:1px solid rgba(245,200,66,.15);
+  border-radius:20px;
+}
+.nav-live{
+  display:flex;align-items:center;gap:6px;
+  font-size:10px;font-weight:700;color:var(--green);
+  letter-spacing:.1em;text-transform:uppercase;
+}
+.live-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 8px var(--green);
+  animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
 
-/* SECTIONS */
-section{position:relative;z-index:1}
+/* LAYOUT */
+.app{display:grid;grid-template-columns:220px 1fr;min-height:100vh;padding-top:60px;position:relative;z-index:1}
 
-/* HERO */
-.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px 60px}
-.hero-eye{font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:20px;display:flex;align-items:center;gap:8px;justify-content:center}
-.hero-eye::before,.hero-eye::after{content:'';width:32px;height:1px;background:rgba(245,200,66,.3)}
-.hero-h{font-family:var(--sg);font-size:clamp(40px,8vw,80px);font-weight:900;line-height:1.05;letter-spacing:-.04em;margin-bottom:20px}
-.hero-h span{background:linear-gradient(135deg,var(--green),#00c866);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hero-h em{background:linear-gradient(135deg,var(--red),#ff6b81);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-style:normal}
-.hero-sub{font-size:18px;color:var(--t2);line-height:1.65;max-width:540px;margin:0 auto 40px}
-.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:60px}
-.btn-lg{padding:14px 32px;font-size:14px;font-weight:800;border-radius:12px;cursor:pointer;transition:all .22s;font-family:var(--sg);border:none;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
-.btn-gold{background:var(--gold);color:#000}
-.btn-gold:hover{box-shadow:0 12px 32px rgba(245,200,66,.35);transform:translateY(-2px)}
-.btn-ghost{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--b2)}
-.btn-ghost:hover{background:rgba(255,255,255,.1)}
+/* SIDEBAR */
+.sidebar{
+  background:rgba(12,12,20,.6);
+  backdrop-filter:blur(12px);
+  border-right:1px solid rgba(255,255,255,.04);
+  padding:24px 0;
+  position:sticky;top:60px;height:calc(100vh - 60px);
+  display:flex;flex-direction:column;
+}
+.sidebar-section{padding:0 16px;margin-bottom:24px}
+.sidebar-label{
+  font-size:9px;font-weight:700;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--t3);
+  padding:0 10px;margin-bottom:8px;
+}
+.sidebar-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px;border-radius:8px;
+  cursor:pointer;transition:all .18s;
+  border:1px solid transparent;background:none;
+  color:var(--t2);font-size:12px;font-weight:500;
+  width:100%;text-align:left;
+}
+.sidebar-item:hover{background:rgba(255,255,255,.04);color:var(--text)}
+.sidebar-item.on{
+  background:rgba(245,200,66,.08);
+  border-color:rgba(245,200,66,.15);
+  color:var(--gold);
+}
+.sidebar-icon{font-size:15px;width:22px;text-align:center}
+.sidebar-count{
+  margin-left:auto;font-size:10px;font-weight:700;
+  color:var(--t3);background:rgba(255,255,255,.06);
+  padding:2px 7px;border-radius:10px;
+}
+.sidebar-divider{height:1px;background:rgba(255,255,255,.04);margin:8px 16px}
+.sidebar-bottom{margin-top:auto;padding:16px}
+.sidebar-stat{
+  padding:14px;
+  background:rgba(245,200,66,.06);
+  border:1px solid rgba(245,200,66,.1);
+  border-radius:8px;margin-bottom:8px;
+}
+.sidebar-stat-n{
+  font-family:var(--sg);font-size:24px;font-weight:800;
+  color:var(--gold);line-height:1;
+  text-shadow:0 0 20px rgba(245,200,66,.3);
+}
+.sidebar-stat-l{font-size:9px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
 
-/* DEMO CARD HERO */
-.demo-card{background:rgba(18,18,28,.9);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:20px 24px;max-width:460px;margin:0 auto;box-shadow:0 24px 60px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.06);text-align:left;position:relative}
-.demo-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);border-radius:16px 16px 0 0}
-.dc-cat{font-size:9px;font-weight:800;letter-spacing:.18em;color:#fb923c;margin-bottom:10px}
-.dc-q{font-family:var(--sg);font-size:17px;font-weight:700;line-height:1.3;margin-bottom:14px}
-.dc-bar{height:7px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;margin-bottom:8px;position:relative}
-.dc-bar-y{height:100%;background:linear-gradient(90deg,#00c866,var(--green));box-shadow:0 0 12px rgba(0,232,122,.4);width:71%}
-.dc-bar-n{position:absolute;top:0;right:0;height:100%;background:linear-gradient(90deg,var(--red),#ff6b81);width:29%}
-.dc-pcts{display:flex;justify-content:space-between;font-family:var(--sg);font-size:14px;font-weight:800;margin-bottom:14px}
-.dc-yes{color:var(--green)}.dc-no{color:var(--red)}
-.dc-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.dc-btn{padding:10px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sg);border:1px solid transparent;transition:all .2s}
-.dc-btn.yes{background:rgba(0,232,122,.1);border-color:rgba(0,232,122,.2);color:var(--green)}
-.dc-btn.yes:hover{background:var(--green);color:#000}
-.dc-btn.no{background:rgba(255,61,90,.1);border-color:rgba(255,61,90,.2);color:var(--red)}
-.dc-btn.no:hover{background:var(--red);color:#fff}
+/* MAIN */
+.main{padding:24px;display:flex;flex-direction:column;gap:12px}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.section-title{
+  font-family:var(--sg);font-size:11px;font-weight:700;
+  color:var(--t3);letter-spacing:.12em;text-transform:uppercase;
+  display:flex;align-items:center;gap:10px;
+}
+.section-title::before{
+  content:'';width:3px;height:12px;
+  background:linear-gradient(180deg,var(--gold),var(--gold2));
+  border-radius:2px;box-shadow:0 0 8px rgba(245,200,66,.5);
+}
 
-/* STATS STRIP */
-.stats{display:flex;justify-content:center;gap:0;flex-wrap:wrap;border-top:1px solid var(--b1);border-bottom:1px solid var(--b1);background:rgba(255,255,255,.02)}
-.stat{flex:1;min-width:140px;padding:28px 20px;text-align:center;border-right:1px solid var(--b1)}
-.stat:last-child{border-right:none}
-.stat-n{font-family:var(--sg);font-size:34px;font-weight:900;color:var(--gold);text-shadow:0 0 24px rgba(245,200,66,.3);line-height:1}
-.stat-l{font-size:11px;color:var(--t2);margin-top:6px;letter-spacing:.04em}
+/* CARD */
+.card{
+  background:var(--card-bg);
+  border:1px solid var(--card-border);
+  border-radius:16px;
+  box-shadow:var(--card-shadow);
+  backdrop-filter:blur(20px) saturate(150%);
+  overflow:hidden;
+  cursor:pointer;
+  transition:all .3s cubic-bezier(.34,1.56,.64,1);
+  animation:fadeUp .5s ease forwards;
+  opacity:0;transform:translateY(16px);
+  position:relative;
+}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+.card::before{
+  content:'';position:absolute;inset:0;border-radius:16px;
+  background:linear-gradient(135deg,rgba(255,255,255,.03) 0%,transparent 60%);
+  pointer-events:none;
+}
+.card:hover{
+  transform:translateY(-3px) scale(1.005);
+  box-shadow:0 32px 80px rgba(0,0,0,.8),0 8px 24px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.1);
+  border-color:rgba(255,255,255,.12);
+}
 
-/* COME FUNZIONA */
-.how{padding:80px 24px;max-width:1000px;margin:0 auto}
-.section-eye{font-size:9px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;text-align:center}
-.section-h{font-family:var(--sg);font-size:clamp(28px,4vw,44px);font-weight:900;letter-spacing:-.03em;text-align:center;margin-bottom:48px}
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--b1)}
-.step{background:var(--s1);padding:28px 24px}
-.step-n{font-family:var(--sg);font-size:48px;font-weight:900;color:var(--b2);line-height:1;margin-bottom:14px}
-.step-icon{font-size:28px;margin-bottom:12px}
-.step-h{font-family:var(--sg);font-size:17px;font-weight:700;margin-bottom:8px}
-.step-t{font-size:13px;color:var(--t2);line-height:1.65}
+/* FEATURED */
+.card.featured{
+  border-color:rgba(245,200,66,.2);
+  background:rgba(18,16,28,.9);
+}
+.card.featured::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),var(--gold2),transparent);
+  border-radius:16px 16px 0 0;
+}
+.featured-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--gold);
+  background:rgba(245,200,66,.1);
+  border:1px solid rgba(245,200,66,.2);
+  padding:3px 10px;border-radius:20px;
+}
 
-/* FASCE BDE */
-.fasce{padding:80px 24px;max-width:1000px;margin:0 auto}
-.fascia-grid{display:flex;flex-direction:column;gap:2px}
-.fascia-row{display:grid;grid-template-columns:160px 1fr auto;align-items:center;gap:16px;padding:16px 20px;border-radius:8px;transition:background .15s}
-.fascia-row:hover{background:rgba(255,255,255,.03)}
-.fascia-name{font-family:var(--sg);font-size:15px;font-weight:700}
-.fascia-bar-wrap{background:rgba(255,255,255,.04);border-radius:4px;height:6px;overflow:hidden}
-.fascia-bar{height:100%;border-radius:4px}
-.fascia-pct{font-size:12px;color:var(--t2);white-space:nowrap}
-.f-n{color:#a0a09a}.f-o{color:#60a5fa}.f-p{color:#c084fc}.f-q{color:var(--gold)}.f-s{color:var(--green)}
+.card-inner{padding:22px 24px}
 
-/* PREMI */
-.premi{padding:80px 24px;background:rgba(255,255,255,.015);border-top:1px solid var(--b1);border-bottom:1px solid var(--b1)}
-.premi-inner{max-width:1000px;margin:0 auto}
-.premi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:40px}
-.premio{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:24px;text-align:center}
-.premio-icon{font-size:32px;margin-bottom:12px}
-.premio-n{font-family:var(--sg);font-size:26px;font-weight:900;color:var(--gold);text-shadow:0 0 20px rgba(245,200,66,.3);margin-bottom:4px}
-.premio-l{font-size:11px;color:var(--t2);margin-bottom:10px;letter-spacing:.04em}
-.premio-t{font-size:13px;color:var(--t2);line-height:1.6}
+.card-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.card-cat-wrap{display:flex;align-items:center;gap:8px}
+.card-cat{font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.cat-sport{color:#fb923c}.cat-finanza{color:var(--gold)}.cat-politica{color:var(--purple)}.cat-mondo{color:var(--blue)}.cat-tech{color:#2dd4bf}
 
-/* PERCHE' */
-.perche{padding:80px 24px;max-width:1000px;margin:0 auto}
-.perche-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--b1)}
-.perche-item{background:var(--s1);padding:28px 24px;border-left:3px solid transparent;transition:all .2s}
-.perche-item:hover{background:var(--s2);border-left-color:var(--gold)}
-.perche-icon{font-size:24px;margin-bottom:12px}
-.perche-h{font-family:var(--sg);font-size:16px;font-weight:700;margin-bottom:8px}
-.perche-t{font-size:13px;color:var(--t2);line-height:1.65}
+.card-time{
+  font-size:11px;font-weight:600;color:var(--t3);
+  display:flex;align-items:center;gap:5px;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.06);
+  padding:4px 10px;border-radius:20px;
+}
 
-/* ISCRIZIONE */
-.signup{padding:80px 24px;text-align:center;max-width:560px;margin:0 auto}
-.signup-h{font-family:var(--sg);font-size:clamp(28px,4vw,40px);font-weight:900;letter-spacing:-.03em;margin-bottom:14px}
-.signup-sub{font-size:15px;color:var(--t2);line-height:1.65;margin-bottom:32px}
-.signup-form{display:flex;gap:8px;max-width:400px;margin:0 auto}
-.signup-input{flex:1;padding:13px 16px;background:rgba(255,255,255,.06);border:1px solid var(--b2);color:var(--text);font-size:14px;border-radius:10px;outline:none;font-family:var(--g);transition:border-color .2s}
-.signup-input:focus{border-color:rgba(245,200,66,.4)}
-.signup-input::placeholder{color:var(--t3)}
-.signup-btn{padding:13px 20px;background:var(--gold);border:none;color:#000;font-size:13px;font-weight:800;border-radius:10px;cursor:pointer;font-family:var(--sg);transition:all .2s;white-space:nowrap}
-.signup-btn:hover{opacity:.88}
-.signup-ok{font-size:13px;color:var(--green);display:none;margin-top:12px}
-.signup-fine{font-size:11px;color:var(--t3);margin-top:12px}
+.card-question{
+  font-family:var(--sg);
+  font-size:18px;font-weight:700;line-height:1.3;
+  color:var(--text);margin-bottom:8px;letter-spacing:-.02em;
+}
+.card.featured .card-question{font-size:22px}
 
-/* FOOTER */
-footer{background:#040408;border-top:1px solid var(--b1);padding:32px 24px}
-.footer-inner{max-width:1000px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
-.f-logo{font-family:var(--sg);font-size:18px;font-weight:800;color:var(--gold)}
-.f-links{display:flex;gap:20px;font-size:11px}
-.f-links a{color:var(--t3);text-decoration:none;transition:color .15s}
-.f-links a:hover{color:var(--text)}
-.f-copy{font-size:11px;color:var(--t3)}
+.card-context{
+  font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:20px;
+  border-left:2px solid rgba(255,255,255,.08);padding-left:10px;
+}
 
-@media(max-width:768px){
-  .steps{grid-template-columns:1fr}
-  .premi-grid{grid-template-columns:1fr}
-  .perche-grid{grid-template-columns:1fr}
-  .stats{flex-direction:column}
-  .stat{border-right:none;border-bottom:1px solid var(--b1)}
-  .fascia-row{grid-template-columns:120px 1fr auto}
-  .signup-form{flex-direction:column}
+/* BARRA */
+.bar-wrap{margin-bottom:18px}
+.bar-labels{display:flex;justify-content:space-between;margin-bottom:8px}
+.bar-label{font-size:11px;font-weight:700;letter-spacing:.04em}
+.bar-label.yes{color:var(--green)}.bar-label.no{color:var(--red)}
+
+.bar{
+  height:8px;background:rgba(255,255,255,.06);
+  border-radius:4px;overflow:hidden;position:relative;
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.5);
+}
+.bar-yes{
+  height:100%;border-radius:4px;
+  background:linear-gradient(90deg,#00c866,var(--green));
+  box-shadow:0 0 12px rgba(0,232,122,.4);
+  transition:width 1.2s cubic-bezier(.34,1.2,.64,1);
+}
+.bar-no{
+  position:absolute;top:0;right:0;height:100%;border-radius:4px;
+  background:linear-gradient(90deg,var(--red),#ff6b81);
+  box-shadow:0 0 12px rgba(255,61,90,.4);
+  transition:width 1.2s cubic-bezier(.34,1.2,.64,1);
+}
+.bar-pcts{display:flex;justify-content:space-between;margin-top:8px}
+.bar-pct{font-family:var(--sg);font-size:15px;font-weight:800}
+.bar-pct.yes{
+  color:var(--green);
+  text-shadow:0 0 16px rgba(0,232,122,.5);
+}
+.bar-pct.no{
+  color:var(--red);
+  text-shadow:0 0 16px rgba(255,61,90,.5);
+}
+
+/* VOTE BUTTONS */
+.vote-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.vbtn{
+  padding:12px 16px;border-radius:10px;
+  font-size:12px;font-weight:700;cursor:pointer;
+  transition:all .2s cubic-bezier(.34,1.4,.64,1);
+  text-align:center;letter-spacing:.04em;
+  font-family:var(--sg);border:1px solid transparent;
+  position:relative;overflow:hidden;
+}
+.vbtn::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.08) 0%,transparent 60%);
+  pointer-events:none;
+}
+.vbtn.yes{
+  background:rgba(0,232,122,.1);
+  border-color:rgba(0,232,122,.2);
+  color:var(--green);
+}
+.vbtn.yes:hover{
+  background:var(--green);color:#000;
+  box-shadow:0 8px 24px rgba(0,232,122,.4);
+  transform:scale(1.02);
+}
+.vbtn.no{
+  background:rgba(255,61,90,.1);
+  border-color:rgba(255,61,90,.2);
+  color:var(--red);
+}
+.vbtn.no:hover{
+  background:var(--red);color:#fff;
+  box-shadow:0 8px 24px rgba(255,61,90,.4);
+  transform:scale(1.02);
+}
+.vbtn.voted-yes{background:var(--green);color:#000;box-shadow:0 4px 16px rgba(0,232,122,.3)}
+.vbtn.voted-no{background:var(--red);color:#fff;box-shadow:0 4px 16px rgba(255,61,90,.3)}
+.vbtn:disabled{cursor:default;transform:none}
+
+/* META */
+.card-meta{
+  display:flex;align-items:center;gap:10px;
+  margin-top:14px;padding-top:14px;
+  border-top:1px solid rgba(255,255,255,.05);
+}
+.meta-votes{font-size:10px;color:var(--t3)}
+.meta-voted{font-size:10px;color:var(--green)}
+.meta-reward{
+  margin-left:auto;font-size:10px;font-weight:700;
+  color:var(--gold);display:flex;align-items:center;gap:4px;
+}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:28px;right:24px;
+  background:rgba(18,18,28,.95);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:12px;
+  padding:12px 18px;font-size:12px;font-weight:500;color:var(--text);
+  z-index:999;opacity:0;transition:all .3s;
+  pointer-events:none;
+  backdrop-filter:blur(20px);
+  box-shadow:0 16px 48px rgba(0,0,0,.6);
+}
+.toast.show{opacity:1;transform:translateY(-4px)}
+
+/* EMPTY */
+.empty{
+  padding:60px;text-align:center;color:var(--t3);
+  background:rgba(255,255,255,.02);border-radius:16px;
+  border:1px dashed rgba(255,255,255,.06);
+}
+.empty-title{font-family:var(--sg);font-size:18px;color:var(--t2);margin-bottom:8px}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px}
+
+@media(max-width:900px){
+  .app{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .nav-cats{display:none}
+  .card.featured .card-question{font-size:18px}
 }
 </style>
-</head>
+
+<style id="extra-css">
+/* LIVE FEED */
+.live-feed{position:fixed;right:0;top:60px;width:280px;height:calc(100vh - 60px);background:rgba(10,10,18,.97);border-left:1px solid rgba(255,255,255,.06);display:flex;flex-direction:column;z-index:50;transform:translateX(100%);transition:transform .3s cubic-bezier(.34,1.2,.64,1)}
+.live-feed.open{transform:translateX(0)}
+.lf-head{padding:16px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between}
+.lf-title{font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;color:#f0efe8;display:flex;align-items:center;gap:6px}
+.lf-close{background:none;border:none;color:#505050;font-size:18px;cursor:pointer;padding:2px 6px}
+.lf-close:hover{color:#f0efe8}
+.lf-body{flex:1;overflow-y:auto;padding:12px}
+.lf-item{padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);animation:fadeUp .4s ease forwards;opacity:0}
+.lf-item:last-child{border-bottom:none}
+.lf-item-src{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#505050;margin-bottom:4px}
+.lf-item-title{font-size:12px;color:#c0c0ba;line-height:1.45;cursor:pointer;transition:color .15s}
+.lf-item-title:hover{color:#f0efe8}
+.lf-item-time{font-size:9px;color:#383838;margin-top:4px}
+.lf-empty{padding:24px;text-align:center;font-size:12px;color:#383838}
+
+/* TOGGLE FEED BTN */
+.feed-toggle{position:fixed;right:16px;bottom:80px;z-index:100;width:44px;height:44px;border-radius:50%;background:rgba(18,18,28,.95);border:1px solid rgba(255,255,255,.1);color:#f0efe8;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.6);transition:all .2s}
+.feed-toggle:hover{background:rgba(245,200,66,.15);border-color:rgba(245,200,66,.3)}
+.feed-toggle .badge{position:absolute;top:-3px;right:-3px;width:16px;height:16px;border-radius:50%;background:#ff3d5a;font-size:9px;font-weight:800;display:flex;align-items:center;justify-content:center;color:#fff}
+
+/* PROFILO MODAL */
+.prof-bg{position:fixed;inset:0;z-index:600;background:rgba(4,4,12,.88);backdrop-filter:blur(16px);display:none;align-items:center;justify-content:center}
+.prof-bg.open{display:flex}
+.prof-box{background:rgba(18,18,28,.98);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:32px;width:360px;max-width:90vw;box-shadow:0 32px 80px rgba(0,0,0,.8)}
+.prof-ast{animation:rot 16s linear infinite;margin:0 auto 16px;display:block}
+.prof-logo{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:900;text-align:center;background:linear-gradient(135deg,#fff,#f5c842);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+.prof-token{font-size:10px;color:#383838;text-align:center;margin-bottom:24px;letter-spacing:.06em}
+.prof-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.prof-stat{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:14px;text-align:center}
+.prof-stat-n{font-family:'Space Grotesk',sans-serif;font-size:24px;font-weight:800;color:#f5c842;text-shadow:0 0 20px rgba(245,200,66,.3)}
+.prof-stat-l{font-size:9px;color:#505050;letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
+.prof-fascia{text-align:center;padding:12px;background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.15);border-radius:10px;margin-bottom:20px}
+.prof-fascia-n{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:800;color:#f5c842}
+.prof-fascia-l{font-size:10px;color:#706840;margin-top:3px}
+.prof-close{width:100%;padding:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#f0efe8;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.prof-close:hover{background:rgba(255,255,255,.1)}
+
+/* CARD IMAGE */
+.card-img{width:100%;height:140px;object-fit:cover;border-radius:8px;margin-bottom:14px;display:block}
+.card-img-wrap{position:relative;overflow:hidden;border-radius:8px;margin-bottom:14px}
+.card-img-wrap::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(10,10,18,.8));pointer-events:none}
+
+/* SENTIMENT TICKER */
+.sentiment-tick{display:flex;align-items:center;gap:8px;padding:8px 12px;background:rgba(255,255,255,.03);border-radius:6px;margin-bottom:14px;font-size:11px;color:#606060}
+.st-dot{width:5px;height:5px;border-radius:50%;animation:pulse 1.5s ease-in-out infinite}
+.st-yes{background:#00e87a;box-shadow:0 0 6px rgba(0,232,122,.5)}
+.st-no{background:#ff3d5a;box-shadow:0 0 6px rgba(255,61,90,.5)}
+
+/* NOTIFICA PUSH BTN */
+.push-btn{display:flex;align-items:center;gap:6px;padding:6px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:6px;font-size:10px;color:#606060;cursor:pointer;transition:all .2s;margin-top:8px;width:100%}
+.push-btn:hover{border-color:rgba(245,200,66,.2);color:#f5c842}
+</style></head>
 <body>
 
-<nav>
-  <a class="n-logo" href="#">
-    <svg class="n-ast" width="20" height="20" viewBox="0 0 20 20" fill="none">
-      <line x1="10" y1="1" x2="10" y2="19" stroke="#f5c842" stroke-width="1.2"/>
-      <line x1="1" y1="10" x2="19" y2="10" stroke="#f5c842" stroke-width="1.2"/>
-      <line x1="2.93" y1="2.93" x2="17.07" y2="17.07" stroke="#f5c842" stroke-width="1.2"/>
-      <line x1="17.07" y1="2.93" x2="2.93" y2="17.07" stroke="#f5c842" stroke-width="1.2"/>
+<nav class="nav">
+  <a class="nav-logo-wrap" href="#" style="text-decoration:none">
+    <svg class="nav-ast" width="22" height="22" viewBox="0 0 22 22" fill="none">
+      <line x1="11" y1="1" x2="11" y2="21" stroke="#f5c842" stroke-width="1.4"/>
+      <line x1="1" y1="11" x2="21" y2="11" stroke="#f5c842" stroke-width="1.4"/>
+      <line x1="3.22" y1="3.22" x2="18.78" y2="18.78" stroke="#f5c842" stroke-width="1.4"/>
+      <line x1="18.78" y1="3.22" x2="3.22" y2="18.78" stroke="#f5c842" stroke-width="1.4"/>
     </svg>
-    <span class="n-name">QUOTA</span>
+    <div class="nav-logo">QUOTA</div>
   </a>
-  <div class="n-right">
-    <a href="#come-funziona" class="n-btn ghost">Come funziona</a>
-    <a href="quota.html" class="n-btn solid">Entra →</a>
+  <div class="nav-cats">
+    <button class="nav-cat on" onclick="filterCat('tutti')">Tutti</button>
+    <button class="nav-cat" onclick="filterCat('Sport')">Sport</button>
+    <button class="nav-cat" onclick="filterCat('Finanza')">Finanza</button>
+    <button class="nav-cat" onclick="filterCat('Politica')">Politica</button>
+    <button class="nav-cat" onclick="filterCat('Mondo')">Mondo</button>
+    <button class="nav-cat" onclick="filterCat('Tech')">Tech</button>
+  </div>
+  <div class="nav-right">
+    <div class="nav-credits">⚡ <span id="nav-credits">100</span> cr</div>
+    <button onclick="openProf()" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:20px;color:#a0a09a;font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;transition:all .2s" onmouseover="this.style.color='#f0efe8'" onmouseout="this.style.color='#a0a09a'">👤 Profilo</button><div class="nav-live"><span class="live-dot"></span>Live</div>
   </div>
 </nav>
 
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-eye">Il mercato delle previsioni</div>
-  <h1 class="hero-h">Prevedi.<br><span>Vinci.</span> <em>Ripeti.</em></h1>
-  <p class="hero-sub">QUOTA è il primo prediction market italiano. Sfida la community su sport, finanza e politica — e guadagna crediti ogni volta che azzecchi.</p>
-  <div class="hero-btns">
-    <a href="quota.html" class="btn-lg btn-gold">⚡ Inizia gratis →</a>
-    <a href="#come-funziona" class="btn-lg btn-ghost">Come funziona</a>
-  </div>
-  <div class="demo-card">
-    <div class="dc-cat">SPORT · WIMBLEDON 2026</div>
-    <div class="dc-q">Sinner difende il titolo a Wimbledon?</div>
-    <div class="dc-bar"><div class="dc-bar-y"></div><div class="dc-bar-n"></div></div>
-    <div class="dc-pcts"><span class="dc-yes">71% Sì</span><span class="dc-no">29% No</span></div>
-    <div class="dc-btns">
-      <button class="dc-btn yes" onclick="this.textContent='✓ Votato';this.disabled=true;document.querySelector('.dc-btn.no').style.opacity='.3'">✓ Sì — +50 cr</button>
-      <button class="dc-btn no" onclick="this.textContent='✓ Votato';this.disabled=true;document.querySelector('.dc-btn.yes').style.opacity='.3'">✗ No — +50 cr</button>
+<div class="app">
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Sezioni</div>
+      <button class="sidebar-item on" onclick="filterCat('tutti')">
+        <span class="sidebar-icon">◈</span>Tutti
+        <span class="sidebar-count" id="c-tutti">0</span>
+      </button>
+      <button class="sidebar-item" onclick="filterCat('Sport')">
+        <span class="sidebar-icon">⚽</span>Sport
+        <span class="sidebar-count" id="c-Sport">0</span>
+      </button>
+      <button class="sidebar-item" onclick="filterCat('Finanza')">
+        <span class="sidebar-icon">📈</span>Finanza
+        <span class="sidebar-count" id="c-Finanza">0</span>
+      </button>
+      <button class="sidebar-item" onclick="filterCat('Politica')">
+        <span class="sidebar-icon">🏛</span>Politica
+        <span class="sidebar-count" id="c-Politica">0</span>
+      </button>
+      <button class="sidebar-item" onclick="filterCat('Mondo')">
+        <span class="sidebar-icon">🌍</span>Mondo
+        <span class="sidebar-count" id="c-Mondo">0</span>
+      </button>
+      <button class="sidebar-item" onclick="filterCat('Tech')">
+        <span class="sidebar-icon">⚡</span>Tech
+        <span class="sidebar-count" id="c-Tech">0</span>
+      </button>
     </div>
-  </div>
-</section>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">I miei voti</div>
+      <button class="sidebar-item" onclick="filterStatus('mie')">
+        <span class="sidebar-icon">★</span>Le mie quota
+      </button>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="sidebar-stat">
+        <div class="sidebar-stat-n" id="sb-cr">100</div>
+        <div class="sidebar-stat-l">Crediti QUOTA</div>
+      </div>
+      <div class="sidebar-stat">
+        <div class="sidebar-stat-n" id="sb-acc">—</div>
+        <div class="sidebar-stat-l">Voti dati</div>
+      </div>
+    </div>
+  </aside>
 
-<!-- STATS -->
-<section class="stats">
-  <div class="stat"><div class="stat-n" id="s-users">2.847</div><div class="stat-l">Utenti attivi</div></div>
-  <div class="stat"><div class="stat-n" id="s-quota">143</div><div class="stat-l">Quote aperte</div></div>
-  <div class="stat"><div class="stat-n" id="s-acc">68%</div><div class="stat-l">Accuratezza media</div></div>
-  <div class="stat"><div class="stat-n" id="s-dist">€4.2k</div><div class="stat-l">Valore redistribuito</div></div>
-</section>
+  <main class="main" id="main">
+    <div class="section-header">
+      <div class="section-title" id="sec-title">In corso</div>
+    </div>
+    <div id="cards"></div>
+  </main>
+</div>
 
-<!-- COME FUNZIONA -->
-<section class="how" id="come-funziona">
-  <div class="section-eye">Come funziona</div>
-  <h2 class="section-h">Tre passi. Poi vinci.</h2>
-  <div class="steps">
-    <div class="step">
-      <div class="step-n">01</div>
-      <div class="step-icon">⚡</div>
-      <div class="step-h">Scegli una quota</div>
-      <div class="step-t">Ogni giorno nuove previsioni su sport, finanza, politica e attualità. Ognuna con una percentuale calcolata da QUOTA e una scadenza precisa.</div>
-    </div>
-    <div class="step">
-      <div class="step-n">02</div>
-      <div class="step-icon">🎯</div>
-      <div class="step-h">Vota Sì o No</div>
-      <div class="step-t">Esprimi la tua previsione. Guadagni 5 crediti solo per partecipare. Se azzecchi, ricevi i crediti premio. Più sei preciso, più sali di fascia.</div>
-    </div>
-    <div class="step">
-      <div class="step-n">03</div>
-      <div class="step-icon">💰</div>
-      <div class="step-h">Accumula e incassa</div>
-      <div class="step-t">I crediti BDE si accumulano. Ogni mese il 50% del valore generato dalla community viene redistribuito per fascia. Chi prevede meglio, guadagna di più.</div>
-    </div>
-  </div>
-</section>
-
-<!-- FASCE BDE -->
-<section class="fasce" id="fasce">
-  <div class="section-eye">Sistema BDE</div>
-  <h2 class="section-h">Cinque fasce. Una classifica.</h2>
-  <p style="text-align:center;color:var(--t2);font-size:14px;margin-bottom:40px;max-width:500px;margin-left:auto;margin-right:auto">La tua fascia dipende dalla tua accuratezza nel tempo — non da quanto spendi. Inizia come Neutrino, arriva alla Singolarità.</p>
-  <div class="fascia-grid">
-    <div class="fascia-row">
-      <div class="fascia-name f-n">🌑 Neutrino</div>
-      <div class="fascia-bar-wrap"><div class="fascia-bar" style="width:20%;background:#a0a09a"></div></div>
-      <div class="fascia-pct">Top 100%  · Tutti iniziano qui</div>
-    </div>
-    <div class="fascia-row">
-      <div class="fascia-name f-o">🔵 Orbiter</div>
-      <div class="fascia-bar-wrap"><div class="fascia-bar" style="width:40%;background:#60a5fa"></div></div>
-      <div class="fascia-pct">Top 40%  · +quota giornaliera</div>
-    </div>
-    <div class="fascia-row">
-      <div class="fascia-name f-p">💜 Pulsar</div>
-      <div class="fascia-bar-wrap"><div class="fascia-bar" style="width:60%;background:#c084fc"></div></div>
-      <div class="fascia-pct">Top 15%  · +bonus mensile</div>
-    </div>
-    <div class="fascia-row">
-      <div class="fascia-name f-q">⭐ Quasar</div>
-      <div class="fascia-bar-wrap"><div class="fascia-bar" style="width:80%;background:var(--gold)"></div></div>
-      <div class="fascia-pct">Top 5%  · +revenue share</div>
-    </div>
-    <div class="fascia-row">
-      <div class="fascia-name f-s">✦ Singolarità</div>
-      <div class="fascia-bar-wrap"><div class="fascia-bar" style="width:100%;background:linear-gradient(90deg,#00c866,var(--green))"></div></div>
-      <div class="fascia-pct">Top 1%  · Pool élite mensile</div>
-    </div>
-  </div>
-</section>
-
-<!-- PREMI -->
-<section class="premi">
-  <div class="premi-inner">
-    <div class="section-eye">Revenue sharing</div>
-    <h2 class="section-h" style="text-align:center">Il tuo valore. Redistribuito.</h2>
-    <div class="premi-grid">
-      <div class="premio">
-        <div class="premio-icon">🌑</div>
-        <div class="premio-n">5 cr</div>
-        <div class="premio-l">Per ogni voto</div>
-        <div class="premio-t">Guadagni crediti solo partecipando. Gratis, ogni giorno, senza limiti.</div>
-      </div>
-      <div class="premio">
-        <div class="premio-icon">⭐</div>
-        <div class="premio-n">+300 cr</div>
-        <div class="premio-l">Fascia Quasar · mensile</div>
-        <div class="premio-t">Top 5% della community. Il revenue pool mensile viene diviso tra i migliori previsori.</div>
-      </div>
-      <div class="premio">
-        <div class="premio-icon">✦</div>
-        <div class="premio-n">Pool élite</div>
-        <div class="premio-l">Fascia Singolarità</div>
-        <div class="premio-t">Top 1%. Accesso al pool élite mensile — il più grande premio della community QUOTA.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- PERCHE' QUOTA -->
-<section class="perche">
-  <div style="max-width:1000px;margin:0 auto">
-    <div class="section-eye" style="text-align:center;padding:80px 0 14px">Perché QUOTA</div>
-    <h2 class="section-h">Non scommesse. Previsioni.</h2>
-    <div class="perche-grid">
-      <div class="perche-item">
-        <div class="perche-icon">🧠</div>
-        <div class="perche-h">Cognitivo, non fortunato</div>
-        <div class="perche-t">Vinci perché sai leggere le notizie meglio degli altri — non perché hai fortuna. La tua accuratezza nel tempo è l'unico parametro che conta.</div>
-      </div>
-      <div class="perche-item">
-        <div class="perche-icon">📊</div>
-        <div class="perche-h">Percentuali reali</div>
-        <div class="perche-t">Ogni quota ha una percentuale calcolata su dati reali — statistiche, quote bookmaker, sentiment di mercato. Non opinioni, dati.</div>
-      </div>
-      <div class="perche-item">
-        <div class="perche-icon">🔄</div>
-        <div class="perche-h">50% redistribuito</div>
-        <div class="perche-t">Il 50% di tutto il valore generato torna alla community ogni mese. Più QUOTA cresce, più vale essere nella fascia alta.</div>
-      </div>
-      <div class="perche-item">
-        <div class="perche-icon">⚡</div>
-        <div class="perche-h">Aggiornato ogni minuto</div>
-        <div class="perche-t">Le percentuali cambiano con le notizie. Un infortunio, una dichiarazione, un dato macro — e la quota si muove in tempo reale.</div>
-      </div>
-      <div class="perche-item">
-        <div class="perche-icon">🆓</div>
-        <div class="perche-h">Gratis per sempre</div>
-        <div class="perche-t">La versione free è completa. Premium a 5€/mese aggiunge analisi avanzate, accesso anticipato alle quote e crediti bonus mensili.</div>
-      </div>
-      <div class="perche-item">
-        <div class="perche-icon">🇮🇹</div>
-        <div class="perche-h">100% italiano</div>
-        <div class="perche-t">Il primo prediction market serio in italiano. Notizie, analisi e community in lingua. Fatto a Milano, per chi legge le notizie davvero.</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CTA ISCRIZIONE -->
-<section class="signup">
-  <h2 class="signup-h">Pronto a prevedere?</h2>
-  <p class="signup-sub">Unisciti alla community. Ricevi le quote del giorno ogni mattina alle 8:00.</p>
-  <div class="signup-form">
-    <input class="signup-input" type="email" id="email" placeholder="La tua email">
-    <button class="signup-btn" onclick="sub()">Iscriviti →</button>
-  </div>
-  <div class="signup-ok" id="sub-ok">✓ Perfetto. Ci vediamo domani mattina.</div>
-  <div class="signup-fine">Niente spam. Una email al giorno. Disiscrizione in un click.</div>
-  <div style="margin-top:24px">
-    <a href="quota.html" class="btn-lg btn-gold" style="display:inline-flex">⚡ Entra in QUOTA →</a>
-  </div>
-</section>
-
-<footer>
-  <div class="footer-inner">
-    <div class="f-logo">QUOTA·</div>
-    <div class="f-links">
-      <a href="quota.html">App</a>
-      <a href="#come-funziona">Come funziona</a>
-      <a href="#fasce">Fasce BDE</a>
-      <a href="feed.html">MODO</a>
-    </div>
-    <div class="f-copy">© 2026 QUOTA · BUR Society</div>
-  </div>
-</footer>
+<div class="toast" id="toast"></div>
 
 <script>
-function sub(){
-  const e=document.getElementById('email');
-  if(!e.value||!e.value.includes('@'))return;
-  localStorage.setItem('quota_email',e.value);
-  e.style.display='none';document.querySelector('.signup-btn').style.display='none';
-  document.getElementById('sub-ok').style.display='block';
+let credits=parseInt(localStorage.getItem('qcr')||'0');
+
+// ── QUOTA CREDITS ENGINE ──────────────────────────────────────
+const CREDITS = {
+  VOTO: 3,
+  AZZECCATA: 15,
+  SBAGLIATA: -2,
+  STREAK_7: 20,
+  STREAK_ROTTA: -5,
+  INATTIVITA_GIORNO: -8, // dopo 3 giorni inattivi
+  INATTIVITA_GRACE: 3,   // giorni di grazia prima del decadimento
+};
+
+const FASCE = [
+  {n:'🌑 Neutrino',   min:0,    max:99,   color:'#a0a09a'},
+  {n:'🔵 Orbiter',    min:100,  max:299,  color:'#60a5fa'},
+  {n:'💜 Pulsar',     min:300,  max:699,  color:'#c084fc'},
+  {n:'⭐ Quasar',     min:700,  max:1499, color:'#f5c842'},
+  {n:'✦ Singolarità', min:1500, max:99999,color:'#00e87a'},
+];
+
+function getFascia(cr){
+  return FASCE.find(f=>cr>=f.min&&cr<=f.max)||FASCE[0];
 }
 
-// Anima counter stats
-function animateN(el,target,suffix){
-  let n=0;const s=target/60;
-  const t=setInterval(()=>{n=Math.min(target,n+s);el.textContent=Math.floor(n).toLocaleString('it-IT')+(suffix||'');if(n>=target)clearInterval(t);},16);
+function applyDecay(){
+  const last=parseInt(localStorage.getItem('q_last_day_ts')||Date.now());
+  const daysMissed=Math.floor((Date.now()-last)/86400000);
+  if(daysMissed>CREDITS.INATTIVITA_GRACE){
+    const decayDays=daysMissed-CREDITS.INATTIVITA_GRACE;
+    const penalty=decayDays*Math.abs(CREDITS.INATTIVITA_GIORNO);
+    credits=Math.max(0,credits-penalty);
+    localStorage.setItem('qcr',credits);
+    if(penalty>0)console.log('[QUOTA] Decadimento: -'+penalty+' cr ('+decayDays+' giorni inattivo)');
+  }
 }
 
-const obs=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{
-    if(e.isIntersecting){
-      animateN(document.getElementById('s-users'),2847);
-      animateN(document.getElementById('s-quota'),143);
-      obs.disconnect();
-    }
+function checkStreak(){
+  const today=new Date().toDateString();
+  const last=localStorage.getItem('q_last_day');
+  const yesterday=new Date(Date.now()-86400000).toDateString();
+  let streak=parseInt(localStorage.getItem('q_streak')||'0');
+  if(last===today) return streak; // già votato oggi
+  if(last===yesterday){
+    streak++;
+    if(streak===7){credits+=CREDITS.STREAK_7;localStorage.setItem('qcr',credits);console.log('[QUOTA] Streak 7 giorni! +'+CREDITS.STREAK_7+' cr');}
+  } else if(last&&last!==yesterday){
+    // Streak rotta
+    credits=Math.max(0,credits+CREDITS.STREAK_ROTTA);
+    localStorage.setItem('qcr',credits);
+    streak=1;
+    console.log('[QUOTA] Streak rotta: '+CREDITS.STREAK_ROTTA+' cr');
+  } else {
+    streak=1;
+  }
+  localStorage.setItem('q_streak',streak);
+  localStorage.setItem('q_last_day',today);
+  localStorage.setItem('q_last_day_ts',Date.now());
+  return streak;
+}
+
+function addCredits(amount,reason){
+  credits=Math.max(0,credits+amount);
+  localStorage.setItem('qcr',credits);
+  if(document.getElementById('nav-cr'))document.getElementById('nav-cr').textContent=credits;
+  if(document.getElementById('st-cr'))document.getElementById('st-cr').textContent=credits;
+  console.log('[QUOTA] '+reason+': '+(amount>0?'+':'')+amount+' cr → tot '+credits);
+}
+
+// Applica decadimento all'avvio
+applyDecay();
+const currentStreak=checkStreak();
+
+let votes=JSON.parse(localStorage.getItem('qvotes')||'{}');
+let activeCat='tutti',activeStatus='aperte';
+
+const BUR='https://god-core-backend.onrender.com';
+
+const CARDS=[
+  {id:'wim1',cat:'Sport',featured:true,
+   question:'Sinner difende il titolo a Wimbledon 2026?',
+   context:'Numero 1 del mondo e campione in carica. Alcaraz out per infortunio al polso. Il campo è insolitamente aperto.',
+   pctYes:71,votes:1847,deadline:new Date('2026-07-12T17:00:00').getTime(),reward:50,status:'aperta'},
+  {id:'wim2',cat:'Sport',
+   question:'Sinner raggiungerà la semifinale di Wimbledon?',
+   context:'Da favorito assoluto e numero 1, la semifinale sarebbe la minima attesa. Ma l\'erba è imprevedibile.',
+   pctYes:86,votes:934,deadline:new Date('2026-07-09T17:00:00').getTime(),reward:20,status:'aperta'},
+  {id:'wim3',cat:'Sport',
+   question:'Un italiano in finale a Wimbledon 2026?',
+   context:'Sinner, Musetti, Cobolli e Darderi nel tabellone. La più forte rappresentanza italiana della storia.',
+   pctYes:79,votes:672,deadline:new Date('2026-07-11T17:00:00').getTime(),reward:30,status:'aperta'},
+  {id:'fin1',cat:'Finanza',
+   question:'Il BTP 10Y chiude sopra 3.5% questa settimana?',
+   context:'Spread BTP-Bund in area 120bp. BCE in pausa. Mercati in attesa dei dati macro USA di venerdì.',
+   pctYes:43,votes:412,deadline:new Date('2026-07-04T17:30:00').getTime(),reward:25,status:'aperta'},
+  {id:'fin2',cat:'Finanza',
+   question:'Wall Street chiude la settimana in positivo?',
+   context:'S&P 500 vicino ai massimi storici. Dati occupazione in uscita venerdì. La Fed tiene i tassi fermi.',
+   pctYes:61,votes:589,deadline:new Date('2026-07-04T22:00:00').getTime(),reward:20,status:'aperta'},
+  {id:'pol1',cat:'Politica',
+   question:'FdI supera il 30% nei sondaggi a luglio?',
+   context:'FdI stabile al 28-29% da mesi. L\'estate storicamente favorisce il partito di governo.',
+   pctYes:35,votes:298,deadline:new Date('2026-07-31T23:59:00').getTime(),reward:35,status:'aperta'},
+  {id:'mon1',cat:'Mondo',
+   question:'Cessate il fuoco in Medio Oriente entro 30 giorni?',
+   context:'Negoziati in corso con mediazione USA-Qatar. Le trattative slittano da mesi. La storia è chiara.',
+   pctYes:19,votes:1102,deadline:new Date('2026-08-01T23:59:00').getTime(),reward:60,status:'aperta'},
+  {id:'tec1',cat:'Tech',
+   question:'Apple annuncia un device AI standalone entro settembre?',
+   context:'Rumors circolano da mesi su un dispositivo AI dedicato post-iPhone. Tim Cook ha evitato la domanda al WWDC.',
+   pctYes:28,votes:634,deadline:new Date('2026-09-30T23:59:00').getTime(),reward:40,status:'aperta'},
+];
+
+function toast(m){
+  const t=document.getElementById('toast');
+  t.textContent=m;t.classList.add('show');
+  clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+function cd(dl){
+  const d=dl-Date.now();
+  if(d<=0)return'Scaduta';
+  const days=Math.floor(d/86400000);
+  const hrs=Math.floor((d%86400000)/3600000);
+  const min=Math.floor((d%3600000)/60000);
+  if(days>0)return days+'g '+hrs+'h';
+  if(hrs>0)return hrs+'h '+min+'m';
+  return min+'m';
+}
+
+function save(){
+  localStorage.setItem('qcr',credits);
+  localStorage.setItem('qvotes',JSON.stringify(votes));
+  document.getElementById('nav-credits').textContent=credits;
+  document.getElementById('sb-cr').textContent=credits;
+  document.getElementById('sb-acc').textContent=Object.keys(votes).length;
+}
+
+function render(){
+  let cards=[...CARDS];
+  if(activeCat!=='tutti')cards=cards.filter(c=>c.cat===activeCat);
+  if(activeStatus==='mie')cards=cards.filter(c=>votes[c.id]);
+  cards.sort((a,b)=>(b.featured?1:0)-(a.featured?1:0));
+
+  // Counts
+  ['tutti','Sport','Finanza','Politica','Mondo','Tech'].forEach(cat=>{
+    const el=document.getElementById('c-'+cat);
+    if(el)el.textContent=cat==='tutti'?CARDS.length:CARDS.filter(c=>c.cat===cat).length;
   });
-},{threshold:.3});
-obs.observe(document.querySelector('.stats'));
+
+  const wrap=document.getElementById('cards');
+  if(!cards.length){
+    wrap.innerHTML='<div class="empty"><div class="empty-title">Nessuna quota</div><div style="font-size:13px;margin-top:6px;color:var(--t3)">Nuove quote in arrivo.</div></div>';
+    return;
+  }
+
+  wrap.innerHTML=cards.map((c,i)=>{
+    const mv=votes[c.id];
+    const pno=100-c.pctYes;
+    const delay=i*60;
+    return `<div class="card${c.featured?' featured':''}" style="animation-delay:${delay}ms;margin-bottom:10px" onclick="openCard('${c.id}')">
+      <div class="card-inner">
+        <div class="card-top">
+          <div class="card-cat-wrap">
+            ${c.featured?'<span class="featured-badge">⚡ In evidenza</span>':''}
+            <span class="card-cat cat-${c.cat.toLowerCase()}">${c.cat}</span>
+          </div>
+          <div class="card-time">⏱ <span id="cd-${c.id}">${cd(c.deadline)}</span></div>
+        </div>
+        <div class="card-question">${c.question}</div>
+        <div class="card-context">${c.context}</div>
+        <div class="bar-wrap">
+          <div class="bar-labels">
+            <span class="bar-label yes">Sì &nbsp;${c.pctYes}%</span>
+            <span class="bar-label no">${pno}%&nbsp; No</span>
+          </div>
+          <div class="bar">
+            <div class="bar-yes" style="width:${c.pctYes}%"></div>
+            <div class="bar-no" style="width:${pno}%"></div>
+          </div>
+        </div>
+        ${!mv?
+          `<div class="vote-grid">
+            <button class="vbtn yes" onclick="vote('${c.id}','si',${c.reward},event)">✓ &nbsp;Sì — ${c.pctYes}%</button>
+            <button class="vbtn no" onclick="vote('${c.id}','no',${c.reward},event)">✗ &nbsp;No — ${pno}%</button>
+          </div>`:
+          `<div class="vote-grid">
+            <button class="vbtn ${mv==='si'?'voted-yes':'yes'}" style="opacity:${mv==='si'?1:.25}" disabled>✓ &nbsp;Sì</button>
+            <button class="vbtn ${mv==='no'?'voted-no':'no'}" style="opacity:${mv==='no'?1:.25}" disabled>✗ &nbsp;No</button>
+          </div>`
+        }
+        <div class="card-meta">
+          <span class="meta-votes">${(c.votes+(mv?1:0)).toLocaleString('it-IT')} voti</span>
+          ${mv?`<span class="meta-voted">✓ Hai votato ${mv==='si'?'Sì':'No'}</span>`:''}
+          <span class="meta-reward">+${c.reward} cr se azzecchi</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Countdown update
+  clearInterval(window._cdTimer);
+  window._cdTimer=setInterval(()=>{
+    cards.forEach(c=>{const el=document.getElementById('cd-'+c.id);if(el)el.textContent=cd(c.deadline);});
+  },30000);
+}
+
+function vote(id,choice,reward,e){e.stopPropagation();
+  e.stopPropagation();
+  if(votes[id])return;
+  votes[id]=choice;
+  credits+=5;
+  save();render();
+  toast('⚡ Voto registrato · +5 cr · +'+reward+' cr se azzecchi');
+}
+
+function filterCat(cat){
+  activeCat=cat;
+  activeStatus='aperte';
+  document.querySelectorAll('.nav-cat,.sidebar-item').forEach(b=>{
+    const txt=b.textContent.trim().replace(/[⚽📈🏛🌍⚡◈★]\s*/,'').replace(/\s*\d+$/,'').trim();
+    b.classList.toggle('on',txt===cat||(cat==='tutti'&&['Tutti','tutti','◈'].some(x=>txt.includes(x))));
+  });
+  document.getElementById('sec-title').textContent=cat==='tutti'?'In corso':cat;
+  render();
+}
+
+function filterStatus(s){activeStatus=s;render();}
+
+// Generatore automatico da RSS
+async function generateFromRSS(){
+  const groqKey=localStorage.getItem('quota_groq_key');
+  if(!groqKey)return;
+  try{
+    const r=await fetch(BUR+'/api/v2/modo/news?limit=10&lang=it');
+    const d=await r.json();
+    if(!d.ok||!d.articles?.length)return;
+    const nuove=d.articles.filter(a=>!CARDS.find(c=>c.id===a.id)).slice(0,2);
+    for(const a of nuove){
+      try{
+        const r2=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+          method:'POST',
+          headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},
+          body:JSON.stringify({
+            model:'llama-3.1-8b-instant',max_tokens:200,temperature:0.6,
+            messages:[
+              {role:'system',content:'Trasforma notizie in domande predittive sì/no. Rispondi SOLO con JSON valido: {"domanda":"max 80 caratteri","contesto":"max 100 caratteri","pct_si":50,"categoria":"Sport|Finanza|Politica|Mondo|Tech","ore":24}'},
+              {role:'user',content:a.sourceTitle+'. '+a.sourceDesc}
+            ]
+          })
+        });
+        const rd=await r2.json();
+        const m=(rd.choices?.[0]?.message?.content||'{}').match(/\{[\s\S]*\}/);
+        if(!m)continue;
+        const g=JSON.parse(m[0]);
+        if(!g.domanda)continue;
+        CARDS.unshift({
+          id:a.id||'g'+Date.now(),cat:g.categoria||'Mondo',
+          question:g.domanda,context:g.contesto||'',
+          pctYes:Math.min(90,Math.max(10,g.pct_si||50)),
+          votes:Math.floor(Math.random()*150+10),
+          deadline:Date.now()+(g.ore||24)*3600000,
+          reward:g.ore>48?40:20,status:'aperta'
+        });
+        render();
+        toast('⚡ Nuova quota: '+g.domanda.slice(0,45)+'...');
+        await new Promise(r=>setTimeout(r,3000));
+      }catch(e){}
+    }
+  }catch(e){}
+}
+
+function setupKey(){
+  if(localStorage.getItem('quota_groq_key'))return true;
+  const k=window.prompt('Groq API key per quote automatiche (console.groq.com):');
+  if(k?.trim()){localStorage.setItem('quota_groq_key',k.trim());return true;}
+  return false;
+}
+
+// ── TOKEN UTENTE ──────────────────────────────────────────────
+function getToken(){
+  let t=localStorage.getItem('quota_token');
+  if(!t){
+    // Genera token ref se arriva da link privato
+    const ref=new URLSearchParams(window.location.search).get('ref');
+    t='u_'+(ref?ref+'_':'')+Math.random().toString(36).slice(2,10)+Date.now().toString(36);
+    localStorage.setItem('quota_token',t);
+    // Registra ref bonus
+    if(ref)fetch(BUR+'/api/v2/quota/private/'+ref).catch(()=>{});
+  }
+  return t;
+}
+
+const TOKEN=getToken();
+
+// ── CARICA STATO UTENTE DAL BACKEND ───────────────────────────
+async function loadUser(){
+  try{
+    const r=await fetch(BUR+'/api/v2/quota/user/'+TOKEN);
+    const d=await r.json();
+    if(d.ok){
+      credits=d.crediti;
+      // Carica voti precedenti
+      if(d.votes)Object.assign(votes,d.votes);
+      save();
+    }
+  }catch(e){}
+}
+
+// ── CARICA CARD DAL BACKEND ───────────────────────────────────
+async function loadCards(){
+  try{
+    const r=await fetch(BUR+'/api/v2/quota/cards?limit=20');
+    const d=await r.json();
+    if(d.ok&&d.cards&&d.cards.length){
+      d.cards.forEach(card=>{
+        if(!CARDS.find(c=>c.id===card.id)){
+          CARDS.push({
+            id:card.id,cat:card.categoria,
+            question:card.domanda,context:card.contesto,
+            pctYes:card.pct_si,
+            votes:(card.votes_si||0)+(card.votes_no||0),
+            deadline:new Date(card.deadline).getTime(),
+            reward:card.reward,status:card.status
+          });
+        }
+      });
+      render();
+    }
+  }catch(e){}
+}
+
+// Override vote per salvare su backend
+const _origVote=vote;
+window.vote=async function(id,choice,reward,e){
+  e.stopPropagation();
+  if(votes[id])return;
+  try{
+    const r=await fetch(BUR+'/api/v2/quota/vote',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({card_id:id,scelta:choice,user_token:TOKEN})
+    });
+    const d=await r.json();
+    if(d.ok){credits=d.crediti;}
+  }catch(e){}
+  votes[id]=choice;credits+=5;save();render();
+  toast('⚡ +5 cr · +'+reward+' cr se azzecchi');
+};
+
+window.voteDet=async function(id,choice,reward){
+  if(votes[id])return;
+  try{
+    await fetch(BUR+'/api/v2/quota/vote',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({card_id:id,scelta:choice,user_token:TOKEN})
+    });
+  }catch(e){}
+  votes[id]=choice;credits+=5;save();render();openCard(id);
+  toast('⚡ +5 cr · +'+reward+' cr se azzecchi');
+};
+
+// INIT
+save();render();
+loadUser().then(()=>loadCards());
+setInterval(loadCards,3*60*1000);
 </script>
-</body>
+
+<style>
+.d-bg{position:fixed;inset:0;z-index:500;background:rgba(4,4,12,.88);backdrop-filter:blur(16px);overflow-y:auto;padding:20px;display:none}
+.d-wrap{max-width:660px;margin:0 auto;display:flex;flex-direction:column;gap:12px;padding-bottom:40px}
+.d-close{position:fixed;top:20px;right:20px;width:40px;height:40px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:50%;color:#fff;font-size:20px;cursor:pointer;z-index:501;display:flex;align-items:center;justify-content:center}
+.d-close:hover{background:rgba(255,255,255,.14)}
+.d-box{background:rgba(18,18,28,.97);border:1px solid rgba(255,255,255,.08);border-radius:16px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.8)}
+.d-box-head{padding:20px 24px 16px;border-bottom:1px solid rgba(255,255,255,.05);font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;color:#a0a09a;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.d-box-head::before{content:'';width:3px;height:12px;background:linear-gradient(180deg,#f5c842,#e8a800);border-radius:2px}
+.d-main-pad{padding:24px}
+.d-cat{font-size:9px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;margin-bottom:10px}
+.d-q{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:800;line-height:1.25;letter-spacing:-.02em;color:#f0efe8;margin-bottom:8px}
+.d-ctx{font-size:12px;color:#808080;line-height:1.6;margin-bottom:20px;padding-left:10px;border-left:2px solid rgba(255,255,255,.08)}
+.d-pcts{display:flex;align-items:center;gap:16px;margin-bottom:14px}
+.d-pct-yes{font-family:'Space Grotesk',sans-serif;font-size:52px;font-weight:900;color:#00e87a;line-height:1;text-shadow:0 0 28px rgba(0,232,122,.4)}
+.d-pct-no{font-family:'Space Grotesk',sans-serif;font-size:30px;font-weight:800;color:#ff3d5a;text-shadow:0 0 20px rgba(255,61,90,.3)}
+.d-vs{font-size:18px;color:rgba(255,255,255,.1)}
+.d-pct-sub{font-size:9px;color:#505050;letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
+.d-bar{height:10px;background:rgba(255,255,255,.06);border-radius:5px;overflow:hidden;margin-bottom:16px;box-shadow:inset 0 1px 4px rgba(0,0,0,.5);position:relative}
+.d-bar-y{height:100%;background:linear-gradient(90deg,#00c866,#00e87a);box-shadow:0 0 16px rgba(0,232,122,.4);transition:width 1.5s cubic-bezier(.34,1.2,.64,1)}
+.d-bar-n{position:absolute;top:0;right:0;height:100%;background:linear-gradient(90deg,#ff3d5a,#ff6b81);box-shadow:0 0 16px rgba(255,61,90,.3)}
+.d-cd{display:flex;align-items:center;justify-content:space-between;background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.12);border-radius:10px;padding:12px 16px;margin-bottom:18px}
+.d-cd-t{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:800;color:#f5c842;text-shadow:0 0 16px rgba(245,200,66,.4)}
+.d-cd-l{font-size:9px;color:#606040;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
+.d-reward{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:800;color:#f5c842}
+.d-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.d-btn{padding:14px;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Space Grotesk',sans-serif;border:1px solid transparent;transition:all .22s;text-align:center}
+.d-btn.yes{background:rgba(0,232,122,.1);border-color:rgba(0,232,122,.2);color:#00e87a}
+.d-btn.yes:hover:not(:disabled){background:#00e87a;color:#000;box-shadow:0 10px 28px rgba(0,232,122,.4);transform:scale(1.02)}
+.d-btn.no{background:rgba(255,61,90,.1);border-color:rgba(255,61,90,.2);color:#ff3d5a}
+.d-btn.no:hover:not(:disabled){background:#ff3d5a;color:#fff;box-shadow:0 10px 28px rgba(255,61,90,.4);transform:scale(1.02)}
+.d-btn:disabled{opacity:.35;cursor:default}
+.d-btn.active-yes{background:#00e87a;color:#000;opacity:1}
+.d-btn.active-no{background:#ff3d5a;color:#fff;opacity:1}
+.d-factor{padding:14px 24px;border-bottom:1px solid rgba(255,255,255,.04);display:flex;gap:12px;align-items:flex-start}
+.d-factor:last-child{border-bottom:none}
+.d-f-icon{font-size:16px;flex-shrink:0;margin-top:2px}
+.d-f-label{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}
+.d-f-label.pro{color:#00e87a}.d-f-label.contro{color:#ff3d5a}.d-f-neutro{color:#f5c842}
+.d-f-text{font-size:12px;color:#909090;line-height:1.55}
+.d-f-w{margin-left:auto;flex-shrink:0;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px}
+.d-f-w.pro{color:#00e87a;background:rgba(0,232,122,.08)}.d-f-w.contro{color:#ff3d5a;background:rgba(255,61,90,.08)}.d-f-w.neutro{color:#f5c842;background:rgba(245,200,66,.06)}
+.d-comm-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:20px 24px}
+.d-comm-n{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:800;line-height:1}
+.d-comm-l{font-size:9px;color:#505050;letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
+.d-hist{padding:14px 24px;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;gap:10px;font-size:12px;color:#909090}
+.d-hist:last-child{border-bottom:none}
+.d-hdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.d-hdot.ok{background:#00e87a;box-shadow:0 0 6px rgba(0,232,122,.5)}
+.d-hdot.ko{background:#ff3d5a;box-shadow:0 0 6px rgba(255,61,90,.4)}
+.d-hdot.open{background:#f5c842;box-shadow:0 0 6px rgba(245,200,66,.4)}
+.d-hpct{margin-left:auto;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;color:#f5c842;flex-shrink:0}
+</style>
+
+<div class="d-bg" id="d-bg" onclick="closeDet(event)">
+  <button class="d-close" onclick="closeDet()">×</button>
+  <div class="d-wrap" id="d-wrap"></div>
+</div>
+
+<script>
+const FACTORS = {
+  wim1:[
+    {type:'pro',icon:'🎾',label:'Forma attuale',text:'Sinner ha vinto 18 delle ultime 21 partite su erba. Il suo serve-and-return è il migliore del tour.',w:'+28%'},
+    {type:'pro',icon:'👑',label:'Campione in carica',text:'I campioni in carica a Wimbledon confermano nel 60% dei casi nell ultimo decennio.',w:'+14%'},
+    {type:'pro',icon:'🤕',label:'Alcaraz out',text:'Il principale rivale è fuori per infortunio al polso. Rimuove circa il 20% di probabilità di sconfitta.',w:'+18%'},
+    {type:'contro',icon:'⚠️',label:'Pressione psicologica',text:'Difendere un titolo Slam è più difficile che conquistarlo. Djokovic è l unico ad averlo fatto 4 volte di fila.',w:'-12%'},
+    {type:'contro',icon:'🌿',label:'Variabile erba',text:'L erba amplifica ace e serve-and-volley. Rublev e Medvedev possono sorprendere in una giornata.',w:'-9%'},
+    {type:'neutro',icon:'📊',label:'Confronto bookmaker',text:'I bookmaker quotano Sinner a 2.1x (circa 48%). QUOTA stima più alto per l assenza di Alcaraz.',w:'Calibrato'}
+  ],
+  fin1:[
+    {type:'pro',icon:'📉',label:'Trend ribassista',text:'Il BTP è sceso da 3.8% a 3.4% in 3 settimane. Il momentum favorisce il ribasso.',w:'+22%'},
+    {type:'contro',icon:'🇺🇸',label:'Dati USA venerdì',text:'Se i dati occupazione battono le attese, il flight-to-quality porta i BTP in vendita.',w:'-18%'},
+    {type:'neutro',icon:'🏦',label:'BCE ferma',text:'Nessuna sorpresa BCE attesa. Supporto implicito ai periferici continua.',w:'Neutro'}
+  ],
+  mon1:[
+    {type:'contro',icon:'🗓️',label:'Storico trattative',text:'Negli ultimi 18 mesi ci sono stati 4 cessate il fuoco annunciati e collassati in meno di 72 ore.',w:'-45%'},
+    {type:'contro',icon:'🌍',label:'Posizioni distanti',text:'Le richieste delle parti sono ancora incompatibili. I mediatori faticano a trovare un minimo comune.',w:'-28%'},
+    {type:'pro',icon:'💼',label:'Pressione USA',text:'L amministrazione ha alzato la pressione diplomatica nelle ultime 2 settimane.',w:'+8%'}
+  ]
+};
+
+const HIST=[
+  {dot:'ok',text:'Sinner vince il Roland Garros 2026',pct:'81%'},
+  {dot:'ok',text:'Fed mantiene tassi a giugno 2026',pct:'73%'},
+  {dot:'ko',text:'Elezioni Francia · Le Pen premier',pct:'38%'},
+  {dot:'open',text:'Euro 2026 · Italia in semifinale',pct:'44%'}
+];
+
+function openCard(id){
+  const card=CARDS.find(c=>c.id===id);
+  if(!card)return;
+  const mv=votes[id];
+  const dynPct=calcPctFromVotes(card);const pno=100-dynPct;card._dynPct=dynPct;
+  const factors=FACTORS[id]||[];
+  const nv=card.votes+(mv?1:0);
+
+  document.getElementById('d-wrap').innerHTML=
+    '<div class="d-box">'
+    +'<div class="d-main-pad">'
+    +'<div class="d-cat cat-'+card.cat.toLowerCase()+'">'+card.cat+'</div>'
+    +'<div class="d-q">'+card.question+'</div>'
+    +'<div class="d-ctx">'+card.context+'</div>'
+    +'<div class="d-pcts">'
+    +'<div><div class="d-pct-yes">'+card.pctYes+'%</div><div class="d-pct-sub">Prob. SÌ · QUOTA</div></div>'
+    +'<div class="d-vs">vs</div>'
+    +'<div><div class="d-pct-no">'+pno+'%</div><div class="d-pct-sub">Prob. NO</div></div>'
+    +'</div>'
+    +'<div class="d-bar"><div class="d-bar-y" style="width:'+card.pctYes+'%"></div><div class="d-bar-n" style="width:'+pno+'%"></div></div>'
+    +'<div class="d-cd"><div><div class="d-cd-l">⏱ Scadenza</div><div class="d-cd-t" id="d-cd-t">'+cd(card.deadline)+'</div></div>'
+    +'<div style="text-align:right"><div class="d-cd-l">Premio</div><div class="d-reward">+'+card.reward+' cr</div></div></div>'
+    +'<div class="d-btns">'
+    +'<button class="d-btn yes'+(mv==='si'?' active-yes':'')+(mv?' ':'')+'" onclick="'+(mv?'':'voteDet(\''+id+'\',\'si\','+card.reward+')')+'" '+(mv?'disabled':'')+'>✓ &nbsp;Sì &nbsp;'+card.pctYes+'%<br><small style="font-size:10px;opacity:.6">'+(mv==='si'?'✓ Il tuo voto':'+'+card.reward+' cr se azzecchi')+'</small></button>'
+    +'<button class="d-btn no'+(mv==='no'?' active-no':'')+(mv?' ':'')+'" onclick="'+(mv?'':'voteDet(\''+id+'\',\'no\','+card.reward+')')+'" '+(mv?'disabled':'')+'>✗ &nbsp;No &nbsp;'+pno+'%<br><small style="font-size:10px;opacity:.6">'+(mv==='no'?'✓ Il tuo voto':'+'+card.reward+' cr se azzecchi')+'</small></button>'
+    +'</div>'
+    +'</div>'
+    +'</div>'
+
+    +(factors.length?
+    '<div class="d-box">'
+    +'<div class="d-box-head">Perché QUOTA dice '+card.pctYes+'%</div>'
+    +factors.map(f=>'<div class="d-factor"><div class="d-f-icon">'+f.icon+'</div><div style="flex:1"><div class="d-f-label '+f.type+'">'+(f.type==='pro'?'PRO SÌ':f.type==='contro'?'PRO NO':'NEUTRO')+' · '+f.label+'</div><div class="d-f-text">'+f.text+'</div></div><div class="d-f-w '+f.type+'">'+f.w+'</div></div>').join('')
+    +'</div>'
+    :'')
+
+    +'<div class="d-box">'
+    +'<div class="d-box-head">Community</div>'
+    +'<div class="d-comm-grid">'
+    +'<div><div class="d-comm-n" style="color:#00e87a">'+Math.round(nv*card.pctYes/100).toLocaleString('it-IT')+'</div><div class="d-comm-l">Hanno detto Sì</div></div>'
+    +'<div><div class="d-comm-n" style="color:#ff3d5a">'+Math.round(nv*pno/100).toLocaleString('it-IT')+'</div><div class="d-comm-l">Hanno detto No</div></div>'
+    +'</div></div>'
+
+    +'<div class="d-box">'
+    +'<div class="d-box-head">Storico previsioni simili</div>'
+    +HIST.map(h=>'<div class="d-hist"><div class="d-hdot '+h.dot+'"></div><div style="flex:1">'+h.text+'</div><div class="d-hpct">'+h.pct+'</div></div>').join('')
+    +'</div>';
+
+  document.getElementById('d-bg').style.display='block';
+  document.body.style.overflow='hidden';
+  clearInterval(window._dcd);
+  window._dcd=setInterval(()=>{const el=document.getElementById('d-cd-t');if(el)el.textContent=cd(card.deadline);},30000);
+}
+
+function voteDet(id,choice,reward){
+  if(votes[id])return;
+  votes[id]=choice;credits+=5;save();render();openCard(id);
+  toast('⚡ +5 cr per la partecipazione · +'+reward+' cr se azzecchi');
+}
+
+function closeDet(e){
+  if(e&&e.target!==document.getElementById('d-bg')&&!e.target.classList.contains('d-close'))return;
+  document.getElementById('d-bg').style.display='none';
+  document.body.style.overflow='';
+  clearInterval(window._dcd);
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDet({target:document.getElementById('d-bg')});});
+</script>
+<!-- LIVE FEED PANEL -->
+<div class="live-feed" id="live-feed">
+  <div class="lf-head">
+    <div class="lf-title"><span class="live-dot"></span>Aggiornamenti live</div>
+    <button class="lf-close" onclick="toggleFeed()">×</button>
+  </div>
+  <div class="lf-body" id="lf-body"><div class="lf-empty">Caricamento...</div></div>
+</div>
+
+<!-- TOGGLE BTN -->
+<button class="feed-toggle" id="feed-toggle-btn" onclick="toggleFeed()" title="Aggiornamenti live">
+  📡
+  <span class="badge" id="feed-badge" style="display:none">0</span>
+</button>
+
+<!-- PROFILO MODAL -->
+<div class="prof-bg" id="prof-bg" onclick="closeProf(event)">
+  <div class="prof-box">
+    <svg class="prof-ast" width="32" height="32" viewBox="0 0 32 32" fill="none">
+      <line x1="16" y1="2" x2="16" y2="30" stroke="#f5c842" stroke-width="1.5"/>
+      <line x1="2" y1="16" x2="30" y2="16" stroke="#f5c842" stroke-width="1.5"/>
+      <line x1="4.69" y1="4.69" x2="27.31" y2="27.31" stroke="#f5c842" stroke-width="1.5"/>
+      <line x1="27.31" y1="4.69" x2="4.69" y2="27.31" stroke="#f5c842" stroke-width="1.5"/>
+    </svg>
+    <div class="prof-logo">QUOTA</div>
+    <div class="prof-token" id="prof-token-txt"></div>
+    <div class="prof-stat-grid">
+      <div class="prof-stat"><div class="prof-stat-n" id="p-cr">0</div><div class="prof-stat-l">Crediti</div></div>
+      <div class="prof-stat"><div class="prof-stat-n" id="p-voti">0</div><div class="prof-stat-l">Voti dati</div></div>
+      <div class="prof-stat"><div class="prof-stat-n" id="p-acc">—%</div><div class="prof-stat-l">Accuratezza</div></div>
+      <div class="prof-stat"><div class="prof-stat-n" id="p-streak">0</div><div class="prof-stat-l">Giorni attivi</div></div>
+    </div>
+    <div class="prof-fascia">
+      <div class="prof-fascia-n" id="p-fascia">Neutrino</div>
+      <div class="prof-fascia-l">Fascia BDE attuale · sali votando ogni giorno</div>
+    </div>
+    <button onclick="requestPush()" class="push-btn">🔔 Ricevi notifiche per nuove quote</button>
+    <button class="prof-close" onclick="closeProf()" style="margin-top:10px">Chiudi</button>
+  </div>
+</div>
+<script>
+// ── LIVE FEED ─────────────────────────────────────────────────
+let feedOpen=false, feedItems=[], newFeedCount=0;
+
+function toggleFeed(){
+  feedOpen=!feedOpen;
+  document.getElementById('live-feed').classList.toggle('open',feedOpen);
+  if(feedOpen){newFeedCount=0;document.getElementById('feed-badge').style.display='none';}
+}
+
+async function loadLiveFeed(){
+  try{
+    const r=await fetch(BUR+'/api/v2/modo/news?limit=12&lang=it');
+    const d=await r.json();
+    if(!d.ok||!d.articles?.length)return;
+    const prev=feedItems.map(i=>i.id);
+    const nuovi=d.articles.filter(a=>!prev.includes(a.id));
+    feedItems=[...d.articles.slice(0,12)];
+    if(nuovi.length&&feedItems.length>0){
+      newFeedCount+=nuovi.length;
+      if(!feedOpen){
+        const badge=document.getElementById('feed-badge');
+        badge.style.display='flex';badge.textContent=Math.min(9,newFeedCount);
+      }
+    }
+    renderFeed();
+  }catch(e){}
+}
+
+function renderFeed(){
+  const body=document.getElementById('lf-body');
+  if(!feedItems.length){body.innerHTML='<div class="lf-empty">Nessun aggiornamento</div>';return;}
+  body.innerHTML=feedItems.map((a,i)=>{
+    const m=Math.round((Date.now()-new Date(a.publishedAt))/60000);
+    const ago=m<1?'ora':m<60?m+'m fa':Math.round(m/60)+'h fa';
+    return '<div class="lf-item" style="animation-delay:'+(i*40)+'ms"><div class="lf-item-src">'+a.sourceName+'</div><div class="lf-item-title" onclick="window.open(\''+a.sourceUrl+'\',\'_blank\')">'+(a.sourceTitle||'').slice(0,90)+'</div><div class="lf-item-time">'+ago+'</div></div>';
+  }).join('');
+}
+
+// Carica feed ogni 2 minuti
+loadLiveFeed();
+setInterval(loadLiveFeed,2*60*1000);
+
+// ── IMMAGINI DA OG:IMAGE ───────────────────────────────────────
+const IMG_FALLBACKS={
+  'Sport':'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=600&q=80',
+  'Finanza':'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&q=80',
+  'Politica':'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=600&q=80',
+  'Mondo':'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&q=80',
+  'Tech':'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&q=80',
+};
+
+function getCardImage(card){
+  return card.img || IMG_FALLBACKS[card.cat] || IMG_FALLBACKS['Mondo'];
+}
+
+// ── SENTIMENT LIVE (simula micro-movimenti) ───────────────────
+function animateSentiment(){
+  CARDS.forEach(card=>{
+    if(card.status!=='aperta')return;
+    // Micro-movimento ±1% random ogni 90 secondi
+    const delta=(Math.random()-.5)*1.5;
+    card.pctYes=Math.min(95,Math.max(5,Math.round((card.pctYes+delta)*10)/10));
+  });
+  render();
+}
+setInterval(animateSentiment,90*1000);
+
+// ── PROFILO ───────────────────────────────────────────────────
+function openProf(){
+  const vCount=Object.keys(votes).length;
+  const streak=parseInt(localStorage.getItem('q_streak')||'1');
+  const acc=parseInt(localStorage.getItem('q_acc')||'0');
+  const fascia=credits>500?'Singolarità':credits>300?'Quasar':credits>150?'Pulsar':credits>100?'Orbiter':'Neutrino';
+  document.getElementById('p-cr').textContent=credits;
+  document.getElementById('p-voti').textContent=vCount;
+  document.getElementById('p-acc').textContent=acc?acc+'%':'—%';
+  document.getElementById('p-streak').textContent=streak;
+  document.getElementById('p-fascia').textContent=fascia;
+  document.getElementById('prof-token-txt').textContent='ID: '+TOKEN.slice(0,16)+'...';
+  document.getElementById('prof-bg').classList.add('open');
+}
+function closeProf(e){
+  if(e&&e.target!==document.getElementById('prof-bg'))return;
+  document.getElementById('prof-bg').classList.remove('open');
+}
+
+// ── NOTIFICHE PUSH ────────────────────────────────────────────
+async function requestPush(){
+  if(!('Notification' in window)){alert('Il tuo browser non supporta le notifiche.');return;}
+  const perm=await Notification.requestPermission();
+  if(perm==='granted'){
+    new Notification('QUOTA · Notifiche attive',{body:'Riceverai un avviso per ogni nuova quota disponibile.',icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><text y="28" font-size="28">⚡</text></svg>'});
+    localStorage.setItem('q_push','1');
+    toast('🔔 Notifiche attivate');
+  }
+}
+
+function sendPushIfEnabled(title,body){
+  if(localStorage.getItem('q_push')==='1'&&Notification.permission==='granted'){
+    new Notification('QUOTA · '+title,{body,icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><text y="28" font-size="28">⚡</text></svg>'});
+  }
+}
+
+// ── STREAK GIORNALIERA ────────────────────────────────────────
+function updateStreak(){
+  const today=new Date().toDateString();
+  const last=localStorage.getItem('q_last_day');
+  if(last!==today){
+    const streak=parseInt(localStorage.getItem('q_streak')||'0');
+    const yesterday=new Date(Date.now()-86400000).toDateString();
+    localStorage.setItem('q_streak',last===yesterday?streak+1:1);
+    localStorage.setItem('q_last_day',today);
+  }
+}
+updateStreak();
+</script></body>
 </html>
