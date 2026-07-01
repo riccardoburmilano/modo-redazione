@@ -473,14 +473,82 @@ function simulateNewCard(){
   }
 }
 
+// ── GENERATORE AUTOMATICO DA RSS ────────────────────────────
+async function generateCardsFromRSS(){
+  try{
+    const r=await fetch('https://god-core-backend.onrender.com/api/v2/modo/news?limit=20&lang=it');
+    const d=await r.json();
+    if(!d.ok||!d.articles?.length)return;
+
+    const groqKey=localStorage.getItem('quota_groq_key');
+    if(!groqKey)return;
+
+    // Prendi solo le prime 3 notizie non già in CARDS
+    const nuove=d.articles.filter(a=>!CARDS.find(c=>c.id===a.id)).slice(0,3);
+
+    for(const a of nuove){
+      try{
+        const r2=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+          method:'POST',
+          headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},
+          body:JSON.stringify({
+            model:'llama-3.1-8b-instant',
+            max_tokens:300,
+            temperature:0.6,
+            messages:[
+              {role:'system',content:'Trasforma notizie in domande predittive per un prediction market italiano. Rispondi SOLO con JSON: {"domanda":"domanda sì/no max 80 caratteri","contesto":"max 100 caratteri","pct_si":50,"categoria":"Sport|Finanza|Politica|Mondo|Tech","ore":24}'},
+              {role:'user',content:'Notizia: '+a.sourceTitle+'. '+a.sourceDesc}
+            ]
+          })
+        });
+        const rd=await r2.json();
+        const txt=rd.choices?.[0]?.message?.content||'{}';
+        const match=txt.match(/{[sS]*}/);
+        if(!match)continue;
+        const gen=JSON.parse(match[0]);
+        if(!gen.domanda)continue;
+
+        const card={
+          id:a.id||('gen'+Date.now()+Math.random()),
+          cat:gen.categoria||'Mondo',
+          question:gen.domanda,
+          context:gen.contesto||a.sourceDesc?.slice(0,100)||'',
+          pctYes:Math.min(90,Math.max(10,gen.pct_si||50)),
+          votes:Math.floor(Math.random()*200+20),
+          deadline:Date.now()+(gen.ore||24)*3600000,
+          creditsReward:gen.ore>48?40:gen.ore>12?25:15,
+          status:'aperta',
+          generated:true
+        };
+        CARDS.unshift(card);
+        render();
+        toast('⚡ Nuova quota: '+card.question.slice(0,50)+'...');
+        await new Promise(r=>setTimeout(r,2000)); // pausa tra chiamate
+      }catch(e){console.log('Errore generazione card:',e.message);}
+    }
+  }catch(e){console.log('Errore RSS:',e.message);}
+}
+
+// Setup Groq key se non presente
+function setupGroqKey(){
+  let k=localStorage.getItem('quota_groq_key');
+  if(!k){
+    k=window.prompt('Inserisci la tua Groq API key per generare quote automatiche:');
+    if(k?.trim())localStorage.setItem('quota_groq_key',k.trim());
+  }
+  return k;
+}
+
 // ── INIT ─────────────────────────────────────────────────────
 updateCredits();
 updateAccuracy();
 render();
 
-// Simula nuove card ogni 3 minuti
-setTimeout(simulateNewCard, 3*60*1000);
-setInterval(simulateNewCard, 3*60*1000);
+// Genera card da RSS subito e ogni 5 minuti
+setTimeout(()=>{if(setupGroqKey())generateCardsFromRSS();},3000);
+setInterval(()=>{if(localStorage.getItem('quota_groq_key'))generateCardsFromRSS();},5*60*1000);
+
+// Card generate da RSS automaticamente
 </script>
 </body>
 </html>
