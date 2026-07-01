@@ -8,111 +8,153 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#08080f;--s1:#0f0f1a;--s2:#161625;
-  --b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.1);
+  --bg:#06060e;--s1:#0d0d1a;--s2:#141428;
+  --b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.11);
   --gold:#f5c842;--gd:rgba(245,200,66,.08);
-  --green:#00e87a;--red:#ff3d5a;--purple:#a855f7;--blue:#4f8ef7;
-  --text:#f0efe8;--t2:#808080;--t3:#404040;
+  --green:#00e87a;--red:#ff3d5a;--purple:#a855f7;--blue:#4f8ef7;--orange:#ff8c00;
+  --text:#f0efe8;--t2:#808080;--t3:#383838;
   --g:'Inter',sans-serif;--sg:'Space Grotesk',sans-serif;
 }
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--g);font-size:13px}
-.app{display:grid;grid-template-columns:240px 1fr 320px;grid-template-rows:52px 1fr;height:100vh;overflow:hidden}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--g);font-size:13px;-webkit-font-smoothing:antialiased}
+.app{display:grid;grid-template-columns:260px 1fr 300px;grid-template-rows:50px 1fr;height:100vh;overflow:hidden}
 
 /* TOPBAR */
-.topbar{grid-column:1/-1;background:rgba(8,8,15,.95);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 16px;gap:12px}
-.tb-logo{font-family:var(--sg);font-size:17px;font-weight:800;background:linear-gradient(135deg,#fff,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.tb-sep{width:1px;height:14px;background:var(--b1)}
-.tb-label{font-size:11px;color:var(--t3);font-weight:500}
+.topbar{grid-column:1/-1;background:rgba(6,6,14,.95);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 14px;gap:10px}
+.tb-logo{font-family:var(--sg);font-size:16px;font-weight:800;background:linear-gradient(135deg,#fff,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.tb-sep{width:1px;height:12px;background:var(--b1)}
+.tb-label{font-size:10px;color:var(--t3);font-weight:500}
 .tb-right{margin-left:auto;display:flex;align-items:center;gap:8px}
-.tb-stat{font-size:10px;padding:4px 10px;border:1px solid var(--b1);background:rgba(255,255,255,.03);color:var(--t2)}
-.tb-stat span{color:var(--gold);font-weight:700;font-family:var(--sg)}
-.tb-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+.tb-stat{font-size:10px;padding:3px 8px;border:1px solid var(--b1);background:rgba(255,255,255,.03);color:var(--t2);border-radius:4px}
+.tb-stat b{color:var(--gold);font-family:var(--sg)}
+.tb-live{display:flex;align-items:center;gap:4px;font-size:9px;font-weight:700;color:var(--green);letter-spacing:.1em}
+.ldot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 5px var(--green);animation:p 2s ease-in-out infinite}
+@keyframes p{0%,100%{opacity:1}50%{opacity:.25}}
 
 /* LEFT */
-.left{background:rgba(10,10,18,.8);border-right:1px solid var(--b1);display:flex;flex-direction:column;overflow:hidden}
-.left-body{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:14px}
-.ls-title{font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--t3);margin-bottom:6px}
+.left{background:rgba(8,8,18,.8);border-right:1px solid var(--b1);display:flex;flex-direction:column;overflow:hidden}
+.left-body{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:12px}
+.ls-title{font-size:8px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+
+/* HYPE METER */
+.hype-meter{background:rgba(255,140,0,.06);border:1px solid rgba(255,140,0,.15);border-radius:8px;padding:12px}
+.hm-title{font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--orange);margin-bottom:8px;display:flex;align-items:center;gap:5px}
+.hm-item{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.hm-bar-wrap{flex:1;height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden}
+.hm-bar{height:100%;border-radius:2px;transition:width .8s}
+.hm-cat{font-size:9px;color:var(--t2);width:52px;flex-shrink:0}
+.hm-pct{font-family:var(--sg);font-size:9px;font-weight:700;width:28px;text-align:right;flex-shrink:0}
+
 .cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px}
-.cat-btn{font-size:10px;font-weight:600;padding:6px 8px;background:rgba(255,255,255,.04);border:1px solid var(--b1);color:var(--t3);cursor:pointer;transition:all .12s;text-align:center;border-radius:4px}
+.cat-btn{font-size:10px;font-weight:600;padding:5px 6px;background:rgba(255,255,255,.04);border:1px solid var(--b1);color:var(--t3);cursor:pointer;transition:all .12s;text-align:center;border-radius:4px}
 .cat-btn.on{border-color:var(--gold);color:var(--gold);background:var(--gd)}
-.btn-gen{width:100%;padding:10px;background:var(--purple);border:none;color:#fff;font-size:11px;font-weight:700;cursor:pointer;transition:opacity .15s;border-radius:4px;font-family:var(--sg)}
-.btn-gen:hover{opacity:.88}
-.btn-gen:disabled{opacity:.4}
+
+.btn-gen{width:100%;padding:10px;background:linear-gradient(135deg,var(--purple),rgba(80,30,140,.8));border:none;color:#fff;font-size:11px;font-weight:800;cursor:pointer;border-radius:6px;font-family:var(--sg);transition:all .2s;position:relative;overflow:hidden}
+.btn-gen::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.1),transparent);pointer-events:none}
+.btn-gen:hover{opacity:.88;transform:scale(1.01)}
+.btn-gen:disabled{opacity:.4;cursor:default;transform:none}
 .btn-sec{width:100%;padding:7px;background:rgba(255,255,255,.04);border:1px solid var(--b1);color:var(--t2);font-size:10px;font-weight:500;cursor:pointer;border-radius:4px;margin-top:3px;transition:all .12s}
 .btn-sec:hover{border-color:var(--green);color:var(--green)}
+
 .stat-mini{display:grid;grid-template-columns:1fr 1fr;gap:3px}
-.sm{background:rgba(255,255,255,.04);border:1px solid var(--b1);padding:8px;border-radius:4px}
-.sm-n{font-family:var(--sg);font-size:18px;font-weight:800;color:var(--gold);line-height:1}
+.sm{background:rgba(255,255,255,.04);border:1px solid var(--b1);padding:8px;border-radius:4px;text-align:center}
+.sm-n{font-family:var(--sg);font-size:18px;font-weight:800;line-height:1}
 .sm-l{font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-top:2px}
-.log{background:rgba(0,0,0,.4);border:1px solid var(--b1);padding:6px;font-size:9px;line-height:1.7;max-height:120px;overflow-y:auto;font-family:monospace;color:var(--t3);border-radius:4px}
-.lok{color:var(--green)}.lerr{color:var(--red)}.linf{color:var(--gold)}
+.log{background:rgba(0,0,0,.5);border:1px solid var(--b1);padding:6px;font-size:9px;line-height:1.8;max-height:130px;overflow-y:auto;font-family:monospace;color:var(--t3);border-radius:4px}
+.lok{color:var(--green)}.lerr{color:var(--red)}.linf{color:var(--gold)}.lwarn{color:var(--orange)}
 
 /* CENTER */
-.center{overflow-y:auto;background:var(--bg)}
-.day-sep{padding:6px 14px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--b1);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);position:sticky;top:0;z-index:10}
-.qrow{border-bottom:1px solid var(--b1);cursor:pointer;transition:background .1s}
-.qrow:hover{background:rgba(255,255,255,.02)}
-.qrow.active{background:var(--gd);border-left:2px solid var(--gold)}
-.qrow.published{border-left:2px solid var(--green)}
-.qrow.rejected{opacity:.3}
-.qrow-inner{padding:11px 14px;display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:start}
-.qrow-cat{font-size:8px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);padding-top:2px;white-space:nowrap}
-.qrow-q{font-family:var(--sg);font-size:13px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:3px}
-.qrow-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.qrow-src{font-size:10px;color:var(--t2)}
-.qbadge{font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:1px 5px;border:1px solid currentColor;border-radius:2px}
-.qbadge.pending{color:var(--gold)}.qbadge.published{color:var(--green)}.qbadge.rejected{color:var(--red)}.qbadge.ai{color:var(--purple)}
-.empty-c{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;color:var(--t3);padding:40px}
-.empty-ct{font-family:var(--sg);font-size:16px;color:var(--t2)}
+.center{overflow-y:auto;background:var(--bg);display:flex;flex-direction:column}
+
+/* NEWS FEED */
+.news-tabs{display:flex;gap:1px;background:var(--b1);flex-shrink:0}
+.news-tab{flex:1;padding:8px;font-size:10px;font-weight:600;color:var(--t3);cursor:pointer;border:none;background:rgba(8,8,18,.8);text-align:center;transition:all .12s;letter-spacing:.04em;text-transform:uppercase}
+.news-tab.on{color:var(--gold);background:var(--gd)}
+
+/* NEWS ROW */
+.news-row{border-bottom:1px solid var(--b1);cursor:pointer;transition:background .1s;position:relative}
+.news-row:hover{background:rgba(255,255,255,.02)}
+.news-row.selected{background:var(--gd);border-left:2px solid var(--gold)}
+.news-row.published{border-left:2px solid var(--green);opacity:.6}
+.news-row.rejected{opacity:.2}
+.nr-inner{padding:10px 12px;display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:start}
+.nr-hype{width:32px;text-align:center;padding-top:1px}
+.nr-hype-n{font-family:var(--sg);font-size:11px;font-weight:900;line-height:1}
+.nr-hype-bar{height:3px;border-radius:2px;margin-top:2px;transition:width .3s}
+.nr-cat{font-size:8px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;margin-bottom:3px}
+.nr-title{font-family:var(--sg);font-size:13px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:3px}
+.nr-q{font-size:11px;color:var(--purple);font-style:italic;line-height:1.3;margin-bottom:3px}
+.nr-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.nr-src{font-size:9px;font-weight:600;color:var(--t2)}
+.nbadge{font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:1px 5px;border:1px solid currentColor;border-radius:2px}
+.nbadge.pending{color:var(--gold)}.nbadge.ai{color:var(--purple)}.nbadge.published{color:var(--green)}.nbadge.rejected{color:var(--red)}.nbadge.hot{color:var(--orange)}
+.nr-actions{display:flex;flex-direction:column;gap:3px;align-items:flex-end}
+.nr-act-btn{font-size:9px;font-weight:700;padding:3px 8px;border:1px solid transparent;cursor:pointer;border-radius:3px;font-family:var(--sg);transition:all .12s;white-space:nowrap}
+.nr-act-btn.pub{background:var(--green);color:#000;border-color:var(--green)}
+.nr-act-btn.pub:hover{opacity:.85}
+.nr-act-btn.rej{background:rgba(255,61,90,.1);color:var(--red);border-color:rgba(255,61,90,.2)}
+.nr-act-btn.rej:hover{background:var(--red);color:#fff}
+.nr-act-btn.gen{background:rgba(168,85,247,.1);color:var(--purple);border-color:rgba(168,85,247,.2)}
+.nr-act-btn.gen:hover{background:var(--purple);color:#fff}
+.empty-c{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:8px;color:var(--t3);padding:40px;text-align:center}
 
 /* EDITOR */
-.editor{display:none;flex-direction:column;height:100%}
+.editor{border-top:1px solid var(--b1);background:rgba(8,8,18,.9);flex-shrink:0;display:none;flex-direction:column;max-height:50vh}
 .editor.show{display:flex}
-.ed-bar{border-bottom:1px solid var(--b1);padding:8px 14px;display:flex;align-items:center;gap:6px;flex-shrink:0;background:rgba(10,10,18,.8)}
-.ed-back{font-size:10px;font-weight:500;color:var(--t2);cursor:pointer;padding:4px 8px;border:1px solid var(--b1);background:rgba(255,255,255,.04);border-radius:3px;transition:all .12s}
-.ed-back:hover{border-color:var(--b2);color:var(--text)}
-.ed-bar-right{margin-left:auto;display:flex;gap:5px}
-.ed-body{flex:1;overflow-y:auto;padding:16px}
-.ed-field{margin-bottom:12px}
-.ed-label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
-.ed-input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--b1);color:var(--text);font-size:13px;padding:8px 10px;outline:none;font-family:var(--sg);font-weight:700;border-radius:4px;transition:border-color .12s}
+.ed-bar{padding:8px 12px;display:flex;align-items:center;gap:6px;flex-shrink:0;border-bottom:1px solid var(--b1);background:rgba(6,6,14,.9)}
+.ed-bar-title{font-family:var(--sg);font-size:11px;font-weight:700;color:var(--text)}
+.ed-bar-right{margin-left:auto;display:flex;gap:4px}
+.ed-body{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
+.ed-field{display:flex;flex-direction:column;gap:4px}
+.ed-label{font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t3)}
+.ed-input{background:rgba(255,255,255,.04);border:1px solid var(--b1);color:var(--text);font-size:12px;padding:7px 9px;outline:none;font-family:var(--sg);font-weight:700;border-radius:4px;transition:border-color .12s;width:100%}
 .ed-input:focus{border-color:rgba(245,200,66,.3)}
-.ed-input.sm{font-size:12px;font-family:var(--g);font-weight:400}
-.ed-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.pct-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.pct-yes{font-family:var(--sg);font-size:32px;font-weight:900;color:var(--green)}
-.pct-no{font-family:var(--sg);font-size:24px;font-weight:800;color:var(--red)}
-.pct-slider{flex:1;-webkit-appearance:none;height:6px;border-radius:3px;background:linear-gradient(90deg,rgba(0,232,122,.3) 0%,rgba(0,232,122,.3) var(--v,71%),rgba(255,61,90,.3) var(--v,71%),rgba(255,61,90,.3) 100%);outline:none}
-.pct-slider::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid var(--bg);box-shadow:0 0 8px rgba(245,200,66,.4)}
-.ai-box{background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.15);padding:12px;border-radius:6px;margin-bottom:12px;font-size:11px;color:rgba(168,85,247,.8);line-height:1.6;display:none}
-.ai-box.show{display:block}
-.ed-bottom{border-top:1px solid var(--b1);padding:8px 12px;background:rgba(10,10,18,.8);display:flex;align-items:center;gap:5px;flex-shrink:0;flex-wrap:wrap}
-.ed-btn{font-size:10px;font-weight:600;padding:6px 12px;background:rgba(255,255,255,.04);border:1px solid var(--b1);color:var(--t2);cursor:pointer;border-radius:3px;transition:all .12s;font-family:var(--g)}
-.ed-btn:hover{border-color:var(--b2);color:var(--text)}
-.ed-save{margin-left:auto;padding:7px 16px;background:var(--gold);border:none;color:#000;font-size:10px;font-weight:800;cursor:pointer;border-radius:3px;font-family:var(--sg)}
-.ed-pub{padding:7px 16px;background:var(--green);border:none;color:#000;font-size:10px;font-weight:800;cursor:pointer;border-radius:3px;font-family:var(--sg)}
-.ed-reject{padding:7px 12px;background:rgba(255,61,90,.1);border:1px solid rgba(255,61,90,.2);color:var(--red);font-size:10px;font-weight:700;cursor:pointer;border-radius:3px}
+.ed-input.sm{font-size:11px;font-family:var(--g);font-weight:400}
+.ed-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.ed-type-row{display:flex;gap:6px}
+.type-btn{flex:1;padding:7px;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;border:1px solid var(--b1);background:rgba(255,255,255,.04);color:var(--t2);transition:all .15s;font-family:var(--sg);text-align:center}
+.type-btn.on.hurry{border-color:rgba(255,61,90,.3);color:var(--red);background:rgba(255,61,90,.06)}
+.type-btn.on.deep{border-color:rgba(245,200,66,.3);color:var(--gold);background:var(--gd)}
+.type-btn.on.flash{border-color:rgba(168,85,247,.3);color:var(--purple);background:rgba(168,85,247,.06)}
+.hype-input{display:flex;align-items:center;gap:8px}
+.hype-slider{flex:1;-webkit-appearance:none;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--red) 0%,var(--orange) 50%,var(--green) 100%);outline:none}
+.hype-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid var(--bg);box-shadow:0 0 6px rgba(245,200,66,.4)}
+.hype-val{font-family:var(--sg);font-size:14px;font-weight:800;color:var(--gold);width:32px;text-align:right}
+.ai-insight{background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.15);padding:10px;border-radius:6px;font-size:11px;color:rgba(168,85,247,.8);line-height:1.6;display:none}
+.ai-insight.show{display:block}
+.ed-bottom{padding:8px 12px;border-top:1px solid var(--b1);display:flex;gap:5px;align-items:center;flex-shrink:0}
+.eb-btn{font-size:10px;font-weight:700;padding:6px 12px;cursor:pointer;border-radius:4px;font-family:var(--sg);border:1px solid transparent;transition:all .12s}
+.eb-pub{background:var(--green);color:#000;border-color:var(--green)}
+.eb-pub:hover{opacity:.88}
+.eb-flash{background:var(--red);color:#fff;border-color:var(--red)}
+.eb-rej{background:rgba(255,61,90,.08);color:var(--red);border-color:rgba(255,61,90,.2)}
+.eb-rej:hover{background:var(--red);color:#fff}
+.eb-ai{background:rgba(168,85,247,.1);color:var(--purple);border-color:rgba(168,85,247,.2)}
+.eb-ai:hover{background:var(--purple);color:#fff}
+.eb-resolve{background:rgba(245,200,66,.1);color:var(--gold);border-color:rgba(245,200,66,.2);margin-left:auto}
 
-/* CHAT */
-.right{background:rgba(10,10,18,.8);border-left:1px solid var(--b1);display:flex;flex-direction:column;overflow:hidden}
-.chat-hdr{padding:12px 14px;border-bottom:1px solid var(--b1);flex-shrink:0}
-.chat-hdr-t{font-family:var(--sg);font-size:13px;font-weight:700;margin-bottom:1px}
-.chat-hdr-s{font-size:10px;color:var(--t3)}
-.chat-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+/* RIGHT CHAT */
+.right{background:rgba(8,8,18,.8);border-left:1px solid var(--b1);display:flex;flex-direction:column;overflow:hidden}
+.chat-hdr{padding:10px 12px;border-bottom:1px solid var(--b1);flex-shrink:0}
+.chat-hdr-t{font-family:var(--sg);font-size:12px;font-weight:700}
+.chat-hdr-s{font-size:9px;color:var(--t3);margin-top:1px}
+.chat-msgs{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:7px}
 .cmsg.user{align-self:flex-end;max-width:88%}
 .cmsg.ai{align-self:flex-start;max-width:94%}
-.bubble{padding:8px 11px;font-size:12px;line-height:1.6;border-radius:8px}
+.bubble{padding:7px 10px;font-size:11px;line-height:1.6;border-radius:8px}
 .cmsg.user .bubble{background:var(--purple);color:#fff}
 .cmsg.ai .bubble{background:rgba(255,255,255,.05);border:1px solid var(--b1);color:var(--text)}
 .ctime{font-size:8px;color:var(--t3);margin-top:2px;padding:0 2px}
-.chat-quick{display:flex;flex-wrap:wrap;gap:3px;padding:0 12px 6px}
-.qbtn{font-size:9px;background:rgba(255,255,255,.04);border:1px solid var(--b1);color:var(--t3);padding:3px 8px;cursor:pointer;border-radius:10px;transition:all .12s}
+.chat-quick{display:flex;flex-wrap:wrap;gap:3px;padding:0 10px 5px}
+.qbtn{font-size:9px;background:rgba(255,255,255,.04);border:1px solid var(--b1);color:var(--t3);padding:3px 7px;cursor:pointer;border-radius:8px;transition:all .12s}
 .qbtn:hover{border-color:var(--gold);color:var(--gold)}
-.chat-foot{padding:8px 12px;border-top:1px solid var(--b1);display:flex;gap:5px;flex-shrink:0}
-.chat-ta{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--b1);color:var(--text);font-size:12px;padding:7px 9px;resize:none;outline:none;min-height:34px;max-height:80px;font-family:var(--g);line-height:1.5;border-radius:4px;transition:border-color .12s}
+.chat-foot{padding:8px 10px;border-top:1px solid var(--b1);display:flex;gap:5px;flex-shrink:0}
+.chat-ta{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--b1);color:var(--text);font-size:11px;padding:6px 8px;resize:none;outline:none;min-height:32px;max-height:70px;font-family:var(--g);border-radius:4px;transition:border-color .12s}
 .chat-ta:focus{border-color:rgba(245,200,66,.3)}
-.chat-send{background:var(--gold);border:none;color:#000;font-size:11px;font-weight:800;padding:7px 11px;cursor:pointer;border-radius:4px;font-family:var(--sg)}
+.chat-send{background:var(--gold);border:none;color:#000;font-size:10px;font-weight:800;padding:6px 10px;cursor:pointer;border-radius:4px;font-family:var(--sg)}
 .chat-send:disabled{opacity:.4}
+
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px}
 </style>
 </head>
 <body>
@@ -122,30 +164,36 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--g
     <div class="tb-sep"></div>
     <div class="tb-label">Redazione predittiva</div>
     <div class="tb-right">
-      <div class="tb-stat">Quote attive: <span id="tb-attive">0</span></div>
-      <div class="tb-stat">Voti oggi: <span id="tb-voti">—</span></div>
-      <div class="tb-dot"></div>
+      <div class="tb-stat">Live: <b id="tb-live">0</b></div>
+      <div class="tb-stat">Voti oggi: <b id="tb-voti">—</b></div>
+      <div class="tb-stat">Top player: <b id="tb-top">—</b></div>
+      <div class="tb-live"><span class="ldot"></span>BUR Connected</div>
     </div>
   </header>
 
   <!-- LEFT -->
   <aside class="left">
     <div class="left-body">
+      <div class="hype-meter">
+        <div class="hm-title">🔥 Hype Index live</div>
+        <div id="hype-bars"></div>
+      </div>
       <div>
-        <div class="ls-title">Genera quote</div>
+        <div class="ls-title">Categorie attive</div>
         <div class="cat-grid" id="cat-grid"></div>
       </div>
       <div>
-        <button class="btn-gen" id="btn-gen" onclick="generateQuote()">⚡ Genera da RSS</button>
-        <button class="btn-sec" onclick="newManual()">+ Crea manuale</button>
-        <button class="btn-sec" onclick="fetchFromRSS()">↓ Aggiorna notizie</button>
+        <button class="btn-gen" id="btn-gen" onclick="generateBatch()">⚡ Genera quote da RSS</button>
+        <button class="btn-sec" onclick="fetchRSS()">↓ Aggiorna notizie</button>
+        <button class="btn-sec" onclick="publishAll()">✓ Pubblica tutte le AI-ready</button>
+        <button class="btn-sec" onclick="rejectAll()">✕ Scarta tutte le basse hype</button>
       </div>
       <div>
         <div class="ls-title">Sessione</div>
         <div class="stat-mini">
-          <div class="sm"><div class="sm-n" id="st-gen">0</div><div class="sm-l">Generate</div></div>
-          <div class="sm"><div class="sm-n" id="st-pub" style="color:var(--green)">0</div><div class="sm-l">Pubblicate</div></div>
-          <div class="sm"><div class="sm-n" id="st-rss">0</div><div class="sm-l">Da RSS</div></div>
+          <div class="sm"><div class="sm-n" id="st-rss" style="color:var(--blue)">0</div><div class="sm-l">Da RSS</div></div>
+          <div class="sm"><div class="sm-n" id="st-gen" style="color:var(--purple)">0</div><div class="sm-l">Generate</div></div>
+          <div class="sm"><div class="sm-n" id="st-pub" style="color:var(--green)">0</div><div class="sm-l">Live</div></div>
           <div class="sm"><div class="sm-n" id="st-rej" style="color:var(--red)">0</div><div class="sm-l">Scartate</div></div>
         </div>
       </div>
@@ -157,88 +205,95 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--g
   </aside>
 
   <!-- CENTER -->
-  <main class="center" id="center">
-    <div id="feed-view">
-      <div class="empty-c" id="empty">
-        <div class="empty-ct">Nessuna quota</div>
-        <div style="font-size:12px">Premi "Genera da RSS" per creare quote automaticamente.</div>
-      </div>
-      <div id="feed-list"></div>
+  <div class="center">
+    <!-- TABS -->
+    <div class="news-tabs">
+      <button class="news-tab on" onclick="switchTab('all')">Tutte</button>
+      <button class="news-tab" onclick="switchTab('ai')">AI-Ready ⚡</button>
+      <button class="news-tab" onclick="switchTab('hot')">🔥 Hot</button>
+      <button class="news-tab" onclick="switchTab('live')">✓ Live</button>
     </div>
+
+    <div id="feed-list" style="flex:1;overflow-y:auto">
+      <div class="empty-c" id="empty">
+        <div style="font-size:24px">⚡</div>
+        <div style="font-family:var(--sg);font-size:14px;color:var(--t2)">Premi "Genera quote da RSS"</div>
+        <div style="font-size:11px">Il sistema carica le notizie, calcola l'hype e genera le domande automaticamente</div>
+      </div>
+    </div>
+
+    <!-- EDITOR -->
     <div class="editor" id="editor">
       <div class="ed-bar">
-        <button class="ed-back" onclick="showFeed()">← Lista</button>
+        <div class="ed-bar-title" id="ed-bar-title">Editor quota</div>
         <div class="ed-bar-right">
-          <button class="ed-btn" onclick="aiSuggestPct()">🧠 AI Suggerisci %</button>
-          <button class="ed-btn" onclick="aiSuggestFactors()">📊 Fattori pro/contro</button>
+          <button class="eb-btn eb-ai" onclick="aiAnalyze()">🧠 AI Analizza</button>
+          <button class="eb-btn" onclick="closeEditor()" style="background:rgba(255,255,255,.04);border-color:var(--b1);color:var(--t2)">× Chiudi</button>
         </div>
       </div>
       <div class="ed-body">
-        <div class="ed-field">
-          <div class="ed-label">Categoria</div>
-          <select class="ed-input sm" id="ed-cat">
-            <option>Sport</option><option>Finanza</option><option>Politica</option><option>Mondo</option><option>Tech</option>
-          </select>
+        <div class="ed-type-row">
+          <button class="type-btn hurry on" id="t-hurry" onclick="setType('hurry')">🔴 Hurry Up</button>
+          <button class="type-btn deep" id="t-deep" onclick="setType('deep')">⭐ Deep Bet</button>
+          <button class="type-btn flash" id="t-flash" onclick="setType('flash')">⚡ Flash</button>
         </div>
         <div class="ed-field">
           <div class="ed-label">Domanda predittiva</div>
-          <input class="ed-input" id="ed-q" type="text" placeholder="Es: Sinner vince Wimbledon?">
+          <input class="ed-input" id="ed-q" type="text" placeholder="La domanda che fa dire 'ohhhh sì ho vinto'...">
         </div>
         <div class="ed-field">
-          <div class="ed-label">Contesto (max 120 car)</div>
-          <input class="ed-input sm" id="ed-ctx" type="text" placeholder="Breve contesto per l'utente...">
-        </div>
-        <div class="ed-field">
-          <div class="ed-label">Prior probabilità SÌ (si muoverà con i voti)</div>
-          <div class="pct-row">
-            <div class="pct-yes" id="pct-yes-big">50%</div>
-            <input type="range" class="pct-slider" id="pct-slider" min="5" max="95" value="50" oninput="updatePct(this.value)">
-            <div class="pct-no" id="pct-no-big">50%</div>
-          </div>
+          <div class="ed-label">Contesto (perché è intrigante)</div>
+          <input class="ed-input sm" id="ed-ctx" type="text" placeholder="Dati, statistiche, context che aumenta la tensione...">
         </div>
         <div class="ed-row">
+          <div class="ed-field">
+            <div class="ed-label">Categoria</div>
+            <select class="ed-input sm" id="ed-cat">
+              <option>Sport</option><option>Finanza</option><option>Politica</option><option>Mondo</option><option>Tech</option>
+            </select>
+          </div>
           <div class="ed-field">
             <div class="ed-label">Scadenza</div>
             <input class="ed-input sm" id="ed-deadline" type="datetime-local">
           </div>
           <div class="ed-field">
-            <div class="ed-label">Premio crediti</div>
-            <input class="ed-input sm" id="ed-reward" type="number" value="25" min="5" max="200">
+            <div class="ed-label">QR Premio</div>
+            <input class="ed-input sm" id="ed-qr" type="number" value="20" min="5" max="500">
           </div>
         </div>
         <div class="ed-field">
-          <div class="ed-label">Fonte originale</div>
-          <input class="ed-input sm" id="ed-src" type="text" placeholder="URL notizia originale...">
+          <div class="ed-label">Hype Score (1-100)</div>
+          <div class="hype-input">
+            <input type="range" class="hype-slider" id="hype-slider" min="1" max="100" value="75" oninput="document.getElementById('hype-val').textContent=this.value">
+            <div class="hype-val" id="hype-val">75</div>
+          </div>
         </div>
-        <div class="ai-box" id="ai-box"></div>
-        <div class="ed-field">
-          <div class="ed-label">Fattori AI (pro/contro)</div>
-          <textarea class="ed-input sm" id="ed-factors" rows="4" placeholder="L'AI inserirà qui i fattori che spiegano la percentuale..."></textarea>
-        </div>
+        <div class="ai-insight" id="ai-insight"></div>
       </div>
       <div class="ed-bottom">
-        <button class="ed-reject" onclick="rejectQ()">✕ Scarta</button><button class="ed-btn" onclick="resolveQ('si')" style="color:var(--green);border-color:rgba(0,232,122,.2)">✓ Chiudi: SÌ</button><button class="ed-btn" onclick="resolveQ('no')" style="color:var(--red);border-color:rgba(255,61,90,.2)">✗ Chiudi: NO</button>
-        <button class="ed-btn" onclick="previewQ()">👁 Anteprima</button>
-        <button class="ed-save" onclick="saveQ()">Salva</button>
-        <button class="ed-pub" onclick="publishQ()">✓ Pubblica</button>
+        <button class="eb-btn eb-rej" onclick="rejectQ()">✕ Scarta</button>
+        <button class="eb-btn eb-flash" onclick="publishFlash()">⚡ Pubblica come Flash</button>
+        <button class="eb-btn eb-pub" onclick="publishQ()">✓ Pubblica Live</button>
+        <button class="eb-btn eb-resolve" onclick="openResolve()">🏁 Chiudi quota</button>
       </div>
     </div>
-  </main>
+  </div>
 
   <!-- RIGHT CHAT -->
   <aside class="right">
     <div class="chat-hdr">
       <div class="chat-hdr-t">Assistente QUOTA</div>
-      <div class="chat-hdr-s">Analisi · % · Fattori · Verifica</div>
+      <div class="chat-hdr-s">Hype · Domande · Percentuali · Timing</div>
     </div>
     <div class="chat-msgs" id="chat-msgs">
-      <div class="cmsg ai"><div class="bubble">Ciao. Genera una quota da RSS o apri una quota esistente per analizzarla. Posso suggerire la percentuale giusta, i fattori pro/contro e verificare la coerenza della domanda.</div><div class="ctime">QUOTA AI</div></div>
+      <div class="cmsg ai"><div class="bubble">Ciao. Genera le quote da RSS e aprile per analizzarle. Posso calcolare l'hype score, suggerirti la domanda più intrigante, il timing ottimale e prevedere l'engagement.</div><div class="ctime">QUOTA AI</div></div>
     </div>
     <div class="chat-quick">
-      <button class="qbtn" onclick="qc('Suggerisci la percentuale giusta per questa quota')">📊 % giusta</button>
-      <button class="qbtn" onclick="qc('Elenca 3 fattori pro Sì e 3 pro No')">⚖️ Fattori</button>
-      <button class="qbtn" onclick="qc('La domanda è chiara e verificabile?')">✓ Verifica</button>
-      <button class="qbtn" onclick="qc('Quando scade questa notizia? Che deadline suggerisci?')">⏱ Deadline</button>
+      <button class="qbtn" onclick="qc('Qual è la notizia con più hype adesso?')">🔥 Hype max</button>
+      <button class="qbtn" onclick="qc('Questa domanda fa venire voglia di scommettere?')">⚡ Check domanda</button>
+      <button class="qbtn" onclick="qc('Quando scade questa notizia? Deadline ideale?')">⏱ Deadline</button>
+      <button class="qbtn" onclick="qc('Genera 3 varianti più intriganti di questa domanda')">✨ Varianti</button>
+      <button class="qbtn" onclick="qc('Qual è il QR premio ottimale per questa difficoltà?')">🎯 QR ottimale</button>
     </div>
     <div class="chat-foot">
       <textarea class="chat-ta" id="chat-ta" rows="2" placeholder="Scrivi..." onkeydown="ckd(event)"></textarea>
@@ -250,27 +305,48 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--g
 <script>
 const BUR='https://god-core-backend.onrender.com';
 const CATS=['Sport','Finanza','Politica','Mondo','Tech'];
-let quotes=[],q=null,stats={gen:0,pub:0,rss:0,rej:0};
-let activeCats=new Set(['Sport','Finanza','Politica','Mondo','Tech']);
+let quotes=[],selected=null,activeTab='all',activeType='hurry';
+let activeCats=new Set(CATS);
+let stats={rss:0,gen:0,pub:0,rej:0};
 
+// ── LOG ──────────────────────────────────────────────────────
 function log(m,t){
   const b=document.getElementById('log');
   const d=document.createElement('div');
   const h=new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  d.className=t==='ok'?'lok':t==='err'?'lerr':t==='info'?'linf':'';
+  d.className=t==='ok'?'lok':t==='err'?'lerr':t==='info'?'linf':t==='warn'?'lwarn':'';
   d.textContent='['+h+'] '+m;
   b.appendChild(d);b.scrollTop=b.scrollHeight;
 }
-
 function upStats(){
-  document.getElementById('st-gen').textContent=stats.gen;
-  document.getElementById('st-pub').textContent=stats.pub;
-  document.getElementById('st-rss').textContent=stats.rss;
-  document.getElementById('st-rej').textContent=stats.rej;
-  document.getElementById('tb-attive').textContent=quotes.filter(x=>x.status==='published').length;
-  localStorage.setItem('quota_gest',JSON.stringify({quotes,stats}));
+  ['rss','gen','pub','rej'].forEach(k=>document.getElementById('st-'+k).textContent=stats[k]);
+  document.getElementById('tb-live').textContent=quotes.filter(q=>q.status==='published').length;
+  localStorage.setItem('qgest',JSON.stringify({quotes,stats}));
 }
 
+// ── HYPE INDEX ────────────────────────────────────────────────
+const HYPE_DATA=[
+  {cat:'Sport',   h:88,c:'#fb923c'},
+  {cat:'Finanza', h:72,c:'#f5c842'},
+  {cat:'Politica',h:65,c:'#a855f7'},
+  {cat:'Mondo',   h:58,c:'#4f8ef7'},
+  {cat:'Tech',    h:61,c:'#2dd4bf'},
+];
+function renderHypeIndex(){
+  document.getElementById('hype-bars').innerHTML=HYPE_DATA.map(h=>`
+    <div class="hm-item">
+      <div class="hm-cat">${h.cat}</div>
+      <div class="hm-bar-wrap"><div class="hm-bar" style="width:${h.h}%;background:${h.c}"></div></div>
+      <div class="hm-pct" style="color:${h.c}">${h.h}</div>
+    </div>`).join('');
+  // Micro-variazioni ogni 30s
+  setInterval(()=>{
+    HYPE_DATA.forEach(h=>{h.h=Math.min(99,Math.max(20,h.h+(Math.random()-.5)*4|0));});
+    renderHypeIndex();
+  },30000);
+}
+
+// ── CATS ─────────────────────────────────────────────────────
 function renderCats(){
   document.getElementById('cat-grid').innerHTML=CATS.map(c=>
     `<button class="cat-btn${activeCats.has(c)?' on':''}" onclick="toggleCat('${c}')">${c}</button>`
@@ -278,220 +354,312 @@ function renderCats(){
 }
 function toggleCat(c){activeCats.has(c)?activeCats.delete(c):activeCats.add(c);renderCats();}
 
-function showFeed(){
-  document.getElementById('feed-view').style.display='block';
-  document.getElementById('editor').classList.remove('show');
-  q=null;renderFeed();
+// ── FETCH RSS ────────────────────────────────────────────────
+async function fetchRSS(){
+  log('Caricamento RSS...','info');
+  try{
+    const r=await fetch(BUR+'/api/v2/modo/news?limit=30&lang=it');
+    const d=await r.json();
+    if(!d.ok)throw new Error(d.error||'Errore');
+    let n=0;
+    (d.articles||[]).forEach(a=>{
+      if(quotes.find(q=>q.sourceUrl===a.sourceUrl||q.sourceTitle===a.sourceTitle))return;
+      if(!activeCats.has(a.cat||'Mondo'))return;
+      // Calcola hype automatico basato su keyword
+      const hype=calcHype(a.sourceTitle,a.cat);
+      quotes.unshift({
+        id:'rss_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+        cat:a.cat||'Mondo',sourceTitle:a.sourceTitle,sourceDesc:a.sourceDesc||'',
+        sourceUrl:a.sourceUrl,sourceName:a.sourceName,
+        question:'',context:'',type:'hurry',qrReward:20,hype,
+        status:'pending',publishedAt:null,
+        deadline:Date.now()+24*3600000
+      });n++;
+    });
+    stats.rss+=n;upStats();renderFeed();
+    log(n+' notizie caricate · '+quotes.filter(q=>q.hype>=80).length+' ad alto hype','ok');
+  }catch(e){log('Errore RSS: '+e.message,'err');}
 }
 
+function calcHype(title,cat){
+  const t=(title||'').toLowerCase();
+  let score=40;
+  // Keyword ad alto hype
+  const hot=['morte','attacco','guerra','esplosione','crisi','elezioni','scandalo','record','bomba','breaking','urgente','sinner','inter','juve','milan','napoli','mondiali','champions','gol','scudetto','pallone','trump','meloni','draghi','spread','borsa','crollo','bce'];
+  const warm=['vince','perde','primo','ultimo','nuovo','storico','mai','sempre','oggi','domani','ora'];
+  hot.forEach(k=>{if(t.includes(k))score+=15;});
+  warm.forEach(k=>{if(t.includes(k))score+=5;});
+  if(cat==='Sport')score+=10;
+  if(cat==='Politica')score+=5;
+  return Math.min(99,Math.max(10,score));
+}
+
+// ── GENERA QUOTE CON AI ───────────────────────────────────────
+async function generateBatch(){
+  const btn=document.getElementById('btn-gen');
+  btn.disabled=true;btn.textContent='Generando...';
+
+  if(!quotes.length)await fetchRSS();
+
+  const groqKey=localStorage.getItem('quota_groq_key');
+  if(!groqKey){
+    const k=window.prompt('Groq API key:');
+    if(!k){btn.disabled=false;btn.textContent='⚡ Genera quote da RSS';return;}
+    localStorage.setItem('quota_groq_key',k.trim());
+  }
+
+  // Priorità: hype >= 70, non ancora generate
+  const toGenerate=quotes.filter(q=>!q.question&&q.hype>=60&&q.status==='pending').slice(0,6);
+
+  if(!toGenerate.length){
+    log('Nessuna notizia ad alto hype da generare. Abbassa il filtro o aggiorna RSS.','warn');
+    btn.disabled=false;btn.textContent='⚡ Genera quote da RSS';
+    return;
+  }
+
+  log('Generando '+toGenerate.length+' quote dalle notizie con hype >= 60...','info');
+
+  for(const q of toGenerate){
+    try{
+      log('→ '+q.sourceTitle.slice(0,50)+'... (hype:'+q.hype+')','info');
+      const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':'Bearer '+localStorage.getItem('quota_groq_key')},
+        body:JSON.stringify({
+          model:'llama-3.1-8b-instant',max_tokens:300,temperature:0.7,
+          messages:[
+            {role:'system',content:`Sei l'editor di QUOTA, prediction market italiano.
+Crei domande predittive che fanno venire VOGLIA di scommettere.
+La domanda deve: usare numeri specifici quando possibile, creare tensione reale, essere verificabile con data precisa.
+NON fare domande banali. Punta all'emozione.
+Esempi buoni: "Sinner farà più di 15 ace oggi?" "Il BTP supera 3.5% entro venerdì?" "Meloni parlerà di Ucraina nelle prossime 2 ore?"
+Esempi brutti: "Sinner vincerà?" "L'economia andrà bene?"
+Rispondi SOLO con JSON: {"domanda":"max 85 caratteri, intrigante","contesto":"dati/stats che aumentano tensione, max 100 caratteri","tipo":"hurry|deep|flash","ore":6,"qr":20,"hype_check":80}`},
+            {role:'user',content:'Notizia: '+q.sourceTitle+'\nFonte: '+q.sourceName+'\nDescrizione: '+(q.sourceDesc||'').slice(0,200)}
+          ]
+        })
+      });
+      const d=await r.json();
+      if(d.error)throw new Error(d.error.message);
+      const txt=d.choices?.[0]?.message?.content||'{}';
+      const m=txt.match(/\{[\s\S]*\}/);
+      if(!m)continue;
+      const g=JSON.parse(m[0]);
+      if(!g.domanda)continue;
+
+      q.question=g.domanda;
+      q.context=g.contesto||'';
+      q.type=g.tipo||'hurry';
+      q.qrReward=Math.min(200,Math.max(5,g.qr||20));
+      q.hype=Math.max(q.hype,g.hype_check||q.hype);
+      q.deadline=Date.now()+(g.ore||24)*3600000;
+      q.status='ai';
+      stats.gen++;upStats();renderFeed();
+      log('✓ '+q.question.slice(0,50),'ok');
+      await new Promise(r=>setTimeout(r,1500));
+    }catch(e){log('Errore: '+e.message,'err');}
+  }
+
+  btn.disabled=false;btn.textContent='⚡ Genera quote da RSS';
+}
+
+// ── RENDER FEED ───────────────────────────────────────────────
 function renderFeed(){
   const list=document.getElementById('feed-list');
   const empty=document.getElementById('empty');
-  if(!quotes.length){empty.style.display='flex';list.innerHTML='';return;}
+  let filtered=[...quotes];
+  if(activeTab==='ai')filtered=filtered.filter(q=>q.status==='ai');
+  if(activeTab==='hot')filtered=filtered.filter(q=>q.hype>=80);
+  if(activeTab==='live')filtered=filtered.filter(q=>q.status==='published');
+  // Ordina per hype desc
+  filtered.sort((a,b)=>b.hype-a.hype);
+  if(!filtered.length){empty.style.display='flex';list.innerHTML='';return;}
   empty.style.display='none';
-  list.innerHTML=quotes.map(x=>`
-    <div class="qrow ${x.status}${q&&q.id===x.id?' active':''}" onclick="openQ('${x.id}')">
-      <div class="qrow-inner">
-        <div class="qrow-cat">${x.cat}</div>
+
+  const hypeColor=h=>h>=85?'#ff3d5a':h>=70?'#ff8c00':h>=50?'#f5c842':'#4f8ef7';
+  list.innerHTML=filtered.map(q=>`
+    <div class="news-row ${q.status}${selected?.id===q.id?' selected':''}" onclick="selectQ('${q.id}')">
+      <div class="nr-inner">
+        <div class="nr-hype">
+          <div class="nr-hype-n" style="color:${hypeColor(q.hype)}">${q.hype}</div>
+          <div class="nr-hype-bar" style="width:${q.hype}%;background:${hypeColor(q.hype)}"></div>
+        </div>
         <div>
-          <div class="qrow-q">${x.question}</div>
-          <div class="qrow-meta">
-            <span class="qrow-src">${x.source||'Manuale'}</span>
-            <span class="qbadge ${x.status}">${x.status==='pending'?'Bozza':x.status==='published'?'Pubblicata':x.status==='ai'?'AI':'Scartata'}</span>
-            <span style="font-size:10px;color:var(--t3)">${x.pctYes||50}% Sì</span>
+          <div class="nr-cat" style="color:${hypeColor(q.hype)}">${q.cat}</div>
+          <div class="nr-title">${q.question||q.sourceTitle}</div>
+          ${q.question?`<div class="nr-q">"${q.question}"</div>`:''}
+          <div class="nr-meta">
+            <span class="nr-src">${q.sourceName||'Manuale'}</span>
+            <span class="nbadge ${q.status}">${q.status==='pending'?'Da generare':q.status==='ai'?'AI-Ready':q.status==='published'?'Live':'Scartata'}</span>
+            ${q.hype>=85?'<span class="nbadge hot">🔥 HOT</span>':''}
+            ${q.type?`<span class="nbadge" style="color:var(--t2)">${q.type}</span>`:''}
+            ${q.qrReward?`<span class="nbadge" style="color:var(--gold)">+${q.qrReward}QR</span>`:''}
           </div>
         </div>
-        <svg width="8" height="8" viewBox="0 0 10 10" fill="none" stroke="var(--t3)" stroke-width="1.5"><path d="M3 2l4 3-4 3"/></svg>
+        <div class="nr-actions">
+          ${q.status==='ai'||q.question?`<button class="nr-act-btn pub" onclick="event.stopPropagation();quickPublish('${q.id}')">✓ Live</button>`:''}
+          ${!q.question?`<button class="nr-act-btn gen" onclick="event.stopPropagation();quickGenerate('${q.id}')">⚡ Gen</button>`:''}
+          <button class="nr-act-btn rej" onclick="event.stopPropagation();quickReject('${q.id}')">✕</button>
+        </div>
       </div>
     </div>`).join('');
 }
 
-function openQ(id){
-  const x=quotes.find(q=>q.id===id);if(!x)return;
-  q=x;
-  document.getElementById('feed-view').style.display='none';
-  document.getElementById('editor').classList.add('show');
-  document.getElementById('ed-cat').value=x.cat||'Sport';
-  document.getElementById('ed-q').value=x.question||'';
-  document.getElementById('ed-ctx').value=x.context||'';
-  document.getElementById('ed-src').value=x.sourceUrl||'';
-  document.getElementById('ed-reward').value=x.reward||25;
-  document.getElementById('ed-factors').value=x.factors||'';
-  const aibox=document.getElementById('ai-box');
-  if(x.motivazione_ai){aibox.classList.add('show');aibox.textContent='📊 Analisi AI: '+x.motivazione_ai;}else{aibox.classList.remove('show');}
-  const dl=x.deadline?new Date(x.deadline).toISOString().slice(0,16):'';
-  document.getElementById('ed-deadline').value=dl;
-  updatePct(x.pctYes||50);
+// ── SELECT + EDITOR ───────────────────────────────────────────
+function selectQ(id){
+  selected=quotes.find(q=>q.id===id);if(!selected)return;
+  const ed=document.getElementById('editor');
+  ed.classList.add('show');
+  document.getElementById('ed-bar-title').textContent=(selected.question||selected.sourceTitle).slice(0,50);
+  document.getElementById('ed-q').value=selected.question||'';
+  document.getElementById('ed-ctx').value=selected.context||'';
+  document.getElementById('ed-cat').value=selected.cat||'Sport';
+  document.getElementById('ed-qr').value=selected.qrReward||20;
+  document.getElementById('hype-slider').value=selected.hype||75;
+  document.getElementById('hype-val').textContent=selected.hype||75;
+  if(selected.deadline)document.getElementById('ed-deadline').value=new Date(selected.deadline).toISOString().slice(0,16);
+  setType(selected.type||'hurry');
+  document.getElementById('ai-insight').classList.remove('show');
   renderFeed();
 }
-
-function updatePct(v){
-  v=parseInt(v);
-  document.getElementById('pct-slider').value=v;
-  document.getElementById('pct-slider').style.setProperty('--v',v+'%');
-  document.getElementById('pct-yes-big').textContent=v+'%';
-  document.getElementById('pct-no-big').textContent=(100-v)+'%';
-  if(q)q.pctYes=v;
+function closeEditor(){selected=null;document.getElementById('editor').classList.remove('show');renderFeed();}
+function setType(t){
+  activeType=t;
+  ['hurry','deep','flash'].forEach(x=>{
+    const btn=document.getElementById('t-'+x);
+    btn.classList.toggle('on',x===t);
+  });
+  if(selected)selected.type=t;
 }
 
-function saveQ(){
-  if(!q)return;
-  q.cat=document.getElementById('ed-cat').value;
-  q.question=document.getElementById('ed-q').value;
-  q.context=document.getElementById('ed-ctx').value;
-  q.pctYes=parseInt(document.getElementById('pct-slider').value);
-  q.sourceUrl=document.getElementById('ed-src').value;
-  q.reward=parseInt(document.getElementById('ed-reward').value)||25;
-  q.factors=document.getElementById('ed-factors').value;
+// ── AZIONI RAPIDE ─────────────────────────────────────────────
+function saveEditor(){
+  if(!selected)return;
+  selected.question=document.getElementById('ed-q').value;
+  selected.context=document.getElementById('ed-ctx').value;
+  selected.cat=document.getElementById('ed-cat').value;
+  selected.qrReward=parseInt(document.getElementById('ed-qr').value)||20;
+  selected.hype=parseInt(document.getElementById('hype-slider').value)||75;
+  selected.type=activeType;
   const dl=document.getElementById('ed-deadline').value;
-  if(dl)q.deadline=new Date(dl).getTime();
-  upStats();renderFeed();
-  log('Salvata: '+q.question.slice(0,40),'ok');
+  if(dl)selected.deadline=new Date(dl).getTime();
 }
 
 async function publishQ(){
-  if(!q)return;saveQ();
-  if(!q.question){alert('Inserisci la domanda');return;}
+  saveEditor();if(!selected?.question){alert('Inserisci la domanda');return;}
+  selected.status='published';selected.publishedAt=new Date().toISOString();
+  stats.pub++;upStats();
+  // Salva sul backend
   try{
-    const r=await fetch(BUR+'/api/v2/quota/card',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({id:q.id,categoria:q.cat,domanda:q.question,contesto:q.context,pct_si:q.pctYes,deadline:new Date(q.deadline||Date.now()+86400000).toISOString(),reward:q.reward,source_url:q.sourceUrl})
-    });
-    const d=await r.json();
-    if(d.ok){log('✓ Pubblicata sul sito: '+q.question.slice(0,40),'ok');q.status='published';stats.pub++;upStats();renderFeed();showFeed();}
-    else{log('Errore backend: '+d.error,'err');q.status='published';stats.pub++;upStats();renderFeed();showFeed();}
-  }catch(e){log('Backend offline - salvata localmente','info');q.status='published';stats.pub++;upStats();renderFeed();showFeed();}
+    await fetch(BUR+'/api/v2/quota/card',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({id:selected.id,categoria:selected.cat,domanda:selected.question,contesto:selected.context,pct_si:50,deadline:new Date(selected.deadline||Date.now()+86400000).toISOString(),reward:selected.qrReward,source_url:selected.sourceUrl||''})});
+    log('✓ LIVE: '+selected.question.slice(0,50),'ok');
+  }catch(e){log('Backend offline — salvato locale','warn');}
+  renderFeed();
 }
 
-function rejectQ(){
-  if(!q)return;q.status='rejected';stats.rej++;upStats();renderFeed();showFeed();
-  log('Scartata: '+q.question.slice(0,40),'info');
+async function publishFlash(){
+  saveEditor();if(!selected?.question)return;
+  selected.type='flash';await publishQ();
+  log('⚡ Pubblicata come Flash Event!','ok');
 }
 
-function newManual(){
-  const newQ={id:'m'+Date.now(),cat:'Sport',question:'',context:'',pctYes:50,reward:25,deadline:Date.now()+86400000,status:'pending',source:'Manuale'};
-  quotes.unshift(newQ);upStats();renderFeed();openQ(newQ.id);
-}
+function rejectQ(){if(!selected)return;selected.status='rejected';stats.rej++;upStats();closeEditor();log('Scartata','info');}
 
-async function fetchFromRSS(){
-  log('Aggiornamento RSS...','info');
-  try{
-    const r=await fetch(BUR+'/api/v2/modo/news?limit=20&lang=it');
-    const d=await r.json();
-    if(!d.ok)throw new Error(d.error);
-    const nuove=d.articles.filter(a=>!quotes.find(q=>q.sourceUrl===a.sourceUrl)).slice(0,10);
-    nuove.forEach(a=>{
-      quotes.unshift({id:'rss'+a.id,cat:a.cat||'Mondo',question:'',context:'',pctYes:50,reward:20,deadline:Date.now()+86400000,status:'pending',source:a.sourceName,sourceUrl:a.sourceUrl,sourceTitle:a.sourceTitle,sourceDesc:a.sourceDesc});
-    });
-    stats.rss+=nuove.length;upStats();renderFeed();
-    log(nuove.length+' notizie caricate','ok');
-  }catch(e){log('Errore RSS: '+e.message,'err');}
+function quickPublish(id){
+  const q=quotes.find(x=>x.id===id);if(!q||!q.question)return;
+  q.status='published';stats.pub++;upStats();renderFeed();
+  log('✓ Live: '+q.question.slice(0,40),'ok');
 }
+function quickReject(id){const q=quotes.find(x=>x.id===id);if(!q)return;q.status='rejected';stats.rej++;upStats();renderFeed();}
 
-async function generateQuote(){
-  const btn=document.getElementById('btn-gen');
-  btn.disabled=true;btn.textContent='Generando...';
+async function quickGenerate(id){
+  const q=quotes.find(x=>x.id===id);if(!q)return;
   const groqKey=localStorage.getItem('quota_groq_key');
-  if(!groqKey){
-    const k=window.prompt('Groq API key:');
-    if(!k){btn.disabled=false;btn.textContent='⚡ Genera da RSS';return;}
-    localStorage.setItem('quota_groq_key',k.trim());
-  }
-
-  // Prendi notizie non ancora convertite in quote
-  const pending=quotes.filter(x=>!x.question&&x.sourceTitle).slice(0,3);
-  if(!pending.length){await fetchFromRSS();btn.disabled=false;btn.textContent='⚡ Genera da RSS';return;}
-
-  for(const rss of pending){
-    try{
-      log('Generando quota da: '+rss.sourceTitle.slice(0,40)+'...','info');
-      const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
-        method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+localStorage.getItem('quota_groq_key')},
-        body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:300,temperature:0.6,messages:[
-          {role:'system',content:'Sei un editor di QUOTA, prediction market italiano. Trasforma la notizia in una domanda predittiva INTRIGANTE e SCOMMETTIBILE. La domanda deve: 1) essere verificabile con una data precisa 2) creare tensione tra due possibilità reali 3) usare numeri o soglie specifiche quando possibile (es: "sopra il 3%", "entro 7 giorni"). NON inventare dati. NON mettere percentuali. Rispondi SOLO con JSON: {"domanda":"domanda max 90 caratteri - deve essere intrigante","contesto":"contesto che spiega perché è rilevante, max 120 caratteri","motivazione_ai":"analisi breve del perché questa previsione è interessante, max 150 caratteri","categoria":"Sport|Finanza|Politica|Mondo|Tech","ore":24,"reward":20}'},
-          {role:'user',content:rss.sourceTitle+'. '+(rss.sourceDesc||'')}
-        ]})
-      });
-      const rd=await r.json();
-      if(rd.error)throw new Error(rd.error.message);
-      const txt=rd.choices?.[0]?.message?.content||'{}';
-      const m=txt.match(/\{[\s\S]*\}/);
-      if(!m)continue;
-      const g=JSON.parse(m[0]);
-      rss.question=g.domanda||'';
-      rss.motivazione_ai=g.motivazione_ai||'';
-      rss.context=g.contesto||'';
-      rss.pctYes=Math.min(90,Math.max(10,g.pct_si||50));
-      rss.cat=g.categoria||rss.cat;
-      rss.reward=g.reward||20;
-      rss.deadline=Date.now()+(g.ore||24)*3600000;
-      rss.status='ai';
-      stats.gen++;upStats();renderFeed();
-      log('✓ Quota generata: '+rss.question.slice(0,40),'ok');
-      await new Promise(r=>setTimeout(r,2000));
-    }catch(e){log('Errore generazione: '+e.message,'err');}
-  }
-  btn.disabled=false;btn.textContent='⚡ Genera da RSS';
-}
-
-async function aiSuggestPct(){
-  if(!q)return;
-  const groqKey=localStorage.getItem('quota_groq_key');
-  if(!groqKey)return;
-  const box=document.getElementById('ai-box');
-  box.classList.add('show');box.textContent='AI sta calcolando la percentuale...';
+  if(!groqKey){log('Configura Groq key','err');return;}
+  log('Generando: '+q.sourceTitle.slice(0,40)+'...','info');
   try{
     const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},
-      body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:150,temperature:0.4,messages:[
-        {role:'system',content:'Sei un analista quantitativo. Stima la probabilità di base (prior) per questa previsione basandoti su dati storici e contesto. Questa sarà la % di partenza - poi il mercato la farà muovere. Rispondi SOLO con JSON: {"pct":70,"motivazione":"spiegazione max 100 caratteri","range_min":55,"range_max":80}'},
-        {role:'user',content:'Domanda: '+q.question+'. Contesto: '+q.context}
-      ]})
+      body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:200,temperature:0.7,
+        messages:[
+          {role:'system',content:'Crea una domanda predittiva intrigante per un prediction market. Rispondi SOLO JSON: {"domanda":"max 85 caratteri","contesto":"max 100 caratteri","qr":20,"ore":24}'},
+          {role:'user',content:q.sourceTitle+'. '+q.sourceDesc}
+        ]})
     });
     const d=await r.json();
     const txt=d.choices?.[0]?.message?.content||'{}';
     const m=txt.match(/\{[\s\S]*\}/);
-    if(m){const g=JSON.parse(m[0]);updatePct(g.pct||50);box.classList.add('show');box.textContent='Prior AI: '+g.pct+'% (range '+g.range_min+'-'+g.range_max+'%) · '+g.motivazione+' · La % reale si calibrerà con i voti della community.';}
-  }catch(e){box.textContent='Errore: '+e.message;}
+    if(m){
+      const g=JSON.parse(m[0]);
+      q.question=g.domanda||'';q.context=g.contesto||'';q.qrReward=g.qr||20;
+      q.deadline=Date.now()+(g.ore||24)*3600000;q.status='ai';
+      stats.gen++;upStats();renderFeed();
+      log('✓ '+q.question.slice(0,40),'ok');
+    }
+  }catch(e){log('Errore: '+e.message,'err');}
 }
 
-async function aiSuggestFactors(){
-  if(!q)return;
+function publishAll(){
+  const toPublish=quotes.filter(q=>q.status==='ai'&&q.question);
+  toPublish.forEach(q=>{q.status='published';stats.pub++;});
+  upStats();renderFeed();
+  log('✓ Pubblicate '+toPublish.length+' quote AI-ready','ok');
+}
+
+function rejectAll(){
+  const toLow=quotes.filter(q=>q.status==='pending'&&!q.question&&q.hype<50);
+  toLow.forEach(q=>{q.status='rejected';stats.rej++;});
+  upStats();renderFeed();
+  log('Scartate '+toLow.length+' notizie a basso hype','info');
+}
+
+// ── AI ANALYZE ────────────────────────────────────────────────
+async function aiAnalyze(){
+  if(!selected)return;
   const groqKey=localStorage.getItem('quota_groq_key');
   if(!groqKey)return;
-  const ta=document.getElementById('ed-factors');
-  ta.value='AI sta analizzando...';
+  const box=document.getElementById('ai-insight');
+  box.classList.add('show');box.textContent='Analisi in corso...';
   try{
     const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},
-      body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:400,temperature:0.5,messages:[
-        {role:'system',content:'Sei un analista. Elenca 3 fattori PRO SÌ e 3 PRO NO per questa previsione. Formato: PRO SÌ: [fattore]. PRO NO: [fattore]. Massimo 15 parole per fattore.'},
-        {role:'user',content:'Previsione: '+q.question+' ('+q.pctYes+'% Sì). Contesto: '+q.context}
-      ]})
+      body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:300,temperature:0.5,
+        messages:[
+          {role:'system',content:'Sei un esperto di prediction market. Analizza questa quota e dai feedback conciso su: 1) Se la domanda è intrigante e scommettibile 2) Hype score suggerito (1-100) 3) Timing ottimale 4) QR premio consigliato. Max 150 parole.'},
+          {role:'user',content:'Quota: '+selected.question+'\nContesto: '+selected.context+'\nCategoria: '+selected.cat+'\nHype attuale: '+selected.hype}
+        ]})
     });
     const d=await r.json();
-    ta.value=d.choices?.[0]?.message?.content||'';
-    if(q)q.factors=ta.value;
-  }catch(e){ta.value='Errore: '+e.message;}
+    box.textContent=d.choices?.[0]?.message?.content||'Analisi non disponibile';
+  }catch(e){box.textContent='Errore: '+e.message;}
 }
 
+// ── RESOLVE ───────────────────────────────────────────────────
+function openResolve(){
+  if(!selected)return;
+  const esito=confirm('La previsione "'+selected.question+'" si è avverata?\n\nOK = SÌ si è avverata\nAnnulla = NO non si è avverata');
+  resolveQ(esito?'si':'no');
+}
 async function resolveQ(esito){
-  if(!q)return;
-  if(!confirm('Chiudi questa quota con esito: '+esito.toUpperCase()+'?'))return;
+  if(!selected)return;
   try{
-    const r=await fetch(BUR+'/api/v2/quota/resolve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({card_id:q.id,esito})});
+    const r=await fetch(BUR+'/api/v2/quota/resolve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({card_id:selected.id,esito})});
     const d=await r.json();
-    if(d.ok){log('✓ Quota chiusa. Vincitori: '+d.vincitori+' (+'+d.reward_distribuito+' cr totali)','ok');q.status='rejected';upStats();renderFeed();showFeed();}
-    else log('Errore: '+d.error,'err');
-  }catch(e){log('Errore resolve: '+e.message,'err');}
+    if(d.ok)log('🏁 Chiusa: '+d.vincitori+' vincitori, '+d.perdenti+' perdenti · +'+d.reward_distribuito+' QR distribuiti','ok');
+    else log('Errore resolve: '+d.error,'err');
+  }catch(e){log('Backend offline','warn');}
+  selected.status='rejected';upStats();closeEditor();
 }
 
-function previewQ(){
-  if(!q)return;
-  window.open('quota.html','_blank');
+// ── TAB ───────────────────────────────────────────────────────
+function switchTab(t){
+  activeTab=t;
+  document.querySelectorAll('.news-tab').forEach((b,i)=>b.classList.toggle('on',['all','ai','hot','live'][i]===t));
+  renderFeed();
 }
 
-// CHAT
+// ── CHAT ─────────────────────────────────────────────────────
 async function sendChat(){
   const ta=document.getElementById('chat-ta');
   const msg=ta.value.trim();if(!msg)return;
@@ -499,44 +667,48 @@ async function sendChat(){
   btn.disabled=true;addMsg('user',msg);ta.value='';
   const typing=addMsg('ai','...');
   const groqKey=localStorage.getItem('quota_groq_key');
-  if(!groqKey){typing.querySelector('.bubble').textContent='Configura la Groq key.';btn.disabled=false;return;}
-  const ctx=q?('Quota attiva: '+q.question+' ('+q.pctYes+'% Sì, cat: '+q.cat+')'):'';
+  if(!groqKey){typing.querySelector('.bubble').textContent='Configura Groq key.';btn.disabled=false;return;}
+  const ctx=selected?('Quota selezionata: '+selected.question+' (hype:'+selected.hype+', cat:'+selected.cat+')'):
+    ('Notizie caricate: '+quotes.length+', AI-ready: '+quotes.filter(q=>q.status==='ai').length+', Hot: '+quotes.filter(q=>q.hype>=80).length);
   try{
     const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
       method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},
-      body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:400,temperature:0.4,messages:[
-        {role:'system',content:'Sei un assistente per la redazione di QUOTA, prediction market italiano. Aiuti a creare domande predittive accurate, suggerisci percentuali calibrate e analizzi fattori pro/contro. Rispondi in italiano, diretto e professionale.'+(ctx?' Contesto: '+ctx:'')},
-        {role:'user',content:msg}
-      ]})
+      body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:400,temperature:0.4,
+        messages:[
+          {role:'system',content:'Sei l\'assistente del gestionale QUOTA, prediction market italiano. Aiuti a creare domande predittive ad alto engagement, calcolare hype score, ottimizzare timing e QR prize. Rispondi in italiano, diretto e professionale. '+ctx},
+          {role:'user',content:msg}
+        ]})
     });
     const d=await r.json();
     if(d.error)throw new Error(d.error.message);
-    const reply=d.choices?.[0]?.message?.content||'';
-    typing.querySelector('.bubble').innerHTML=reply.replace(/\n/g,'<br>');
+    typing.querySelector('.bubble').innerHTML=(d.choices?.[0]?.message?.content||'').replace(/\n/g,'<br>');
   }catch(e){typing.querySelector('.bubble').textContent='Errore: '+e.message;}
   btn.disabled=false;
   document.getElementById('chat-msgs').scrollTop=99999;
 }
-
 function addMsg(role,text){
   const c=document.getElementById('chat-msgs');
   const t=new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
-  const div=document.createElement('div');
-  div.className='cmsg '+role;
+  const div=document.createElement('div');div.className='cmsg '+role;
   div.innerHTML='<div class="bubble">'+text+'</div><div class="ctime">'+(role==='user'?'Tu':'QUOTA AI')+' · '+t+'</div>';
-  c.appendChild(div);c.scrollTop=c.scrollHeight;
-  return div;
+  c.appendChild(div);c.scrollTop=c.scrollHeight;return div;
 }
-
 function qc(m){document.getElementById('chat-ta').value=m;sendChat();}
 function ckd(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}}
 
-// INIT
-renderCats();renderFeed();
-const saved=JSON.parse(localStorage.getItem('quota_gest')||'{}');
-if(saved.quotes?.length){quotes=saved.quotes;if(saved.stats)stats=saved.stats;upStats();renderFeed();}
-log('Gestionale QUOTA pronto.','ok');
-setInterval(()=>document.getElementById('tb-voti').textContent=Math.floor(Math.random()*50+100),30000);
+// ── SIMULA VOTI LIVE ──────────────────────────────────────────
+function simulateActivity(){
+  const n=Math.floor(Math.random()*50+80);
+  document.getElementById('tb-voti').textContent=n;
+  document.getElementById('tb-top').textContent='Top 1%: '+Math.round(850+Math.random()*50)+' QR';
+}
+
+// ── INIT ─────────────────────────────────────────────────────
+const saved=JSON.parse(localStorage.getItem('qgest')||'{}');
+if(saved.quotes?.length){quotes=saved.quotes;if(saved.stats)stats=saved.stats;}
+renderCats();renderHypeIndex();renderFeed();upStats();simulateActivity();
+setInterval(simulateActivity,15000);
+log('Gestionale QUOTA pronto. Premi "Genera quote da RSS" per iniziare.','ok');
 </script>
 </body>
 </html>
