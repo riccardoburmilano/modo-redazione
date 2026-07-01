@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QUOTA · Gestionale</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#08080f;--s1:#0f0f1a;--s2:#161625;
+  --b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.1);
+  --gold:#f5c842;--gd:rgba(245,200,66,.08);
+  --green:#00e87a;--red:#ff3d5a;--purple:#a855f7;--blue:#4f8ef7;
+  --text:#f0efe8;--t2:#808080;--t3:#404040;
+  --g:'Inter',sans-serif;--sg:'Space Grotesk',sans-serif;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--g);font-size:13px}
+.app{display:grid;grid-template-columns:240px 1fr 320px;grid-template-rows:52px 1fr;height:100vh;overflow:hidden}
+
+/* TOPBAR */
+.topbar{grid-column:1/-1;background:rgba(8,8,15,.95);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 16px;gap:12px}
+.tb-logo{font-family:var(--sg);font-size:17px;font-weight:800;background:linear-gradient(135deg,#fff,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.tb-sep{width:1px;height:14px;background:var(--b1)}
+.tb-label{font-size:11px;color:var(--t3);font-weight:500}
+.tb-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.tb-stat{font-size:10px;padding:4px 10px;border:1px solid var(--b1);background:rgba(255,255,255,.03);color:var(--t2)}
+.tb-stat span{color:var(--gold);font-weight:700;font-family:var(--sg)}
+.tb-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+
+/* LEFT */
+.left{background:rgba(10,10,18,.8);border-right:1px solid var(--b1);display:flex;flex-direction:column;overflow:hidden}
+.left-body{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:14px}
+.ls-title{font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--t3);margin-bottom:6px}
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.cat-btn{font-size:10px;font-weight:600;padding:6px 8px;background:rgba(255,255,255,.04);border:1px solid var(--b1);color:var(--t3);cursor:pointer;transition:all .12s;text-align:center;border-radius:4px}
+.cat-btn.on{border-color:var(--gold);color:var(--gold);background:var(--gd)}
+.btn-gen{width:100%;padding:10px;background:var(--purple);border:none;color:#fff;font-size:11px;font-weight:700;cursor:pointer;transition:opacity .15s;border-radius:4px;font-family:var(--sg)}
+.btn-gen:hover{opacity:.88}
+.btn-gen:disabled{opacity:.4}
+.btn-sec{width:100%;padding:7px;background:rgba(255,255,255,.04);border:1px solid var(--b1);color:var(--t2);font-size:10px;font-weight:500;cursor:pointer;border-radius:4px;margin-top:3px;transition:all .12s}
+.btn-sec:hover{border-color:var(--green);color:var(--green)}
+.stat-mini{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.sm{background:rgba(255,255,255,.04);border:1px solid var(--b1);padding:8px;border-radius:4px}
+.sm-n{font-family:var(--sg);font-size:18px;font-weight:800;color:var(--gold);line-height:1}
+.sm-l{font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-top:2px}
+.log{background:rgba(0,0,0,.4);border:1px solid var(--b1);padding:6px;font-size:9px;line-height:1.7;max-height:120px;overflow-y:auto;font-family:monospace;color:var(--t3);border-radius:4px}
+.lok{color:var(--green)}.lerr{color:var(--red)}.linf{color:var(--gold)}
+
+/* CENTER */
+.center{overflow-y:auto;background:var(--bg)}
+.day-sep{padding:6px 14px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--b1);font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);position:sticky;top:0;z-index:10}
+.qrow{border-bottom:1px solid var(--b1);cursor:pointer;transition:background .1s}
+.qrow:hover{background:rgba(255,255,255,.02)}
+.qrow.active{background:var(--gd);border-left:2px solid var(--gold)}
+.qrow.published{border-left:2px solid var(--green)}
+.qrow.rejected{opacity:.3}
+.qrow-inner{padding:11px 14px;display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:start}
+.qrow-cat{font-size:8px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);padding-top:2px;white-space:nowrap}
+.qrow-q{font-family:var(--sg);font-size:13px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:3px}
+.qrow-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.qrow-src{font-size:10px;color:var(--t2)}
+.qbadge{font-size:8px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:1px 5px;border:1px solid currentColor;border-radius:2px}
+.qbadge.pending{color:var(--gold)}.qbadge.published{color:var(--green)}.qbadge.rejected{color:var(--red)}.qbadge.ai{color:var(--purple)}
+.empty-c{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px;color:var(--t3);padding:40px}
+.empty-ct{font-family:var(--sg);font-size:16px;color:var(--t2)}
+
+/* EDITOR */
+.editor{display:none;flex-direction:column;height:100%}
+.editor.show{display:flex}
+.ed-bar{border-bottom:1px solid var(--b1);padding:8px 14px;display:flex;align-items:center;gap:6px;flex-shrink:0;background:rgba(10,10,18,.8)}
+.ed-back{font-size:10px;font-weight:500;color:var(--t2);cursor:pointer;padding:4px 8px;border:1px solid var(--b1);background:rgba(255,255,255,.04);border-radius:3px;transition:all .12s}
+.ed-back:hover{border-color:var(--b2);color:var(--text)}
+.ed-bar-right{margin-left:auto;display:flex;gap:5px}
+.ed-body{flex:1;overflow-y:auto;padding:16px}
+.ed-field{margin-bottom:12px}
+.ed-label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--t3);margin-bottom:5px}
+.ed-input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--b1);color:var(--text);font-size:13px;padding:8px 10px;outline:none;font-family:var(--sg);font-weight:700;border-radius:4px;transition:border-color .12s}
+.ed-input:focus{border-color:rgba(245,200,66,.3)}
+.ed-input.sm{font-size:12px;font-family:var(--g);font-weight:400}
+.ed-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pct-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.pct-yes{font-family:var(--sg);font-size:32px;font-weight:900;color:var(--green)}
+.pct-no{font-family:var(--sg);font-size:24px;font-weight:800;color:var(--red)}
+.pct-slider{flex:1;-webkit-appearance:none;height:6px;border-radius:3px;background:linear-gradient(90deg,rgba(0,232,122,.3) 0%,rgba(0,232,122,.3) var(--v,71%),rgba(255,61,90,.3) var(--v,71%),rgba(255,61,90,.3) 100%);outline:none}
+.pct-slider::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--gold);cursor:pointer;border:2px solid var(--bg);box-shadow:0 0 8px rgba(245,200,66,.4)}
+.ai-box{background:rgba(168,85,247,.06);border:1px solid rgba(168,85,247,.15);padding:12px;border-radius:6px;margin-bottom:12px;font-size:11px;color:rgba(168,85,247,.8);line-height:1.6;display:none}
+.ai-box.show{display:block}
+.ed-bottom{border-top:1px solid var(--b1);padding:8px 12px;background:rgba(10,10,18,.8);display:flex;align-items:center;gap:5px;flex-shrink:0;flex-wrap:wrap}
+.ed-btn{font-size:10px;font-weight:600;padding:6px 12px;background:rgba(255,255,255,.04);border:1px solid var(--b1);color:var(--t2);cursor:pointer;border-radius:3px;transition:all .12s;font-family:var(--g)}
+.ed-btn:hover{border-color:var(--b2);color:var(--text)}
+.ed-save{margin-left:auto;padding:7px 16px;background:var(--gold);border:none;color:#000;font-size:10px;font-weight:800;cursor:pointer;border-radius:3px;font-family:var(--sg)}
+.ed-pub{padding:7px 16px;background:var(--green);border:none;color:#000;font-size:10px;font-weight:800;cursor:pointer;border-radius:3px;font-family:var(--sg)}
+.ed-reject{padding:7px 12px;background:rgba(255,61,90,.1);border:1px solid rgba(255,61,90,.2);color:var(--red);font-size:10px;font-weight:700;cursor:pointer;border-radius:3px}
+
+/* CHAT */
+.right{background:rgba(10,10,18,.8);border-left:1px solid var(--b1);display:flex;flex-direction:column;overflow:hidden}
+.chat-hdr{padding:12px 14px;border-bottom:1px solid var(--b1);flex-shrink:0}
+.chat-hdr-t{font-family:var(--sg);font-size:13px;font-weight:700;margin-bottom:1px}
+.chat-hdr-s{font-size:10px;color:var(--t3)}
+.chat-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.cmsg.user{align-self:flex-end;max-width:88%}
+.cmsg.ai{align-self:flex-start;max-width:94%}
+.bubble{padding:8px 11px;font-size:12px;line-height:1.6;border-radius:8px}
+.cmsg.user .bubble{background:var(--purple);color:#fff}
+.cmsg.ai .bubble{background:rgba(255,255,255,.05);border:1px solid var(--b1);color:var(--text)}
+.ctime{font-size:8px;color:var(--t3);margin-top:2px;padding:0 2px}
+.chat-quick{display:flex;flex-wrap:wrap;gap:3px;padding:0 12px 6px}
+.qbtn{font-size:9px;background:rgba(255,255,255,.04);border:1px solid var(--b1);color:var(--t3);padding:3px 8px;cursor:pointer;border-radius:10px;transition:all .12s}
+.qbtn:hover{border-color:var(--gold);color:var(--gold)}
+.chat-foot{padding:8px 12px;border-top:1px solid var(--b1);display:flex;gap:5px;flex-shrink:0}
+.chat-ta{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--b1);color:var(--text);font-size:12px;padding:7px 9px;resize:none;outline:none;min-height:34px;max-height:80px;font-family:var(--g);line-height:1.5;border-radius:4px;transition:border-color .12s}
+.chat-ta:focus{border-color:rgba(245,200,66,.3)}
+.chat-send{background:var(--gold);border:none;color:#000;font-size:11px;font-weight:800;padding:7px 11px;cursor:pointer;border-radius:4px;font-family:var(--sg)}
+.chat-send:disabled{opacity:.4}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="tb-logo">QUOTA · Gestionale</div>
+    <div class="tb-sep"></div>
+    <div class="tb-label">Redazione predittiva</div>
+    <div class="tb-right">
+      <div class="tb-stat">Quote attive: <span id="tb-attive">0</span></div>
+      <div class="tb-stat">Voti oggi: <span id="tb-voti">—</span></div>
+      <div class="tb-dot"></div>
+    </div>
+  </header>
+
+  <!-- LEFT -->
+  <aside class="left">
+    <div class="left-body">
+      <div>
+        <div class="ls-title">Genera quote</div>
+        <div class="cat-grid" id="cat-grid"></div>
+      </div>
+      <div>
+        <button class="btn-gen" id="btn-gen" onclick="generateQuote()">⚡ Genera da RSS</button>
+        <button class="btn-sec" onclick="newManual()">+ Crea manuale</button>
+        <button class="btn-sec" onclick="fetchFromRSS()">↓ Aggiorna notizie</button>
+      </div>
+      <div>
+        <div class="ls-title">Sessione</div>
+        <div class="stat-mini">
+          <div class="sm"><div class="sm-n" id="st-gen">0</div><div class="sm-l">Generate</div></div>
+          <div class="sm"><div class="sm-n" id="st-pub" style="color:var(--green)">0</div><div class="sm-l">Pubblicate</div></div>
+          <div class="sm"><div class="sm-n" id="st-rss">0</div><div class="sm-l">Da RSS</div></div>
+          <div class="sm"><div class="sm-n" id="st-rej" style="color:var(--red)">0</div><div class="sm-l">Scartate</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="ls-title">Log</div>
+        <div class="log" id="log"></div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- CENTER -->
+  <main class="center" id="center">
+    <div id="feed-view">
+      <div class="empty-c" id="empty">
+        <div class="empty-ct">Nessuna quota</div>
+        <div style="font-size:12px">Premi "Genera da RSS" per creare quote automaticamente.</div>
+      </div>
+      <div id="feed-list"></div>
+    </div>
+    <div class="editor" id="editor">
+      <div class="ed-bar">
+        <button class="ed-back" onclick="showFeed()">← Lista</button>
+        <div class="ed-bar-right">
+          <button class="ed-btn" onclick="aiSuggestPct()">🧠 AI Suggerisci %</button>
+          <button class="ed-btn" onclick="aiSuggestFactors()">📊 Fattori pro/contro</button>
+        </div>
+      </div>
+      <div class="ed-body">
+        <div class="ed-field">
+          <div class="ed-label">Categoria</div>
+          <select class="ed-input sm" id="ed-cat">
+            <option>Sport</option><option>Finanza</option><option>Politica</option><option>Mondo</option><option>Tech</option>
+          </select>
+        </div>
+        <div class="ed-field">
+          <div class="ed-label">Domanda predittiva</div>
+          <input class="ed-input" id="ed-q" type="text" placeholder="Es: Sinner vince Wimbledon?">
+        </div>
+        <div class="ed-field">
+          <div class="ed-label">Contesto (max 120 car)</div>
+          <input class="ed-input sm" id="ed-ctx" type="text" placeholder="Breve contesto per l'utente...">
+        </div>
+        <div class="ed-field">
+          <div class="ed-label">Probabilità SÌ</div>
+          <div class="pct-row">
+            <div class="pct-yes" id="pct-yes-big">50%</div>
+            <input type="range" class="pct-slider" id="pct-slider" min="5" max="95" value="50" oninput="updatePct(this.value)">
+            <div class="pct-no" id="pct-no-big">50%</div>
+          </div>
+        </div>
+        <div class="ed-row">
+          <div class="ed-field">
+            <div class="ed-label">Scadenza</div>
+            <input class="ed-input sm" id="ed-deadline" type="datetime-local">
+          </div>
+          <div class="ed-field">
+            <div class="ed-label">Premio crediti</div>
+            <input class="ed-input sm" id="ed-reward" type="number" value="25" min="5" max="200">
+          </div>
+        </div>
+        <div class="ed-field">
+          <div class="ed-label">Fonte originale</div>
+          <input class="ed-input sm" id="ed-src" type="text" placeholder="URL notizia originale...">
+        </div>
+        <div class="ai-box" id="ai-box"></div>
+        <div class="ed-field">
+          <div class="ed-label">Fattori AI (pro/contro)</div>
+          <textarea class="ed-input sm" id="ed-factors" rows="4" placeholder="L'AI inserirà qui i fattori che spiegano la percentuale..."></textarea>
+        </div>
+      </div>
+      <div class="ed-bottom">
+        <button class="ed-reject" onclick="rejectQ()">✕ Scarta</button>
+        <button class="ed-btn" onclick="previewQ()">👁 Anteprima</button>
+        <button class="ed-save" onclick="saveQ()">Salva</button>
+        <button class="ed-pub" onclick="publishQ()">✓ Pubblica</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- RIGHT CHAT -->
+  <aside class="right">
+    <div class="chat-hdr">
+      <div class="chat-hdr-t">Assistente QUOTA</div>
+      <div class="chat-hdr-s">Analisi · % · Fattori · Verifica</div>
+    </div>
+    <div class="chat-msgs" id="chat-msgs">
+      <div class="cmsg ai"><div class="bubble">Ciao. Genera una quota da RSS o apri una quota esistente per analizzarla. Posso suggerire la percentuale giusta, i fattori pro/contro e verificare la coerenza della domanda.</div><div class="ctime">QUOTA AI</div></div>
+    </div>
+    <div class="chat-quick">
+      <button class="qbtn" onclick="qc('Suggerisci la percentuale giusta per questa quota')">📊 % giusta</button>
+      <button class="qbtn" onclick="qc('Elenca 3 fattori pro Sì e 3 pro No')">⚖️ Fattori</button>
+      <button class="qbtn" onclick="qc('La domanda è chiara e verificabile?')">✓ Verifica</button>
+      <button class="qbtn" onclick="qc('Quando scade questa notizia? Che deadline suggerisci?')">⏱ Deadline</button>
+    </div>
+    <div class="chat-foot">
+      <textarea class="chat-ta" id="chat-ta" rows="2" placeholder="Scrivi..." onkeydown="ckd(event)"></textarea>
+      <button class="chat-send" id="chat-send" onclick="sendChat()">→</button>
+    </div>
+  </aside>
+</div>
+
+<script>
+const BUR='https://god-core-backend.onrender.com';
+const CATS=['Sport','Finanza','Politica','Mondo','Tech'];
+let quotes=[],q=null,stats={gen:0,pub:0,rss:0,rej:0};
+let activeCats=new Set(['Sport','Finanza','Politica','Mondo','Tech']);
+
+function log(m,t){
+  const b=document.getElementById('log');
+  const d=document.createElement('div');
+  const h=new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  d.className=t==='ok'?'lok':t==='err'?'lerr':t==='info'?'linf':'';
+  d.textContent='['+h+'] '+m;
+  b.appendChild(d);b.scrollTop=b.scrollHeight;
+}
+
+function upStats(){
+  document.getElementById('st-gen').textContent=stats.gen;
+  document.getElementById('st-pub').textContent=stats.pub;
+  document.getElementById('st-rss').textContent=stats.rss;
+  document.getElementById('st-rej').textContent=stats.rej;
+  document.getElementById('tb-attive').textContent=quotes.filter(x=>x.status==='published').length;
+  localStorage.setItem('quota_gest',JSON.stringify({quotes,stats}));
+}
+
+function renderCats(){
+  document.getElementById('cat-grid').innerHTML=CATS.map(c=>
+    `<button class="cat-btn${activeCats.has(c)?' on':''}" onclick="toggleCat('${c}')">${c}</button>`
+  ).join('');
+}
+function toggleCat(c){activeCats.has(c)?activeCats.delete(c):activeCats.add(c);renderCats();}
+
+function showFeed(){
+  document.getElementById('feed-view').style.display='block';
+  document.getElementById('editor').classList.remove('show');
+  q=null;renderFeed();
+}
+
+function renderFeed(){
+  const list=document.getElementById('feed-list');
+  const empty=document.getElementById('empty');
+  if(!quotes.length){empty.style.display='flex';list.innerHTML='';return;}
+  empty.style.display='none';
+  list.innerHTML=quotes.map(x=>`
+    <div class="qrow ${x.status}${q&&q.id===x.id?' active':''}" onclick="openQ('${x.id}')">
+      <div class="qrow-inner">
+        <div class="qrow-cat">${x.cat}</div>
+        <div>
+          <div class="qrow-q">${x.question}</div>
+          <div class="qrow-meta">
+            <span class="qrow-src">${x.source||'Manuale'}</span>
+            <span class="qbadge ${x.status}">${x.status==='pending'?'Bozza':x.status==='published'?'Pubblicata':x.status==='ai'?'AI':'Scartata'}</span>
+            <span style="font-size:10px;color:var(--t3)">${x.pctYes||50}% Sì</span>
+          </div>
+        </div>
+        <svg width="8" height="8" viewBox="0 0 10 10" fill="none" stroke="var(--t3)" stroke-width="1.5"><path d="M3 2l4 3-4 3"/></svg>
+      </div>
+    </div>`).join('');
+}
+
+function openQ(id){
+  const x=quotes.find(q=>q.id===id);if(!x)return;
+  q=x;
+  document.getElementById('feed-view').style.display='none';
+  document.getElementById('editor').classList.add('show');
+  document.getElementById('ed-cat').value=x.cat||'Sport';
+  document.getElementById('ed-q').value=x.question||'';
+  document.getElementById('ed-ctx').value=x.context||'';
+  document.getElementById('ed-src').value=x.sourceUrl||'';
+  document.getElementById('ed-reward').value=x.reward||25;
+  document.getElementById('ed-factors').value=x.factors||'';
+  const dl=x.deadline?new Date(x.deadline).toISOString().slice(0,16):'';
+  document.getElementById('ed-deadline').value=dl;
+  updatePct(x.pctYes||50);
+  renderFeed();
+}
+
+function updatePct(v){
+  v=parseInt(v);
+  document.getElementById('pct-slider').value=v;
+  document.getElementById('pct-slider').style.setProperty('--v',v+'%');
+  document.getElementById('pct-yes-big').textContent=v+'%';
+  document.getElementById('pct-no-big').textContent=(100-v)+'%';
+  if(q)q.pctYes=v;
+}
+
+function saveQ(){
+  if(!q)return;
+  q.cat=document.getElementById('ed-cat').value;
+  q.question=document.getElementById('ed-q').value;
+  q.context=document.getElementById('ed-ctx').value;
+  q.pctYes=parseInt(document.getElementById('pct-slider').value);
+  q.sourceUrl=document.getElementById('ed-src').value;
+  q.reward=parseInt(document.getElementById('ed-reward').value)||25;
+  q.factors=document.getElementById('ed-factors').value;
+  const dl=document.getElementById('ed-deadline').value;
+  if(dl)q.deadline=new Date(dl).getTime();
+  upStats();renderFeed();
+  log('Salvata: '+q.question.slice(0,40),'ok');
+}
+
+async function publishQ(){
+  if(!q)return;saveQ();
+  if(!q.question){alert('Inserisci la domanda');return;}
+  try{
+    const r=await fetch(BUR+'/api/v2/quota/card',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({id:q.id,categoria:q.cat,domanda:q.question,contesto:q.context,pct_si:q.pctYes,deadline:new Date(q.deadline||Date.now()+86400000).toISOString(),reward:q.reward,source_url:q.sourceUrl})
+    });
+    const d=await r.json();
+    if(d.ok){log('✓ Pubblicata sul sito: '+q.question.slice(0,40),'ok');q.status='published';stats.pub++;upStats();renderFeed();showFeed();}
+    else{log('Errore backend: '+d.error,'err');q.status='published';stats.pub++;upStats();renderFeed();showFeed();}
+  }catch(e){log('Backend offline - salvata localmente','info');q.status='published';stats.pub++;upStats();renderFeed();showFeed();}
+}
+
+function rejectQ(){
+  if(!q)return;q.status='rejected';stats.rej++;upStats();renderFeed();showFeed();
+  log('Scartata: '+q.question.slice(0,40),'info');
+}
+
+function newManual(){
+  const newQ={id:'m'+Date.now(),cat:'Sport',question:'',context:'',pctYes:50,reward:25,deadline:Date.now()+86400000,status:'pending',source:'Manuale'};
+  quotes.unshift(newQ);upStats();renderFeed();openQ(newQ.id);
+}
+
+async function fetchFromRSS(){
+  log('Aggiornamento RSS...','info');
+  try{
+    const r=await fetch(BUR+'/api/v2/modo/news?limit=20&lang=it');
+    const d=await r.json();
+    if(!d.ok)throw new Error(d.error);
+    const nuove=d.articles.filter(a=>!quotes.find(q=>q.sourceUrl===a.sourceUrl)).slice(0,10);
+    nuove.forEach(a=>{
+      quotes.unshift({id:'rss'+a.id,cat:a.cat||'Mondo',question:'',context:'',pctYes:50,reward:20,deadline:Date.now()+86400000,status:'pending',source:a.sourceName,sourceUrl:a.sourceUrl,sourceTitle:a.sourceTitle,sourceDesc:a.sourceDesc});
+    });
+    stats.rss+=nuove.length;upStats();renderFeed();
+    log(nuove.length+' notizie caricate','ok');
+  }catch(e){log('Errore RSS: '+e.message,'err');}
+}
+
+async function generateQuote(){
+  const btn=document.getElementById('btn-gen');
+  btn.disabled=true;btn.textContent='Generando...';
+  const groqKey=localStorage.getItem('quota_groq_key');
+  if(!groqKey){
+    const k=window.prompt('Groq API key:');
+    if(!k){btn.disabled=false;btn.textContent='⚡ Genera da RSS';return;}
+    localStorage.setItem('quota_groq_key',k.trim());
+  }
+
+  // Prendi notizie non ancora convertite in quote
+  const pending=quotes.filter(x=>!x.question&&x.sourceTitle).slice(0,3);
+  if(!pending.length){await fetchFromRSS();btn.disabled=false;btn.textContent='⚡ Genera da RSS';return;}
+
+  for(const rss of pending){
+    try{
+      log('Generando quota da: '+rss.sourceTitle.slice(0,40)+'...','info');
+      const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+        method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+localStorage.getItem('quota_groq_key')},
+        body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:300,temperature:0.6,messages:[
+          {role:'system',content:'Trasforma notizie in domande predittive sì/no per un prediction market italiano. Rispondi SOLO con JSON: {"domanda":"max 80 caratteri","contesto":"max 100 caratteri","pct_si":50,"categoria":"Sport|Finanza|Politica|Mondo|Tech","ore":24,"reward":20}'},
+          {role:'user',content:rss.sourceTitle+'. '+(rss.sourceDesc||'')}
+        ]})
+      });
+      const rd=await r.json();
+      if(rd.error)throw new Error(rd.error.message);
+      const txt=rd.choices?.[0]?.message?.content||'{}';
+      const m=txt.match(/\{[\s\S]*\}/);
+      if(!m)continue;
+      const g=JSON.parse(m[0]);
+      rss.question=g.domanda||'';
+      rss.context=g.contesto||'';
+      rss.pctYes=Math.min(90,Math.max(10,g.pct_si||50));
+      rss.cat=g.categoria||rss.cat;
+      rss.reward=g.reward||20;
+      rss.deadline=Date.now()+(g.ore||24)*3600000;
+      rss.status='ai';
+      stats.gen++;upStats();renderFeed();
+      log('✓ Quota generata: '+rss.question.slice(0,40),'ok');
+      await new Promise(r=>setTimeout(r,2000));
+    }catch(e){log('Errore generazione: '+e.message,'err');}
+  }
+  btn.disabled=false;btn.textContent='⚡ Genera da RSS';
+}
+
+async function aiSuggestPct(){
+  if(!q)return;
+  const groqKey=localStorage.getItem('quota_groq_key');
+  if(!groqKey)return;
+  const box=document.getElementById('ai-box');
+  box.classList.add('show');box.textContent='AI sta calcolando la percentuale...';
+  try{
+    const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},
+      body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:150,temperature:0.4,messages:[
+        {role:'system',content:'Sei un analista di prediction market. Suggerisci la probabilità % per una domanda predittiva. Rispondi SOLO con JSON: {"pct":70,"motivazione":"max 80 caratteri"}'},
+        {role:'user',content:'Domanda: '+q.question+'. Contesto: '+q.context}
+      ]})
+    });
+    const d=await r.json();
+    const txt=d.choices?.[0]?.message?.content||'{}';
+    const m=txt.match(/\{[\s\S]*\}/);
+    if(m){const g=JSON.parse(m[0]);updatePct(g.pct||50);box.textContent='AI suggerisce '+g.pct+'% · '+g.motivazione;}
+  }catch(e){box.textContent='Errore: '+e.message;}
+}
+
+async function aiSuggestFactors(){
+  if(!q)return;
+  const groqKey=localStorage.getItem('quota_groq_key');
+  if(!groqKey)return;
+  const ta=document.getElementById('ed-factors');
+  ta.value='AI sta analizzando...';
+  try{
+    const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},
+      body:JSON.stringify({model:'llama-3.1-8b-instant',max_tokens:400,temperature:0.5,messages:[
+        {role:'system',content:'Sei un analista. Elenca 3 fattori PRO SÌ e 3 PRO NO per questa previsione. Formato: PRO SÌ: [fattore]. PRO NO: [fattore]. Massimo 15 parole per fattore.'},
+        {role:'user',content:'Previsione: '+q.question+' ('+q.pctYes+'% Sì). Contesto: '+q.context}
+      ]})
+    });
+    const d=await r.json();
+    ta.value=d.choices?.[0]?.message?.content||'';
+    if(q)q.factors=ta.value;
+  }catch(e){ta.value='Errore: '+e.message;}
+}
+
+function previewQ(){
+  if(!q)return;
+  window.open('quota.html','_blank');
+}
+
+// CHAT
+async function sendChat(){
+  const ta=document.getElementById('chat-ta');
+  const msg=ta.value.trim();if(!msg)return;
+  const btn=document.getElementById('chat-send');
+  btn.disabled=true;addMsg('user',msg);ta.value='';
+  const typing=addMsg('ai','...');
+  const groqKey=localStorage.getItem('quota_groq_key');
+  if(!groqKey){typing.querySelector('.bubble').textContent='Configura la Groq key.';btn.disabled=false;return;}
+  const ctx=q?('Quota attiva: '+q.question+' ('+q.pctYes+'% Sì, cat: '+q.cat+')'):'';
+  try{
+    const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},
+      body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:400,temperature:0.4,messages:[
+        {role:'system',content:'Sei un assistente per la redazione di QUOTA, prediction market italiano. Aiuti a creare domande predittive accurate, suggerisci percentuali calibrate e analizzi fattori pro/contro. Rispondi in italiano, diretto e professionale.'+(ctx?' Contesto: '+ctx:'')},
+        {role:'user',content:msg}
+      ]})
+    });
+    const d=await r.json();
+    if(d.error)throw new Error(d.error.message);
+    const reply=d.choices?.[0]?.message?.content||'';
+    typing.querySelector('.bubble').innerHTML=reply.replace(/\n/g,'<br>');
+  }catch(e){typing.querySelector('.bubble').textContent='Errore: '+e.message;}
+  btn.disabled=false;
+  document.getElementById('chat-msgs').scrollTop=99999;
+}
+
+function addMsg(role,text){
+  const c=document.getElementById('chat-msgs');
+  const t=new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
+  const div=document.createElement('div');
+  div.className='cmsg '+role;
+  div.innerHTML='<div class="bubble">'+text+'</div><div class="ctime">'+(role==='user'?'Tu':'QUOTA AI')+' · '+t+'</div>';
+  c.appendChild(div);c.scrollTop=c.scrollHeight;
+  return div;
+}
+
+function qc(m){document.getElementById('chat-ta').value=m;sendChat();}
+function ckd(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}}
+
+// INIT
+renderCats();renderFeed();
+const saved=JSON.parse(localStorage.getItem('quota_gest')||'{}');
+if(saved.quotes?.length){quotes=saved.quotes;if(saved.stats)stats=saved.stats;upStats();renderFeed();}
+log('Gestionale QUOTA pronto.','ok');
+setInterval(()=>document.getElementById('tb-voti').textContent=Math.floor(Math.random()*50+100),30000);
+</script>
+</body>
+</html>
