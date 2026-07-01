@@ -513,7 +513,7 @@ function render(){
     const mv=votes[c.id];
     const pno=100-c.pctYes;
     const delay=i*60;
-    return `<div class="card${c.featured?' featured':''}" style="animation-delay:${delay}ms;margin-bottom:10px">
+    return `<div class="card${c.featured?' featured':''}" style="animation-delay:${delay}ms;margin-bottom:10px" onclick="openCard('${c.id}')">
       <div class="card-inner">
         <div class="card-top">
           <div class="card-cat-wrap">
@@ -560,7 +560,7 @@ function render(){
   },30000);
 }
 
-function vote(id,choice,reward,e){
+function vote(id,choice,reward,e){e.stopPropagation();
   e.stopPropagation();
   if(votes[id])return;
   votes[id]=choice;
@@ -636,5 +636,160 @@ save();render();
 setTimeout(()=>{if(setupKey())generateFromRSS();},2000);
 setInterval(()=>{if(localStorage.getItem('quota_groq_key'))generateFromRSS();},5*60*1000);
 </script>
-</body>
+
+<style>
+.d-bg{position:fixed;inset:0;z-index:500;background:rgba(4,4,12,.88);backdrop-filter:blur(16px);overflow-y:auto;padding:20px;display:none}
+.d-wrap{max-width:660px;margin:0 auto;display:flex;flex-direction:column;gap:12px;padding-bottom:40px}
+.d-close{position:fixed;top:20px;right:20px;width:40px;height:40px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:50%;color:#fff;font-size:20px;cursor:pointer;z-index:501;display:flex;align-items:center;justify-content:center}
+.d-close:hover{background:rgba(255,255,255,.14)}
+.d-box{background:rgba(18,18,28,.97);border:1px solid rgba(255,255,255,.08);border-radius:16px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.8)}
+.d-box-head{padding:20px 24px 16px;border-bottom:1px solid rgba(255,255,255,.05);font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;color:#a0a09a;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.d-box-head::before{content:'';width:3px;height:12px;background:linear-gradient(180deg,#f5c842,#e8a800);border-radius:2px}
+.d-main-pad{padding:24px}
+.d-cat{font-size:9px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;margin-bottom:10px}
+.d-q{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:800;line-height:1.25;letter-spacing:-.02em;color:#f0efe8;margin-bottom:8px}
+.d-ctx{font-size:12px;color:#808080;line-height:1.6;margin-bottom:20px;padding-left:10px;border-left:2px solid rgba(255,255,255,.08)}
+.d-pcts{display:flex;align-items:center;gap:16px;margin-bottom:14px}
+.d-pct-yes{font-family:'Space Grotesk',sans-serif;font-size:52px;font-weight:900;color:#00e87a;line-height:1;text-shadow:0 0 28px rgba(0,232,122,.4)}
+.d-pct-no{font-family:'Space Grotesk',sans-serif;font-size:30px;font-weight:800;color:#ff3d5a;text-shadow:0 0 20px rgba(255,61,90,.3)}
+.d-vs{font-size:18px;color:rgba(255,255,255,.1)}
+.d-pct-sub{font-size:9px;color:#505050;letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
+.d-bar{height:10px;background:rgba(255,255,255,.06);border-radius:5px;overflow:hidden;margin-bottom:16px;box-shadow:inset 0 1px 4px rgba(0,0,0,.5);position:relative}
+.d-bar-y{height:100%;background:linear-gradient(90deg,#00c866,#00e87a);box-shadow:0 0 16px rgba(0,232,122,.4);transition:width 1.5s cubic-bezier(.34,1.2,.64,1)}
+.d-bar-n{position:absolute;top:0;right:0;height:100%;background:linear-gradient(90deg,#ff3d5a,#ff6b81);box-shadow:0 0 16px rgba(255,61,90,.3)}
+.d-cd{display:flex;align-items:center;justify-content:space-between;background:rgba(245,200,66,.06);border:1px solid rgba(245,200,66,.12);border-radius:10px;padding:12px 16px;margin-bottom:18px}
+.d-cd-t{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:800;color:#f5c842;text-shadow:0 0 16px rgba(245,200,66,.4)}
+.d-cd-l{font-size:9px;color:#606040;letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px}
+.d-reward{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:800;color:#f5c842}
+.d-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.d-btn{padding:14px;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer;font-family:'Space Grotesk',sans-serif;border:1px solid transparent;transition:all .22s;text-align:center}
+.d-btn.yes{background:rgba(0,232,122,.1);border-color:rgba(0,232,122,.2);color:#00e87a}
+.d-btn.yes:hover:not(:disabled){background:#00e87a;color:#000;box-shadow:0 10px 28px rgba(0,232,122,.4);transform:scale(1.02)}
+.d-btn.no{background:rgba(255,61,90,.1);border-color:rgba(255,61,90,.2);color:#ff3d5a}
+.d-btn.no:hover:not(:disabled){background:#ff3d5a;color:#fff;box-shadow:0 10px 28px rgba(255,61,90,.4);transform:scale(1.02)}
+.d-btn:disabled{opacity:.35;cursor:default}
+.d-btn.active-yes{background:#00e87a;color:#000;opacity:1}
+.d-btn.active-no{background:#ff3d5a;color:#fff;opacity:1}
+.d-factor{padding:14px 24px;border-bottom:1px solid rgba(255,255,255,.04);display:flex;gap:12px;align-items:flex-start}
+.d-factor:last-child{border-bottom:none}
+.d-f-icon{font-size:16px;flex-shrink:0;margin-top:2px}
+.d-f-label{font-size:9px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}
+.d-f-label.pro{color:#00e87a}.d-f-label.contro{color:#ff3d5a}.d-f-neutro{color:#f5c842}
+.d-f-text{font-size:12px;color:#909090;line-height:1.55}
+.d-f-w{margin-left:auto;flex-shrink:0;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px}
+.d-f-w.pro{color:#00e87a;background:rgba(0,232,122,.08)}.d-f-w.contro{color:#ff3d5a;background:rgba(255,61,90,.08)}.d-f-w.neutro{color:#f5c842;background:rgba(245,200,66,.06)}
+.d-comm-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:20px 24px}
+.d-comm-n{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:800;line-height:1}
+.d-comm-l{font-size:9px;color:#505050;letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
+.d-hist{padding:14px 24px;border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;gap:10px;font-size:12px;color:#909090}
+.d-hist:last-child{border-bottom:none}
+.d-hdot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.d-hdot.ok{background:#00e87a;box-shadow:0 0 6px rgba(0,232,122,.5)}
+.d-hdot.ko{background:#ff3d5a;box-shadow:0 0 6px rgba(255,61,90,.4)}
+.d-hdot.open{background:#f5c842;box-shadow:0 0 6px rgba(245,200,66,.4)}
+.d-hpct{margin-left:auto;font-family:'Space Grotesk',sans-serif;font-size:12px;font-weight:700;color:#f5c842;flex-shrink:0}
+</style>
+
+<div class="d-bg" id="d-bg" onclick="closeDet(event)">
+  <button class="d-close" onclick="closeDet()">×</button>
+  <div class="d-wrap" id="d-wrap"></div>
+</div>
+
+<script>
+const FACTORS = {
+  wim1:[
+    {type:'pro',icon:'🎾',label:'Forma attuale',text:'Sinner ha vinto 18 delle ultime 21 partite su erba. Il suo serve-and-return è il migliore del tour.',w:'+28%'},
+    {type:'pro',icon:'👑',label:'Campione in carica',text:'I campioni in carica a Wimbledon confermano nel 60% dei casi nell ultimo decennio.',w:'+14%'},
+    {type:'pro',icon:'🤕',label:'Alcaraz out',text:'Il principale rivale è fuori per infortunio al polso. Rimuove circa il 20% di probabilità di sconfitta.',w:'+18%'},
+    {type:'contro',icon:'⚠️',label:'Pressione psicologica',text:'Difendere un titolo Slam è più difficile che conquistarlo. Djokovic è l unico ad averlo fatto 4 volte di fila.',w:'-12%'},
+    {type:'contro',icon:'🌿',label:'Variabile erba',text:'L erba amplifica ace e serve-and-volley. Rublev e Medvedev possono sorprendere in una giornata.',w:'-9%'},
+    {type:'neutro',icon:'📊',label:'Confronto bookmaker',text:'I bookmaker quotano Sinner a 2.1x (circa 48%). QUOTA stima più alto per l assenza di Alcaraz.',w:'Calibrato'}
+  ],
+  fin1:[
+    {type:'pro',icon:'📉',label:'Trend ribassista',text:'Il BTP è sceso da 3.8% a 3.4% in 3 settimane. Il momentum favorisce il ribasso.',w:'+22%'},
+    {type:'contro',icon:'🇺🇸',label:'Dati USA venerdì',text:'Se i dati occupazione battono le attese, il flight-to-quality porta i BTP in vendita.',w:'-18%'},
+    {type:'neutro',icon:'🏦',label:'BCE ferma',text:'Nessuna sorpresa BCE attesa. Supporto implicito ai periferici continua.',w:'Neutro'}
+  ],
+  mon1:[
+    {type:'contro',icon:'🗓️',label:'Storico trattative',text:'Negli ultimi 18 mesi ci sono stati 4 cessate il fuoco annunciati e collassati in meno di 72 ore.',w:'-45%'},
+    {type:'contro',icon:'🌍',label:'Posizioni distanti',text:'Le richieste delle parti sono ancora incompatibili. I mediatori faticano a trovare un minimo comune.',w:'-28%'},
+    {type:'pro',icon:'💼',label:'Pressione USA',text:'L amministrazione ha alzato la pressione diplomatica nelle ultime 2 settimane.',w:'+8%'}
+  ]
+};
+
+const HIST=[
+  {dot:'ok',text:'Sinner vince il Roland Garros 2026',pct:'81%'},
+  {dot:'ok',text:'Fed mantiene tassi a giugno 2026',pct:'73%'},
+  {dot:'ko',text:'Elezioni Francia · Le Pen premier',pct:'38%'},
+  {dot:'open',text:'Euro 2026 · Italia in semifinale',pct:'44%'}
+];
+
+function openCard(id){
+  const card=CARDS.find(c=>c.id===id);
+  if(!card)return;
+  const mv=votes[id];
+  const pno=100-card.pctYes;
+  const factors=FACTORS[id]||[];
+  const nv=card.votes+(mv?1:0);
+
+  document.getElementById('d-wrap').innerHTML=
+    '<div class="d-box">'
+    +'<div class="d-main-pad">'
+    +'<div class="d-cat cat-'+card.cat.toLowerCase()+'">'+card.cat+'</div>'
+    +'<div class="d-q">'+card.question+'</div>'
+    +'<div class="d-ctx">'+card.context+'</div>'
+    +'<div class="d-pcts">'
+    +'<div><div class="d-pct-yes">'+card.pctYes+'%</div><div class="d-pct-sub">Prob. SÌ · QUOTA</div></div>'
+    +'<div class="d-vs">vs</div>'
+    +'<div><div class="d-pct-no">'+pno+'%</div><div class="d-pct-sub">Prob. NO</div></div>'
+    +'</div>'
+    +'<div class="d-bar"><div class="d-bar-y" style="width:'+card.pctYes+'%"></div><div class="d-bar-n" style="width:'+pno+'%"></div></div>'
+    +'<div class="d-cd"><div><div class="d-cd-l">⏱ Scadenza</div><div class="d-cd-t" id="d-cd-t">'+cd(card.deadline)+'</div></div>'
+    +'<div style="text-align:right"><div class="d-cd-l">Premio</div><div class="d-reward">+'+card.reward+' cr</div></div></div>'
+    +'<div class="d-btns">'
+    +'<button class="d-btn yes'+(mv==='si'?' active-yes':'')+(mv?' ':'')+'" onclick="'+(mv?'':'voteDet(\''+id+'\',\'si\','+card.reward+')')+'" '+(mv?'disabled':'')+'>✓ &nbsp;Sì &nbsp;'+card.pctYes+'%<br><small style="font-size:10px;opacity:.6">'+(mv==='si'?'✓ Il tuo voto':'+'+card.reward+' cr se azzecchi')+'</small></button>'
+    +'<button class="d-btn no'+(mv==='no'?' active-no':'')+(mv?' ':'')+'" onclick="'+(mv?'':'voteDet(\''+id+'\',\'no\','+card.reward+')')+'" '+(mv?'disabled':'')+'>✗ &nbsp;No &nbsp;'+pno+'%<br><small style="font-size:10px;opacity:.6">'+(mv==='no'?'✓ Il tuo voto':'+'+card.reward+' cr se azzecchi')+'</small></button>'
+    +'</div>'
+    +'</div>'
+    +'</div>'
+
+    +(factors.length?
+    '<div class="d-box">'
+    +'<div class="d-box-head">Perché QUOTA dice '+card.pctYes+'%</div>'
+    +factors.map(f=>'<div class="d-factor"><div class="d-f-icon">'+f.icon+'</div><div style="flex:1"><div class="d-f-label '+f.type+'">'+(f.type==='pro'?'PRO SÌ':f.type==='contro'?'PRO NO':'NEUTRO')+' · '+f.label+'</div><div class="d-f-text">'+f.text+'</div></div><div class="d-f-w '+f.type+'">'+f.w+'</div></div>').join('')
+    +'</div>'
+    :'')
+
+    +'<div class="d-box">'
+    +'<div class="d-box-head">Community</div>'
+    +'<div class="d-comm-grid">'
+    +'<div><div class="d-comm-n" style="color:#00e87a">'+Math.round(nv*card.pctYes/100).toLocaleString('it-IT')+'</div><div class="d-comm-l">Hanno detto Sì</div></div>'
+    +'<div><div class="d-comm-n" style="color:#ff3d5a">'+Math.round(nv*pno/100).toLocaleString('it-IT')+'</div><div class="d-comm-l">Hanno detto No</div></div>'
+    +'</div></div>'
+
+    +'<div class="d-box">'
+    +'<div class="d-box-head">Storico previsioni simili</div>'
+    +HIST.map(h=>'<div class="d-hist"><div class="d-hdot '+h.dot+'"></div><div style="flex:1">'+h.text+'</div><div class="d-hpct">'+h.pct+'</div></div>').join('')
+    +'</div>';
+
+  document.getElementById('d-bg').style.display='block';
+  document.body.style.overflow='hidden';
+  clearInterval(window._dcd);
+  window._dcd=setInterval(()=>{const el=document.getElementById('d-cd-t');if(el)el.textContent=cd(card.deadline);},30000);
+}
+
+function voteDet(id,choice,reward){
+  if(votes[id])return;
+  votes[id]=choice;credits+=5;save();render();openCard(id);
+  toast('⚡ +5 cr per la partecipazione · +'+reward+' cr se azzecchi');
+}
+
+function closeDet(e){
+  if(e&&e.target!==document.getElementById('d-bg')&&!e.target.classList.contains('d-close'))return;
+  document.getElementById('d-bg').style.display='none';
+  document.body.style.overflow='';
+  clearInterval(window._dcd);
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDet({target:document.getElementById('d-bg')});});
+</script></body>
 </html>
