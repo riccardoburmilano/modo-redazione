@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QUOTA · Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080810;--s1:#0f0f1a;--s2:#161625;
+  --b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.1);
+  --gold:#f5c842;--gd:rgba(245,200,66,.08);
+  --green:#00e87a;--red:#ff3d5a;--purple:#a855f7;
+  --text:#f0efe8;--t2:#909090;--t3:#404040;
+  --g:'Inter',sans-serif;--sg:'Space Grotesk',sans-serif;
+  --card:rgba(18,18,28,.9);--card-b:rgba(255,255,255,.07);
+  --shadow:0 16px 48px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.05);
+}
+html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--g);-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 15% 10%,rgba(80,30,120,.18),transparent 55%),radial-gradient(ellipse 40% 30% at 85% 85%,rgba(20,50,120,.12),transparent 55%);pointer-events:none;z-index:0}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;height:58px;background:rgba(8,8,16,.88);backdrop-filter:blur(16px);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 20px;gap:12px}
+.n-ast{animation:rot 18s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+.n-logo{font-family:var(--sg);font-size:20px;font-weight:800;background:linear-gradient(135deg,#fff,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-decoration:none;display:flex;align-items:center;gap:8px}
+.n-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.n-cr{font-family:var(--sg);font-size:13px;font-weight:700;color:var(--gold);background:var(--gd);border:1px solid rgba(245,200,66,.15);padding:5px 12px;border-radius:20px}
+.n-live{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--green);letter-spacing:.1em}
+.live-dot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green);animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* LAYOUT */
+.app{display:grid;grid-template-columns:200px 1fr;min-height:calc(100vh - 58px);position:relative;z-index:1}
+
+/* SIDEBAR */
+.sidebar{background:rgba(10,10,18,.6);border-right:1px solid var(--b1);padding:20px 0;display:flex;flex-direction:column}
+.sb-user{padding:16px;margin-bottom:4px;border-bottom:1px solid var(--b1)}
+.sb-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,rgba(245,200,66,.3),rgba(80,30,120,.5));border:2px solid rgba(245,200,66,.2);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:8px}
+.sb-name{font-family:var(--sg);font-size:13px;font-weight:700;color:var(--text)}
+.sb-fascia{font-size:10px;color:var(--gold);letter-spacing:.06em}
+.sb-nav{padding:12px 0}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 16px;font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;border:none;background:none;width:100%;text-align:left;border-left:2px solid transparent;transition:all .15s}
+.sb-item:hover{color:var(--text);background:rgba(255,255,255,.03)}
+.sb-item.on{color:var(--gold);background:var(--gd);border-left-color:var(--gold)}
+.sb-icon{font-size:14px;width:18px;text-align:center}
+.sb-bottom{margin-top:auto;padding:14px}
+.sb-streak{background:var(--gd);border:1px solid rgba(245,200,66,.12);border-radius:8px;padding:12px;text-align:center}
+.sb-streak-n{font-family:var(--sg);font-size:22px;font-weight:800;color:var(--gold)}
+.sb-streak-l{font-size:9px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-top:3px}
+
+/* MAIN */
+.main{padding:20px;display:flex;flex-direction:column;gap:16px;overflow-y:auto}
+
+/* BENVENUTO */
+.welcome-bar{background:linear-gradient(135deg,rgba(245,200,66,.08),rgba(80,30,120,.08));border:1px solid rgba(245,200,66,.12);border-radius:12px;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.wb-left h2{font-family:var(--sg);font-size:18px;font-weight:800;margin-bottom:4px}
+.wb-left p{font-size:12px;color:var(--t2)}
+.wb-right{display:flex;gap:8px;flex-shrink:0}
+.wb-btn{padding:8px 16px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sg);border:none;transition:all .2s}
+.wb-btn.gold{background:var(--gold);color:#000}
+.wb-btn.ghost{background:rgba(255,255,255,.06);border:1px solid var(--b2);color:var(--text)}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.stat-box{background:var(--card);border:1px solid var(--card-b);border-radius:10px;padding:16px;text-align:center;box-shadow:var(--shadow)}
+.stat-box-n{font-family:var(--sg);font-size:24px;font-weight:900;line-height:1;margin-bottom:4px}
+.stat-box-l{font-size:9px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase}
+
+/* SEZIONE TITOLO */
+.sec-head{display:flex;align-items:center;justify-content:space-between}
+.sec-title{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t2);display:flex;align-items:center;gap:8px}
+.sec-title::before{content:'';width:3px;height:11px;background:var(--gold);border-radius:2px}
+.sec-link{font-size:11px;color:var(--gold);cursor:pointer;background:none;border:none;font-family:var(--g)}
+
+/* CARD QUOTA */
+.cards-col{display:flex;flex-direction:column;gap:8px}
+.qcard{background:var(--card);border:1px solid var(--card-b);border-radius:12px;padding:16px 18px;cursor:pointer;transition:all .2s;box-shadow:var(--shadow);animation:fadeUp .4s ease forwards;opacity:0}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+.qcard:hover{border-color:rgba(255,255,255,.12);transform:translateY(-2px)}
+.qcard.featured{border-color:rgba(245,200,66,.18);background:rgba(20,18,32,.95)}
+.qcard.featured::before{content:'';display:block;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:-16px -18px 14px;border-radius:12px 12px 0 0}
+.qc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.qc-cat{font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.cat-sport{color:#fb923c}.cat-finanza{color:var(--gold)}.cat-politica{color:var(--purple)}.cat-mondo{color:#4f8ef7}.cat-tech{color:#2dd4bf}
+.qc-cd{font-size:10px;color:var(--t3);background:rgba(255,255,255,.04);padding:3px 8px;border-radius:10px}
+.qc-q{font-family:var(--sg);font-size:15px;font-weight:700;line-height:1.3;margin-bottom:10px}
+.qc-bar{height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:7px;position:relative}
+.qc-bar-y{height:100%;background:linear-gradient(90deg,#00c866,var(--green));box-shadow:0 0 10px rgba(0,232,122,.35);transition:width 1.2s}
+.qc-bar-n{position:absolute;top:0;right:0;height:100%;background:linear-gradient(90deg,var(--red),#ff6b81)}
+.qc-pcts{display:flex;justify-content:space-between;font-family:var(--sg);font-size:12px;font-weight:800;margin-bottom:12px}
+.qc-yes{color:var(--green)}.qc-no{color:var(--red)}
+.qc-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.qc-btn{padding:9px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--sg);border:1px solid transparent;transition:all .18s}
+.qc-btn.yes{background:rgba(0,232,122,.08);border-color:rgba(0,232,122,.18);color:var(--green)}
+.qc-btn.yes:hover{background:var(--green);color:#000}
+.qc-btn.no{background:rgba(255,61,90,.08);border-color:rgba(255,61,90,.18);color:var(--red)}
+.qc-btn.no:hover{background:var(--red);color:#fff}
+.qc-btn.voted{opacity:.3;cursor:default}
+.qc-btn.active{opacity:1}
+.qc-meta{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.04);font-size:10px;color:var(--t3)}
+.qc-reward{margin-left:auto;color:var(--gold);font-weight:700}
+
+/* GRID 2 COL */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+
+/* STORICO */
+.hist-item{background:var(--card);border:1px solid var(--card-b);border-radius:10px;padding:13px 16px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
+.hist-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.hist-dot.ok{background:var(--green);box-shadow:0 0 6px rgba(0,232,122,.5)}
+.hist-dot.ko{background:var(--red);box-shadow:0 0 6px rgba(255,61,90,.4)}
+.hist-dot.open{background:var(--gold);box-shadow:0 0 6px rgba(245,200,66,.4)}
+.hist-text{flex:1;font-size:12px;color:var(--t2);line-height:1.4}
+.hist-pct{font-family:var(--sg);font-size:12px;font-weight:700;color:var(--gold);flex-shrink:0}
+
+/* ACCURACY CARD */
+.acc-card{background:var(--card);border:1px solid var(--card-b);border-radius:10px;padding:18px;box-shadow:var(--shadow)}
+.acc-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:12px}
+.acc-big{font-family:var(--sg);font-size:40px;font-weight:900;color:var(--green);text-shadow:0 0 20px rgba(0,232,122,.3);line-height:1;margin-bottom:8px}
+.acc-bar-wrap{height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:8px}
+.acc-bar{height:100%;background:linear-gradient(90deg,#00c866,var(--green));border-radius:3px;transition:width 1s}
+.acc-sub{font-size:11px;color:var(--t3)}
+
+/* RANKING */
+.rank-item{background:var(--card);border:1px solid var(--card-b);border-radius:8px;padding:11px 14px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow)}
+.rank-pos{font-family:var(--sg);font-size:16px;font-weight:900;color:var(--t3);width:24px;text-align:center}
+.rank-pos.top{color:var(--gold)}
+.rank-name{font-size:12px;font-weight:600;flex:1}
+.rank-cr{font-family:var(--sg);font-size:12px;font-weight:700;color:var(--gold)}
+.rank-fascia{font-size:9px;color:var(--t3)}
+.you-badge{font-size:9px;font-weight:700;background:rgba(245,200,66,.1);border:1px solid rgba(245,200,66,.2);color:var(--gold);padding:2px 7px;border-radius:10px}
+
+@media(max-width:900px){
+  .app{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .grid-2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="n-logo" style="text-decoration:none">
+    <svg class="n-ast" width="18" height="18" viewBox="0 0 20 20" fill="none">
+      <line x1="10" y1="1" x2="10" y2="19" stroke="#f5c842" stroke-width="1.2"/>
+      <line x1="1" y1="10" x2="19" y2="10" stroke="#f5c842" stroke-width="1.2"/>
+      <line x1="2.93" y1="2.93" x2="17.07" y2="17.07" stroke="#f5c842" stroke-width="1.2"/>
+      <line x1="17.07" y1="2.93" x2="2.93" y2="17.07" stroke="#f5c842" stroke-width="1.2"/>
+    </svg>
+    QUOTA
+  </a>
+  <div class="n-right">
+    <div class="n-cr">⚡ <span id="nav-cr">100</span> cr</div>
+    <div class="n-live"><span class="live-dot"></span>Live</div>
+  </div>
+</nav>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="sb-user">
+      <div class="sb-avatar">⚡</div>
+      <div class="sb-name" id="sb-name">Utente</div>
+      <div class="sb-fascia" id="sb-fascia">🌑 Neutrino</div>
+    </div>
+    <div class="sb-nav">
+      <button class="sb-item on"><span class="sb-icon">◈</span>Dashboard</button>
+      <button class="sb-item" onclick="location.href='quota.html'"><span class="sb-icon">⚡</span>Tutte le quote</button>
+      <button class="sb-item" onclick="showTab('miei')"><span class="sb-icon">★</span>I miei voti</button>
+      <button class="sb-item" onclick="showTab('rank')"><span class="sb-icon">🏆</span>Classifica</button>
+      <button class="sb-item" onclick="location.href='index.html'"><span class="sb-icon">←</span>Home</button>
+    </div>
+    <div class="sb-bottom">
+      <div class="sb-streak">
+        <div class="sb-streak-n" id="sb-streak">1</div>
+        <div class="sb-streak-l">Giorni attivi</div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- BENVENUTO -->
+    <div class="welcome-bar">
+      <div class="wb-left">
+        <h2 id="wb-title">Bentornato 👋</h2>
+        <p id="wb-sub">Hai <strong id="wb-open">0</strong> quote aperte oggi. Non perderle.</p>
+      </div>
+      <div class="wb-right">
+        <button class="wb-btn ghost" onclick="showTab('miei')">I miei voti</button>
+        <button class="wb-btn gold" onclick="location.href='quota.html'">⚡ Vai alle quote</button>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-box-n" id="st-cr" style="color:var(--gold)">100</div>
+        <div class="stat-box-l">Crediti totali</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-n" id="st-voti" style="color:var(--text)">0</div>
+        <div class="stat-box-l">Voti dati</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-n" id="st-acc" style="color:var(--green)">—%</div>
+        <div class="stat-box-l">Accuratezza</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-n" id="st-rank" style="color:var(--purple)">#—</div>
+        <div class="stat-box-l">Posizione</div>
+      </div>
+    </div>
+
+    <!-- QUOTE IN EVIDENZA -->
+    <div id="tab-home">
+      <div class="sec-head" style="margin-bottom:10px">
+        <div class="sec-title">Quote del giorno</div>
+        <button class="sec-link" onclick="location.href='quota.html'">Tutte →</button>
+      </div>
+      <div class="cards-col" id="cards-col"></div>
+
+      <div class="grid-2" style="margin-top:16px">
+        <!-- ACCURATEZZA -->
+        <div class="acc-card">
+          <div class="acc-title">La tua accuratezza</div>
+          <div class="acc-big" id="acc-big">—%</div>
+          <div class="acc-bar-wrap"><div class="acc-bar" id="acc-bar" style="width:0%"></div></div>
+          <div class="acc-sub" id="acc-sub">Dai il tuo primo voto per iniziare il track record</div>
+        </div>
+
+        <!-- FASCIA -->
+        <div class="acc-card">
+          <div class="acc-title">La tua fascia BDE</div>
+          <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px" id="fasce-mini"></div>
+        </div>
+      </div>
+
+      <!-- STORICO RAPIDO -->
+      <div class="sec-head" style="margin:16px 0 10px">
+        <div class="sec-title">Ultimi voti</div>
+      </div>
+      <div class="cards-col" id="hist-col"></div>
+    </div>
+
+    <!-- TAB CLASSIFICA -->
+    <div id="tab-rank" style="display:none">
+      <div class="sec-head" style="margin-bottom:10px">
+        <div class="sec-title">Classifica questa settimana</div>
+      </div>
+      <div class="cards-col" id="rank-col"></div>
+    </div>
+
+    <!-- TAB MIEI VOTI -->
+    <div id="tab-miei" style="display:none">
+      <div class="sec-head" style="margin-bottom:10px">
+        <div class="sec-title">I miei voti</div>
+      </div>
+      <div class="cards-col" id="miei-col"></div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const BUR='https://god-core-backend.onrender.com';
+let credits=parseInt(localStorage.getItem('qcr')||'100');
+let votes=JSON.parse(localStorage.getItem('qvotes')||'{}');
+const TOKEN=localStorage.getItem('quota_token')||'u_'+Math.random().toString(36).slice(2);
+const streak=parseInt(localStorage.getItem('q_streak')||'1');
+
+// CARD DATA
+const CARDS=[
+  {id:'wim1',cat:'Sport',featured:true,question:'Sinner difende il titolo a Wimbledon 2026?',context:'Numero 1 del mondo, campione in carica, Alcaraz out.',pctYes:71,votes:1847,deadline:new Date('2026-07-12T17:00:00').getTime(),reward:50},
+  {id:'wim2',cat:'Sport',question:'Sinner raggiunge la semifinale di Wimbledon?',context:'Da favorito assoluto la semifinale è il minimo atteso.',pctYes:86,votes:934,deadline:new Date('2026-07-09T17:00:00').getTime(),reward:20},
+  {id:'fin1',cat:'Finanza',question:'Il BTP 10Y chiude sopra 3.5% questa settimana?',context:'Spread in area 120bp. BCE in pausa.',pctYes:43,votes:412,deadline:new Date('2026-07-04T17:30:00').getTime(),reward:25},
+  {id:'pol1',cat:'Politica',question:'FdI supera il 30% nei sondaggi a luglio?',context:'FdI stabile al 28-29%. Estate favorevole al governo.',pctYes:35,votes:298,deadline:new Date('2026-07-31T23:59:00').getTime(),reward:35},
+  {id:'mon1',cat:'Mondo',question:'Cessate il fuoco in Medio Oriente entro 30 giorni?',context:'Negoziati in corso. La storia dice che slittano.',pctYes:19,votes:1102,deadline:new Date('2026-08-01T23:59:00').getTime(),reward:60},
+];
+
+const HIST_DEMO=[
+  {dot:'ok',text:'Fed mantiene tassi a giugno 2026',pct:'73%',scelta:'si'},
+  {dot:'ok',text:'Sinner vince Roland Garros 2026',pct:'81%',scelta:'si'},
+  {dot:'ko',text:'Euro/Dollaro sopra 1.12 a maggio',pct:'38%',scelta:'no'},
+  {dot:'open',text:'Italia in semifinale Euro 2026',pct:'44%',scelta:'si'},
+];
+
+const RANK_DEMO=[
+  {pos:1,name:'Alessandro R.',cr:1240,fascia:'✦ Singolarità'},
+  {pos:2,name:'Giulia M.',cr:980,fascia:'⭐ Quasar'},
+  {pos:3,name:'Marco T.',cr:870,fascia:'⭐ Quasar'},
+  {pos:4,name:'Sara L.',cr:720,fascia:'💜 Pulsar'},
+  {pos:5,name:'Luca B.',cr:650,fascia:'💜 Pulsar'},
+  {pos:'?',name:'Tu',cr:credits,fascia:'🌑 Neutrino',isYou:true},
+];
+
+const FASCE=[
+  {n:'🌑 Neutrino',pct:100,bar:20,c:'#a0a09a'},
+  {n:'🔵 Orbiter',pct:40,bar:40,c:'#60a5fa'},
+  {n:'💜 Pulsar',pct:15,bar:60,c:'#c084fc'},
+  {n:'⭐ Quasar',pct:5,bar:80,c:'#f5c842'},
+  {n:'✦ Singolarità',pct:1,bar:100,c:'#00e87a'},
+];
+
+function cd(dl){
+  const d=dl-Date.now();
+  if(d<=0)return'Scaduta';
+  const days=Math.floor(d/86400000);
+  const hrs=Math.floor((d%86400000)/3600000);
+  const min=Math.floor((d%3600000)/60000);
+  if(days>0)return days+'g '+hrs+'h';
+  if(hrs>0)return hrs+'h '+min+'m';
+  return min+'m';
+}
+
+function save(){
+  localStorage.setItem('qcr',credits);
+  localStorage.setItem('qvotes',JSON.stringify(votes));
+  document.getElementById('nav-cr').textContent=credits;
+  document.getElementById('st-cr').textContent=credits;
+}
+
+function getFascia(cr){
+  if(cr>500)return'✦ Singolarità';
+  if(cr>300)return'⭐ Quasar';
+  if(cr>150)return'💜 Pulsar';
+  if(cr>100)return'🔵 Orbiter';
+  return'🌑 Neutrino';
+}
+
+function initUI(){
+  document.getElementById('nav-cr').textContent=credits;
+  document.getElementById('st-cr').textContent=credits;
+  document.getElementById('st-voti').textContent=Object.keys(votes).length;
+  document.getElementById('sb-streak').textContent=streak;
+  document.getElementById('sb-fascia').textContent=getFascia(credits);
+  document.getElementById('wb-open').textContent=CARDS.filter(c=>!votes[c.id]).length;
+
+  const voteCount=Object.keys(votes).length;
+  const acc=voteCount>0?Math.floor(60+Math.random()*20):null;
+  if(acc){
+    document.getElementById('acc-big').textContent=acc+'%';
+    document.getElementById('acc-bar').style.width=acc+'%';
+    document.getElementById('acc-sub').textContent=voteCount+' voti · '+Math.floor(voteCount*acc/100)+' azzeccati';
+    document.getElementById('st-acc').textContent=acc+'%';
+  }
+
+  // Fasce mini
+  const cur=getFascia(credits);
+  document.getElementById('fasce-mini').innerHTML=FASCE.map(f=>`
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="font-size:11px;width:110px;color:${f.n===cur?f.c:'#404040'};font-weight:${f.n===cur?'700':'400'}">${f.n}</div>
+      <div style="flex:1;height:4px;background:rgba(255,255,255,.04);border-radius:2px;overflow:hidden"><div style="width:${f.bar}%;height:100%;background:${f.c};border-radius:2px"></div></div>
+      ${f.n===cur?'<div style="font-size:9px;color:'+f.c+';font-weight:700">Tu</div>':''}
+    </div>`).join('');
+}
+
+function renderCards(){
+  const col=document.getElementById('cards-col');
+  col.innerHTML=CARDS.slice(0,3).map((c,i)=>{
+    const mv=votes[c.id];
+    const pno=100-c.pctYes;
+    return `<div class="qcard${c.featured?' featured':''}" style="animation-delay:${i*60}ms">
+      <div class="qc-top">
+        <span class="qc-cat cat-${c.cat.toLowerCase()}">${c.cat}</span>
+        <span class="qc-cd">⏱ ${cd(c.deadline)}</span>
+      </div>
+      <div class="qc-q">${c.question}</div>
+      <div class="qc-bar"><div class="qc-bar-y" style="width:${c.pctYes}%"></div><div class="qc-bar-n" style="width:${pno}%"></div></div>
+      <div class="qc-pcts"><span class="qc-yes">${c.pctYes}%</span><span class="qc-no">${pno}%</span></div>
+      ${!mv?
+        `<div class="qc-btns">
+          <button class="qc-btn yes" onclick="vote('${c.id}','si',${c.reward},event)">✓ Sì</button>
+          <button class="qc-btn no" onclick="vote('${c.id}','no',${c.reward},event)">✗ No</button>
+        </div>`:
+        `<div class="qc-btns">
+          <button class="qc-btn yes ${mv==='si'?'active':'voted'}" disabled>✓ Sì</button>
+          <button class="qc-btn no ${mv==='no'?'active':'voted'}" disabled>✗ No</button>
+        </div>`}
+      <div class="qc-meta">
+        <span>${c.votes.toLocaleString('it-IT')} voti</span>
+        ${mv?`<span style="color:var(--green)">✓ Hai votato ${mv==='si'?'Sì':'No'}</span>`:''}
+        <span class="qc-reward">+${c.reward} cr</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderHist(){
+  document.getElementById('hist-col').innerHTML=HIST_DEMO.map(h=>`
+    <div class="hist-item">
+      <div class="hist-dot ${h.dot}"></div>
+      <div class="hist-text">${h.text}</div>
+      <div style="font-size:9px;color:var(--t3);margin-right:4px">Sì</div>
+      <div class="hist-pct">${h.pct}</div>
+    </div>`).join('');
+}
+
+function renderRank(){
+  document.getElementById('rank-col').innerHTML=RANK_DEMO.map(r=>`
+    <div class="rank-item" style="${r.isYou?'border-color:rgba(245,200,66,.2);background:rgba(245,200,66,.04)':''}">
+      <div class="rank-pos ${r.pos<=3?'top':''}">${r.pos<=3?['🥇','🥈','🥉'][r.pos-1]:r.pos}</div>
+      <div>
+        <div class="rank-name">${r.name} ${r.isYou?'<span class="you-badge">Tu</span>':''}</div>
+        <div class="rank-fascia">${r.fascia}</div>
+      </div>
+      <div class="rank-cr">${r.cr.toLocaleString('it-IT')} cr</div>
+    </div>`).join('');
+}
+
+function renderMiei(){
+  const myCards=CARDS.filter(c=>votes[c.id]);
+  document.getElementById('miei-col').innerHTML=myCards.length?
+    myCards.map(c=>`
+      <div class="hist-item">
+        <div class="hist-dot open"></div>
+        <div class="hist-text">${c.question}</div>
+        <div style="font-size:9px;color:${votes[c.id]==='si'?'var(--green)':'var(--red)'};font-weight:700">${votes[c.id]==='si'?'Sì':'No'}</div>
+        <div class="hist-pct">${c.pctYes}%</div>
+      </div>`).join('')
+    :'<div style="padding:24px;text-align:center;color:var(--t3);font-size:13px">Nessun voto ancora. <a href="quota.html" style="color:var(--gold)">Vai alle quote →</a></div>';
+}
+
+function showTab(t){
+  ['home','rank','miei'].forEach(x=>{
+    document.getElementById('tab-'+x).style.display=x===t?'block':'none';
+  });
+  if(t==='rank')renderRank();
+  if(t==='miei')renderMiei();
+}
+
+function vote(id,choice,reward,e){
+  e.stopPropagation();
+  if(votes[id])return;
+  votes[id]=choice;credits+=5;save();
+  initUI();renderCards();
+  // Notifica
+  if(Notification.permission==='granted'){
+    new Notification('QUOTA · Voto registrato',{body:'+5 cr · +'+reward+' cr se azzecchi'});
+  }
+}
+
+// Aggiorna crediti dal backend
+fetch(BUR+'/api/v2/quota/user/'+TOKEN).then(r=>r.json()).then(d=>{
+  if(d.ok){credits=d.crediti;if(d.votes)Object.assign(votes,d.votes);save();initUI();renderCards();}
+}).catch(()=>{});
+
+// Aggiorna countdown ogni minuto
+setInterval(()=>{document.querySelectorAll('[id^="cd-"]').forEach(el=>{
+  const id=el.id.replace('cd-','');
+  const c=CARDS.find(x=>x.id===id);
+  if(c)el.textContent=cd(c.deadline);
+});},60000);
+
+initUI();renderCards();renderHist();
+</script>
+</body>
+</html>
