@@ -3,136 +3,227 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QUOTA</title>
+<title>QUOTA · Il mercato cognitivo</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#07070f;--s1:#0e0e1a;--s2:#151525;
+  --bg:#06060e;--s1:#0d0d1a;--s2:#141428;
   --b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.11);
-  --gold:#f5c842;--gd:rgba(245,200,66,.09);
-  --green:#00e87a;--red:#ff3d5a;--orange:#ff8c00;
-  --purple:#a855f7;--blue:#4f8ef7;
+  --gold:#f5c842;--gd:rgba(245,200,66,.09);--gg:rgba(245,200,66,.05);
+  --green:#00e87a;--red:#ff3d5a;--orange:#ff8c00;--blue:#4f8ef7;--purple:#a855f7;
   --text:#f0efe8;--t2:#909090;--t3:#404040;
+  --card:rgba(14,14,24,.94);--cb:rgba(255,255,255,.07);
+  --sh:0 20px 60px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06);
   --g:'Inter',sans-serif;--sg:'Space Grotesk',sans-serif;
-  --card:rgba(16,16,26,.92);--cb:rgba(255,255,255,.07);
-  --sh:0 24px 60px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.06);
 }
 html,body{min-height:100%;background:var(--bg);color:var(--text);font-family:var(--g);-webkit-font-smoothing:antialiased;overflow-x:hidden}
-body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 70% 50% at 15% 10%,rgba(80,30,130,.2),transparent 55%),radial-gradient(ellipse 50% 40% at 85% 85%,rgba(20,50,130,.15),transparent 55%);pointer-events:none}
+body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse 70% 50% at 15% 10%,rgba(80,30,140,.22),transparent 55%),radial-gradient(ellipse 50% 40% at 85% 85%,rgba(20,50,140,.16),transparent 55%),radial-gradient(ellipse 30% 30% at 50% 50%,rgba(245,200,66,.03),transparent 60%);pointer-events:none}
 
-/* NAV */
-.nav{position:fixed;top:0;left:0;right:0;z-index:200;height:58px;background:rgba(7,7,15,.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 20px;gap:14px}
-.nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none}
-.nav-ast{animation:rot 18s linear infinite}
+/* ── TICKER TG ── */
+.ticker{position:fixed;top:0;left:0;right:0;z-index:1000;height:28px;background:var(--red);display:flex;align-items:center;overflow:hidden;box-shadow:0 2px 12px rgba(255,61,90,.4)}
+.ticker-label{flex-shrink:0;background:rgba(0,0,0,.3);padding:0 14px;height:100%;display:flex;align-items:center;font-size:9px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;color:#fff;white-space:nowrap;border-right:1px solid rgba(255,255,255,.2)}
+.ticker-track{flex:1;overflow:hidden;position:relative}
+.ticker-inner{display:flex;gap:48px;animation:tickScroll 40s linear infinite;white-space:nowrap;padding-left:100%}
+@keyframes tickScroll{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.ticker-item{font-size:11px;font-weight:600;color:#fff;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.ticker-item::after{content:'·';opacity:.4}
+.ticker-dot{width:5px;height:5px;border-radius:50%;background:#fff;opacity:.6}
+
+/* ── NAV ── */
+.nav{position:fixed;top:28px;left:0;right:0;z-index:200;height:56px;background:rgba(6,6,14,.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 18px;gap:12px}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+.nav-ast{animation:rot 18s linear infinite;filter:drop-shadow(0 0 6px rgba(245,200,66,.35))}
 @keyframes rot{to{transform:rotate(360deg)}}
-.nav-name{font-family:var(--sg);font-size:21px;font-weight:800;background:linear-gradient(135deg,#fff 0%,var(--gold) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.nav-cats{display:flex;gap:2px;margin-left:8px}
-.nav-cat{font-size:11px;font-weight:600;color:var(--t3);padding:5px 13px;border:none;background:none;cursor:pointer;border-radius:20px;transition:all .18s;letter-spacing:.04em;text-transform:uppercase}
+.nav-name{font-family:var(--sg);font-size:21px;font-weight:800;background:linear-gradient(135deg,#fff,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-cats{display:flex;gap:1px;margin-left:10px}
+.nav-cat{font-size:10px;font-weight:700;color:var(--t3);padding:5px 12px;border:none;background:none;cursor:pointer;border-radius:20px;transition:all .18s;letter-spacing:.05em;text-transform:uppercase}
 .nav-cat:hover{color:var(--t2)}
 .nav-cat.on{color:var(--gold);background:var(--gd);border:1px solid rgba(245,200,66,.18)}
-.nav-right{margin-left:auto;display:flex;align-items:center;gap:12px}
-.nav-cr{font-family:var(--sg);font-size:13px;font-weight:700;color:var(--gold);background:var(--gd);border:1px solid rgba(245,200,66,.15);padding:5px 13px;border-radius:20px;display:flex;align-items:center;gap:5px}
-.nav-live{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:700;color:var(--green);letter-spacing:.1em;text-transform:uppercase}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.nav-qr{font-family:var(--sg);font-size:12px;font-weight:700;color:var(--gold);background:var(--gd);border:1px solid rgba(245,200,66,.15);padding:5px 12px;border-radius:20px;cursor:pointer;transition:all .2s}
+.nav-qr:hover{background:rgba(245,200,66,.15)}
+.nav-live{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:700;color:var(--green);letter-spacing:.1em;text-transform:uppercase}
 .ldot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 7px var(--green);animation:pulse 2s ease-in-out infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.notif-btn{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid var(--b1);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .2s;position:relative}
+.notif-btn:hover{background:rgba(255,255,255,.1)}
+.notif-badge{position:absolute;top:-3px;right:-3px;width:15px;height:15px;border-radius:50%;background:var(--red);font-size:8px;font-weight:800;color:#fff;display:none;align-items:center;justify-content:center}
+.notif-badge.show{display:flex}
 
-/* LAYOUT */
-.app{display:grid;grid-template-columns:200px 1fr;min-height:100vh;padding-top:58px;position:relative;z-index:1}
+/* ── LAYOUT ── */
+.app{display:grid;grid-template-columns:190px 1fr;min-height:100vh;padding-top:84px;position:relative;z-index:1}
 
-/* SIDEBAR */
-.sidebar{background:rgba(10,10,20,.65);border-right:1px solid var(--b1);padding:18px 0;position:sticky;top:58px;height:calc(100vh - 58px);display:flex;flex-direction:column}
-.sb-lbl{font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--t3);padding:0 16px;margin-bottom:6px}
-.sb-item{display:flex;align-items:center;gap:9px;padding:9px 16px;font-size:12px;font-weight:500;color:var(--t2);cursor:pointer;border:none;background:none;width:100%;text-align:left;border-left:2px solid transparent;transition:all .15s}
+/* ── SIDEBAR ── */
+.sidebar{background:rgba(8,8,18,.7);border-right:1px solid var(--b1);padding:16px 0;position:sticky;top:84px;height:calc(100vh - 84px);display:flex;flex-direction:column;overflow-y:auto}
+.sb-lbl{font-size:8px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--t3);padding:0 14px;margin-bottom:5px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:11px;font-weight:500;color:var(--t2);cursor:pointer;border:none;background:none;width:100%;text-align:left;border-left:2px solid transparent;transition:all .15s}
 .sb-item:hover{color:var(--text);background:rgba(255,255,255,.03)}
 .sb-item.on{color:var(--gold);background:var(--gd);border-left-color:var(--gold)}
-.sb-ico{font-size:14px;width:18px;text-align:center}
-.sb-cnt{margin-left:auto;font-size:10px;font-weight:700;color:var(--t3);background:rgba(255,255,255,.06);padding:1px 6px;border-radius:8px}
-.sb-div{height:1px;background:var(--b1);margin:10px 16px}
-.sb-bot{margin-top:auto;padding:14px}
-.sb-stat{background:var(--gd);border:1px solid rgba(245,200,66,.12);border-radius:8px;padding:12px;margin-bottom:8px;text-align:center}
-.sb-stat-n{font-family:var(--sg);font-size:22px;font-weight:800;color:var(--gold);line-height:1}
-.sb-stat-l{font-size:9px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-top:3px}
-.sb-fascia{font-size:11px;font-weight:600;color:var(--t2);text-align:center;padding:8px}
+.sb-ico{font-size:13px;width:16px;text-align:center}
+.sb-cnt{margin-left:auto;font-size:9px;font-weight:700;color:var(--t3);background:rgba(255,255,255,.06);padding:1px 5px;border-radius:6px}
+.sb-div{height:1px;background:var(--b1);margin:8px 14px}
+.sb-bot{margin-top:auto;padding:12px 14px}
+.sb-qr-box{background:var(--gd);border:1px solid rgba(245,200,66,.12);border-radius:8px;padding:12px;margin-bottom:6px;text-align:center}
+.sb-qr-n{font-family:var(--sg);font-size:20px;font-weight:900;color:var(--gold);line-height:1}
+.sb-qr-l{font-size:8px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-top:2px}
+.sb-pct{font-size:11px;color:var(--t2);text-align:center;margin-top:4px}
+.sb-fascia{font-size:10px;font-weight:600;text-align:center;padding:6px;border-radius:6px;margin-top:4px}
+.sb-streak{display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;color:var(--t2);margin-top:6px}
+.sb-streak span{color:var(--gold);font-weight:700;font-family:var(--sg)}
 
-/* MAIN */
-.main{padding:20px;display:flex;flex-direction:column;gap:8px}
-.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.sec-title{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--t3);display:flex;align-items:center;gap:8px}
-.sec-title::before{content:'';width:3px;height:11px;background:var(--gold);border-radius:2px;box-shadow:0 0 6px rgba(245,200,66,.4)}
+/* ── MAIN ── */
+.main{padding:16px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.sec-title{font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--t3);display:flex;align-items:center;gap:7px}
+.sec-title::before{content:'';width:2px;height:10px;background:var(--gold);border-radius:1px;box-shadow:0 0 5px rgba(245,200,66,.4)}
 
-/* ── HURRY UP CARD (breve) ── */
-.card-hurry{background:var(--card);border:1px solid rgba(255,61,90,.2);border-radius:14px;overflow:hidden;box-shadow:var(--sh);animation:fadeUp .4s ease forwards;opacity:0;position:relative;cursor:pointer;transition:all .25s}
-.card-hurry::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent)}
-.card-hurry:hover{transform:translateY(-2px);box-shadow:0 32px 70px rgba(0,0,0,.8)}
-@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+/* ── FLASH EVENT ── */
+.flash-overlay{position:fixed;inset:0;z-index:400;background:rgba(255,61,90,.08);pointer-events:none;opacity:0;transition:opacity .3s}
+.flash-overlay.active{opacity:1;animation:flashPulse 1s ease-in-out infinite}
+@keyframes flashPulse{0%,100%{opacity:1}50%{opacity:.3}}
+.flash-card{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);z-index:500;width:min(460px,90vw);background:rgba(12,6,18,.98);border:2px solid var(--red);border-radius:16px;box-shadow:0 0 60px rgba(255,61,90,.5),0 32px 80px rgba(0,0,0,.9);display:none;animation:flashIn .3s cubic-bezier(.34,1.4,.64,1) forwards}
+.flash-card.show{display:block;transform:translate(-50%,-50%) scale(1)}
+@keyframes flashIn{from{transform:translate(-50%,-50%) scale(.85);opacity:0}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
+.fc-header{background:var(--red);padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.fc-badge{font-size:9px;font-weight:900;letter-spacing:.2em;text-transform:uppercase;color:#fff;display:flex;align-items:center;gap:6px}
+.fc-rdot{width:6px;height:6px;border-radius:50%;background:#fff;animation:pulse .8s ease-in-out infinite}
+.fc-timer-big{font-family:var(--sg);font-size:28px;font-weight:900;color:#fff;text-shadow:0 0 20px rgba(255,255,255,.5)}
+.fc-body{padding:20px}
+.fc-cat{font-size:8px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;margin-bottom:8px}
+.fc-q{font-family:var(--sg);font-size:20px;font-weight:800;line-height:1.28;letter-spacing:-.02em;margin-bottom:10px}
+.fc-ctx{font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:16px;padding:10px;background:rgba(255,61,90,.06);border-radius:6px;border-left:2px solid rgba(255,61,90,.3)}
+.fc-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.fc-btn{padding:14px;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:var(--sg);border:1px solid transparent;transition:all .2s}
+.fc-btn.yes{background:rgba(0,232,122,.1);border-color:rgba(0,232,122,.2);color:var(--green)}
+.fc-btn.yes:hover{background:var(--green);color:#000;box-shadow:0 8px 24px rgba(0,232,122,.4)}
+.fc-btn.no{background:rgba(255,61,90,.1);border-color:rgba(255,61,90,.2);color:var(--red)}
+.fc-btn.no:hover{background:var(--red);color:#fff;box-shadow:0 8px 24px rgba(255,61,90,.4)}
+.fc-skip{width:100%;padding:8px;background:rgba(255,255,255,.04);border:1px solid var(--b1);color:var(--t3);font-size:11px;cursor:pointer;border-radius:6px;transition:all .2s}
+.fc-skip:hover{color:var(--t2)}
 
-.ch-top{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 10px}
-.ch-badge{display:flex;align-items:center;gap:5px;font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--red);background:rgba(255,61,90,.1);border:1px solid rgba(255,61,90,.2);padding:3px 10px;border-radius:20px}
-.rdot{width:5px;height:5px;border-radius:50%;background:var(--red);animation:pulse 1s ease-in-out infinite}
-.ch-timer{font-family:var(--sg);font-size:20px;font-weight:900;color:var(--red);text-shadow:0 0 20px rgba(255,61,90,.5);letter-spacing:.02em}
-.ch-body{padding:0 18px 16px}
-.ch-cat{font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;margin-bottom:8px}
-.ch-q{font-family:var(--sg);font-size:18px;font-weight:800;line-height:1.28;letter-spacing:-.02em;margin-bottom:10px}
-.ch-info{background:rgba(255,255,255,.04);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:11px;color:var(--t2);line-height:1.6;border-left:2px solid rgba(255,61,90,.3)}
-.ch-info-title{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:5px;display:flex;align-items:center;gap:5px}
-.ch-btns{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-.ch-btn{padding:12px;border-radius:9px;font-size:13px;font-weight:800;cursor:pointer;font-family:var(--sg);border:1px solid transparent;transition:all .2s;text-align:center}
-.ch-btn.yes{background:rgba(0,232,122,.09);border-color:rgba(0,232,122,.2);color:var(--green)}
-.ch-btn.yes:hover{background:var(--green);color:#000;box-shadow:0 8px 24px rgba(0,232,122,.35);transform:scale(1.02)}
-.ch-btn.no{background:rgba(255,61,90,.09);border-color:rgba(255,61,90,.2);color:var(--red)}
-.ch-btn.no:hover{background:var(--red);color:#fff;box-shadow:0 8px 24px rgba(255,61,90,.35);transform:scale(1.02)}
+/* ── HURRY UP CARD ── */
+.card-h{background:var(--card);border:1px solid rgba(255,61,90,.18);border-radius:14px;overflow:hidden;box-shadow:var(--sh);position:relative;cursor:pointer;transition:all .25s;margin-bottom:8px}
+.card-h::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent)}
+.card-h:hover{transform:translateY(-2px);box-shadow:0 28px 70px rgba(0,0,0,.85)}
+.ch-top{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px}
+.hurry-badge{display:flex;align-items:center;gap:5px;font-size:8px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:var(--red);background:rgba(255,61,90,.1);border:1px solid rgba(255,61,90,.2);padding:3px 9px;border-radius:20px}
+.rdot{width:4px;height:4px;border-radius:50%;background:var(--red);animation:pulse .9s ease-in-out infinite}
+.ch-timer{font-family:var(--sg);font-size:18px;font-weight:900;color:var(--red);text-shadow:0 0 16px rgba(255,61,90,.5);letter-spacing:.02em}
+.ch-body{padding:0 16px 14px}
+.ch-cat{font-size:8px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;margin-bottom:6px}
+.ch-q{font-family:var(--sg);font-size:17px;font-weight:800;line-height:1.28;letter-spacing:-.02em;margin-bottom:8px}
+.ch-info{font-size:11px;color:var(--t2);line-height:1.6;margin-bottom:12px;padding:8px 10px;background:rgba(255,255,255,.04);border-radius:6px;border-left:2px solid rgba(255,61,90,.25)}
+.ch-btns{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.ch-btn{padding:11px;border-radius:8px;font-size:12px;font-weight:800;cursor:pointer;font-family:var(--sg);border:1px solid transparent;transition:all .2s;position:relative}
+.ch-btn.yes{background:rgba(0,232,122,.08);border-color:rgba(0,232,122,.18);color:var(--green)}
+.ch-btn.yes:hover:not(:disabled){background:var(--green);color:#000;box-shadow:0 8px 20px rgba(0,232,122,.35);transform:scale(1.02)}
+.ch-btn.no{background:rgba(255,61,90,.08);border-color:rgba(255,61,90,.18);color:var(--red)}
+.ch-btn.no:hover:not(:disabled){background:var(--red);color:#fff;box-shadow:0 8px 20px rgba(255,61,90,.35);transform:scale(1.02)}
 .ch-btn:disabled{opacity:.3;cursor:default;transform:none!important}
 .ch-btn.voted-y{background:var(--green);color:#000}
 .ch-btn.voted-n{background:var(--red);color:#fff}
-.ch-meta{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.05);font-size:10px;color:var(--t3)}
-.ch-reward{margin-left:auto;color:var(--red);font-weight:700;font-family:var(--sg)}
+.ch-actions{display:flex;gap:6px;margin-top:8px}
+.ch-action{flex:1;padding:7px;border-radius:7px;font-size:10px;font-weight:700;cursor:pointer;font-family:var(--sg);border:1px solid var(--b1);background:rgba(255,255,255,.04);color:var(--t2);transition:all .18s;text-align:center}
+.ch-action:hover{border-color:var(--b2);color:var(--text)}
+.ch-action.double{border-color:rgba(245,200,66,.2);color:var(--gold)}
+.ch-action.double:hover{background:var(--gd)}
+.ch-action.contra{border-color:rgba(168,85,247,.2);color:var(--purple)}
+.ch-action.contra:hover{background:rgba(168,85,247,.08)}
+.ch-meta{display:flex;align-items:center;gap:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05);font-size:9px;color:var(--t3)}
+.ch-qr{margin-left:auto;color:var(--gold);font-weight:700;font-family:var(--sg);font-size:10px}
 
-/* ── DEEP BET CARD (lunga) ── */
-.card-deep{background:var(--card);border:1px solid var(--cb);border-radius:14px;overflow:hidden;box-shadow:var(--sh);animation:fadeUp .4s ease forwards;opacity:0;cursor:pointer;transition:all .25s;position:relative}
-.card-deep::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
-.card-deep:hover{transform:translateY(-2px);border-color:rgba(245,200,66,.15)}
-.cd-hero{padding:20px 20px 16px;position:relative}
-.cd-badges{display:flex;align-items:center;gap:7px;margin-bottom:12px}
-.deep-badge{font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);background:var(--gd);border:1px solid rgba(245,200,66,.2);padding:3px 10px;border-radius:20px}
-.cd-cat{font-size:9px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
-.cd-q{font-family:var(--sg);font-size:19px;font-weight:800;line-height:1.28;letter-spacing:-.02em;margin-bottom:8px}
-.cd-context{font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:14px;padding-left:10px;border-left:2px solid rgba(255,255,255,.08)}
-.cd-timer{display:inline-flex;align-items:center;gap:6px;font-family:var(--sg);font-size:12px;font-weight:700;color:var(--gold);background:var(--gd);border:1px solid rgba(245,200,66,.15);padding:4px 12px;border-radius:20px;margin-bottom:14px}
-
-/* SOTTO-SCOMMESSE */
+/* ── DEEP BET CARD ── */
+.card-d{background:var(--card);border:1px solid var(--cb);border-radius:14px;overflow:hidden;box-shadow:var(--sh);cursor:pointer;transition:all .25s;margin-bottom:8px;position:relative}
+.card-d::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.card-d:hover{transform:translateY(-2px);border-color:rgba(245,200,66,.12)}
+.card-d.featured::after{content:'⭐ In evidenza';position:absolute;top:14px;right:14px;font-size:9px;font-weight:800;letter-spacing:.1em;color:var(--gold);background:var(--gd);border:1px solid rgba(245,200,66,.2);padding:3px 8px;border-radius:10px}
+.cd-hero{padding:18px 18px 12px}
+.cd-top{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.cd-deep-badge{font-size:8px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);background:var(--gd);border:1px solid rgba(245,200,66,.18);padding:3px 9px;border-radius:20px}
+.cd-cat{font-size:8px;font-weight:800;letter-spacing:.16em;text-transform:uppercase}
+.cd-q{font-family:var(--sg);font-size:18px;font-weight:800;line-height:1.28;letter-spacing:-.02em;margin-bottom:8px}
+.cd-ctx{font-size:11px;color:var(--t2);line-height:1.6;margin-bottom:12px;padding-left:9px;border-left:2px solid rgba(255,255,255,.07)}
+.cd-cd{display:inline-flex;align-items:center;gap:5px;font-family:var(--sg);font-size:11px;font-weight:700;color:var(--gold);background:var(--gd);border:1px solid rgba(245,200,66,.15);padding:4px 11px;border-radius:20px;margin-bottom:12px}
 .cd-bets{border-top:1px solid var(--b1)}
-.cd-bet{padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.04);transition:background .15s}
+.cd-bet{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.04)}
 .cd-bet:last-child{border-bottom:none}
-.cd-bet:hover{background:rgba(255,255,255,.02)}
-.cd-bet-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
-.cd-bet-cr{font-family:var(--sg);font-size:10px;font-weight:700;color:var(--gold)}
-.cd-bet-opts{display:flex;flex-wrap:wrap;gap:5px}
-.cd-opt{padding:7px 13px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--b2);background:rgba(255,255,255,.04);color:var(--t2);transition:all .18s;font-family:var(--sg)}
-.cd-opt:hover{border-color:rgba(245,200,66,.25);color:var(--gold);background:var(--gd)}
-.cd-opt.sel{border-color:var(--gold);color:var(--gold);background:var(--gd);box-shadow:0 0 12px rgba(245,200,66,.15)}
-.cd-opt.sel-green{border-color:var(--green);color:var(--green);background:rgba(0,232,122,.08)}
-.cd-opt:disabled{opacity:.35;cursor:default}
+.cd-bet-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:7px;display:flex;align-items:center;justify-content:space-between}
+.cd-bet-qr{font-family:var(--sg);font-size:9px;font-weight:700;color:var(--gold)}
+.cd-opts{display:flex;flex-wrap:wrap;gap:5px}
+.cd-opt{padding:6px 12px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--b2);background:rgba(255,255,255,.04);color:var(--t2);transition:all .18s;font-family:var(--sg)}
+.cd-opt:hover:not(:disabled){border-color:rgba(245,200,66,.25);color:var(--gold);background:var(--gd)}
+.cd-opt.sel{border-color:var(--gold);color:var(--gold);background:var(--gd);box-shadow:0 0 10px rgba(245,200,66,.12)}
+.cd-opt:disabled{opacity:.3;cursor:default}
+.cd-foot{padding:12px 18px;background:rgba(0,0,0,.2);display:flex;align-items:center;gap:8px}
+.cd-submit{flex:1;padding:11px;background:var(--gold);border:none;color:#000;font-size:12px;font-weight:800;cursor:pointer;border-radius:8px;font-family:var(--sg);transition:all .2s}
+.cd-submit:hover{opacity:.88}
+.cd-submit:disabled{opacity:.3;cursor:default}
+.cd-tot-qr{font-family:var(--sg);font-size:12px;font-weight:700;color:var(--gold)}
 
-.cd-footer{padding:14px 20px;background:rgba(0,0,0,.2);display:flex;align-items:center;gap:10px}
-.cd-submit{flex:1;padding:12px;background:var(--gold);border:none;color:#000;font-size:13px;font-weight:800;cursor:pointer;border-radius:9px;font-family:var(--sg);transition:all .2s}
-.cd-submit:hover{opacity:.88;transform:scale(1.01)}
-.cd-submit:disabled{opacity:.3;cursor:default;transform:none}
-.cd-total-cr{font-family:var(--sg);font-size:13px;font-weight:700;color:var(--gold)}
-.cd-voted-msg{font-size:11px;color:var(--green);display:flex;align-items:center;gap:5px}
+/* ── NOTIFICHE IN OVERLAY ── */
+.notif-stack{position:fixed;top:92px;right:16px;z-index:300;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+.notif-item{background:rgba(14,14,24,.97);border:1px solid var(--b2);border-radius:12px;padding:12px 14px;width:280px;box-shadow:0 16px 48px rgba(0,0,0,.7);backdrop-filter:blur(16px);pointer-events:all;animation:notifIn .35s cubic-bezier(.34,1.4,.64,1) forwards;cursor:pointer}
+@keyframes notifIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.notif-item.out{animation:notifOut .25s ease forwards}
+@keyframes notifOut{to{transform:translateX(110%);opacity:0}}
+.ni-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.ni-icon{font-size:16px}
+.ni-title{font-family:var(--sg);font-size:12px;font-weight:700;flex:1}
+.ni-close{font-size:14px;color:var(--t3);cursor:pointer;background:none;border:none;color:var(--t3)}
+.ni-body{font-size:11px;color:var(--t2);line-height:1.5}
 
-/* TOAST */
-.toast{position:fixed;bottom:24px;right:20px;background:rgba(16,16,26,.97);border:1px solid var(--b2);border-radius:12px;padding:11px 16px;font-size:12px;color:var(--text);z-index:999;opacity:0;transition:all .28s;pointer-events:none;backdrop-filter:blur(20px);box-shadow:0 16px 48px rgba(0,0,0,.6);font-family:var(--sg)}
-.toast.show{opacity:1;transform:translateY(-4px)}
+/* ── PROFILO MODAL ── */
+.prof-bg{position:fixed;inset:0;z-index:600;background:rgba(4,4,12,.9);backdrop-filter:blur(16px);display:none;align-items:center;justify-content:center}
+.prof-bg.open{display:flex}
+.prof-box{background:rgba(14,14,24,.98);border:1px solid var(--b2);border-radius:20px;padding:28px;width:340px;max-width:90vw;box-shadow:0 32px 80px rgba(0,0,0,.9)}
+.prof-ast-wrap{text-align:center;margin-bottom:16px}
+.prof-ast{animation:rot 16s linear infinite}
+.prof-name{font-family:var(--sg);font-size:24px;font-weight:900;text-align:center;background:linear-gradient(135deg,#fff,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+.prof-fascia-big{text-align:center;font-size:14px;font-weight:700;margin-bottom:20px}
+.prof-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+.pg-box{background:rgba(255,255,255,.04);border:1px solid var(--b1);border-radius:10px;padding:12px;text-align:center}
+.pg-n{font-family:var(--sg);font-size:22px;font-weight:900;color:var(--gold);line-height:1}
+.pg-l{font-size:8px;color:var(--t3);letter-spacing:.08em;text-transform:uppercase;margin-top:3px}
+.prof-bar-wrap{margin-bottom:14px}
+.prof-bar-lbl{font-size:9px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;display:flex;justify-content:space-between}
+.prof-bar{height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+.prof-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),#00e87a);border-radius:3px;transition:width 1s}
+.prof-ranks{display:flex;flex-direction:column;gap:4px;margin-bottom:16px}
+.pr-row{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:6px;font-size:11px}
+.pr-row.active{background:var(--gd);border:1px solid rgba(245,200,66,.15)}
+.pr-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.pr-name{flex:1;font-weight:500}
+.pr-req{font-size:9px;color:var(--t3)}
+.prof-close{width:100%;padding:11px;background:rgba(255,255,255,.06);border:1px solid var(--b1);border-radius:10px;color:var(--text);font-family:var(--sg);font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;margin-top:4px}
+.prof-close:hover{background:rgba(255,255,255,.1)}
 
-/* MODAL DETAIL */
-.modal-bg{position:fixed;inset:0;z-index:500;background:rgba(4,4,12,.88);backdrop-filter:blur(16px);display:none;overflow-y:auto;padding:20px}
-.modal-bg.open{display:block}
-.modal-close{position:fixed;top:20px;right:20px;width:40px;height:40px;background:rgba(255,255,255,.07);border:1px solid var(--b2);border-radius:50%;color:var(--text);font-size:20px;cursor:pointer;z-index:501;display:flex;align-items:center;justify-content:center}
-.modal-wrap{max-width:660px;margin:0 auto;display:flex;flex-direction:column;gap:10px;padding-bottom:40px}
-.mbox{background:rgba(16,16,26,.98);border:1px solid var(--b2);border-radius:14px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.8)}
-.mbox-head{padding:16px 22px;border-bottom:1px solid var(--b1);font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
-.mbox-head::before{content:'';width:3px;height:11px;background:var(--gold);border-radius:2px}
+/* ── TOAST ── */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(10px);background:rgba(14,14,24,.97);border:1px solid var(--b2);border-radius:12px;padding:10px 18px;font-size:12px;font-weight:600;color:var(--text);z-index:999;opacity:0;transition:all .3s;pointer-events:none;backdrop-filter:blur(16px);box-shadow:0 16px 48px rgba(0,0,0,.6);font-family:var(--sg);white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── CHAIN BET BANNER ── */
+.chain-banner{display:none;background:linear-gradient(135deg,rgba(168,85,247,.15),rgba(80,30,140,.2));border:1px solid rgba(168,85,247,.25);border-radius:12px;padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:all .2s}
+.chain-banner.show{display:flex;align-items:center;gap:12px;animation:fadeUp .4s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.chain-banner:hover{background:linear-gradient(135deg,rgba(168,85,247,.2),rgba(80,30,140,.25))}
+.cb-icon{font-size:28px}
+.cb-text{flex:1}
+.cb-title{font-family:var(--sg);font-size:14px;font-weight:800;color:var(--purple);margin-bottom:3px}
+.cb-sub{font-size:11px;color:rgba(168,85,247,.7)}
+.cb-arrow{font-size:20px;color:var(--purple)}
+
+/* ── SENTIMENT WAR ── */
+.sentiment-war{background:var(--card);border:1px solid var(--b1);border-radius:12px;padding:14px 16px;margin-bottom:8px}
+.sw-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.sw-title{font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--t3)}
+.sw-timer{font-family:var(--sg);font-size:11px;font-weight:700;color:var(--gold)}
+.sw-bars{display:flex;flex-direction:column;gap:6px}
+.sw-row{display:flex;align-items:center;gap:8px}
+.sw-cat{font-size:10px;font-weight:600;width:60px;color:var(--t2);flex-shrink:0}
+.sw-bar-wrap{flex:1;height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+.sw-bar{height:100%;border-radius:3px;transition:width 1s}
+.sw-pct{font-family:var(--sg);font-size:10px;font-weight:700;width:32px;text-align:right;flex-shrink:0}
 
 /* SCROLLBAR */
 ::-webkit-scrollbar{width:3px}
@@ -142,11 +233,23 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
   .app{grid-template-columns:1fr}
   .sidebar{display:none}
   .nav-cats{display:none}
+  .ticker{display:none}
+  .nav{top:0}
+  .app{padding-top:56px}
 }
 </style>
 </head>
 <body>
 
+<!-- TICKER TG -->
+<div class="ticker">
+  <div class="ticker-label">⚡ QUOTA LIVE</div>
+  <div class="ticker-track">
+    <div class="ticker-inner" id="ticker-inner"></div>
+  </div>
+</div>
+
+<!-- NAV -->
 <nav class="nav">
   <a class="nav-logo" href="index-quota.html">
     <svg class="nav-ast" width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -165,18 +268,23 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
     <button class="nav-cat" onclick="filterCat('Mondo')">Mondo</button>
   </div>
   <div class="nav-right">
-    <div class="nav-cr">🎯 <span id="nav-cr">Top 60%</span></div>
+    <div class="nav-qr" onclick="openProf()">🎯 <span id="nav-qr">Top 60%</span></div>
+    <button class="notif-btn" onclick="toggleNotifs()" title="Notifiche">
+      🔔
+      <span class="notif-badge" id="notif-badge">0</span>
+    </button>
     <div class="nav-live"><span class="ldot"></span>Live</div>
   </div>
 </nav>
 
 <div class="app">
+  <!-- SIDEBAR -->
   <aside class="sidebar">
-    <div style="padding:14px 0">
-      <div class="sb-lbl">Tipo quota</div>
-      <button class="sb-item on" onclick="filterType('tutti')"><span class="sb-ico">◈</span>Tutte<span class="sb-cnt" id="cnt-tutti">0</span></button>
-      <button class="sb-item" onclick="filterType('hurry')"><span class="sb-ico" style="color:var(--red)">🔴</span>Hurry Up<span class="sb-cnt" id="cnt-hurry">0</span></button>
-      <button class="sb-item" onclick="filterType('deep')"><span class="sb-ico" style="color:var(--gold)">⭐</span>Deep Bet<span class="sb-cnt" id="cnt-deep">0</span></button>
+    <div style="padding:12px 0">
+      <div class="sb-lbl">Tipo</div>
+      <button class="sb-item on" onclick="filterType('tutti')"><span class="sb-ico">◈</span>Tutte<span class="sb-cnt" id="cnt-t">0</span></button>
+      <button class="sb-item" onclick="filterType('hurry')"><span class="sb-ico" style="color:var(--red)">🔴</span>Hurry Up<span class="sb-cnt" id="cnt-h">0</span></button>
+      <button class="sb-item" onclick="filterType('deep')"><span class="sb-ico" style="color:var(--gold)">⭐</span>Deep Bet<span class="sb-cnt" id="cnt-d">0</span></button>
       <div class="sb-div"></div>
       <div class="sb-lbl">Categoria</div>
       <button class="sb-item" onclick="filterCat('Sport')"><span class="sb-ico">⚽</span>Sport</button>
@@ -185,208 +293,296 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
       <button class="sb-item" onclick="filterCat('Mondo')"><span class="sb-ico">🌍</span>Mondo</button>
       <button class="sb-item" onclick="filterCat('Tech')"><span class="sb-ico">⚡</span>Tech</button>
       <div class="sb-div"></div>
-      <button class="sb-item" onclick="filterMiei()"><span class="sb-ico">★</span>I miei voti</button>
+      <button class="sb-item" onclick="filterMiei()"><span class="sb-ico">★</span>I miei</button>
+      <button class="sb-item" onclick="filterContra()"><span class="sb-ico" style="color:var(--purple)">↺</span>Contrarian</button>
     </div>
     <div class="sb-bot">
-      <div class="sb-stat"><div class="sb-stat-n" id="sb-cr">400</div><div class="sb-stat-l">QUOTA Rating</div></div>
-      <div class="sb-stat"><div class="sb-stat-n" id="sb-streak" style="color:var(--green)">0</div><div class="sb-stat-l">Giorni streak</div></div>
+      <div class="sb-qr-box">
+        <div class="sb-qr-n" id="sb-qr">400</div>
+        <div class="sb-qr-l">QUOTA Rating</div>
+      </div>
+      <div class="sb-pct" id="sb-pct">Top 60% della community</div>
       <div class="sb-fascia" id="sb-fascia">🌑 Neutrino</div>
+      <div class="sb-streak">🔥 Streak: <span id="sb-streak">0</span> giorni</div>
     </div>
   </aside>
 
-  <main class="main" id="main">
-    <div class="sec-head">
-      <div class="sec-title" id="sec-title">🔴 Hurry Up · Scadono presto</div>
+  <!-- MAIN -->
+  <main class="main" id="main-content">
+
+    <!-- CHAIN BET BANNER -->
+    <div class="chain-banner" id="chain-banner" onclick="openChain()">
+      <div class="cb-icon">🔗</div>
+      <div class="cb-text">
+        <div class="cb-title">Chain Bet sbloccato!</div>
+        <div class="cb-sub">Hai 3 previsioni giuste di fila — accedi alla scommessa esclusiva</div>
+      </div>
+      <div class="cb-arrow">→</div>
     </div>
-    <div id="hurry-section"></div>
-    <div class="sec-head" style="margin-top:8px">
+
+    <!-- SENTIMENT WAR -->
+    <div class="sentiment-war">
+      <div class="sw-head">
+        <div class="sw-title">⚔️ Sentiment War · Chi azzecca di più oggi?</div>
+        <div class="sw-timer" id="sw-timer">Aggiorna tra 58m</div>
+      </div>
+      <div class="sw-bars" id="sw-bars"></div>
+    </div>
+
+    <!-- SEZIONI -->
+    <div class="sec-head">
+      <div class="sec-title">🔴 Hurry Up · Scadono presto</div>
+    </div>
+    <div id="hurry-wrap"></div>
+
+    <div class="sec-head" style="margin-top:4px">
       <div class="sec-title">⭐ Deep Bet · Scommesse lunghe</div>
     </div>
-    <div id="deep-section"></div>
+    <div id="deep-wrap"></div>
   </main>
+</div>
+
+<!-- NOTIFICHE STACK -->
+<div class="notif-stack" id="notif-stack"></div>
+
+<!-- FLASH OVERLAY -->
+<div class="flash-overlay" id="flash-overlay"></div>
+
+<!-- FLASH CARD -->
+<div class="flash-card" id="flash-card">
+  <div class="fc-header">
+    <div class="fc-badge"><span class="fc-rdot"></span>FLASH EVENT · QUOTA ESCLUSIVA</div>
+    <div class="fc-timer-big" id="fc-timer">90</div>
+  </div>
+  <div class="fc-body">
+    <div class="fc-cat" id="fc-cat"></div>
+    <div class="fc-q" id="fc-q"></div>
+    <div class="fc-ctx" id="fc-ctx"></div>
+    <div class="fc-btns">
+      <button class="fc-btn yes" id="fc-yes" onclick="voteFlash('si')">✓ Sì</button>
+      <button class="fc-btn no" id="fc-no" onclick="voteFlash('no')">✗ No</button>
+    </div>
+    <button class="fc-skip" onclick="closeFlash()">Salta questa quota →</button>
+  </div>
+</div>
+
+<!-- PROFILO -->
+<div class="prof-bg" id="prof-bg" onclick="closeProf(event)">
+  <div class="prof-box">
+    <div class="prof-ast-wrap">
+      <svg class="prof-ast" width="28" height="28" viewBox="0 0 20 20" fill="none">
+        <line x1="10" y1="1" x2="10" y2="19" stroke="#f5c842" stroke-width="1.2"/>
+        <line x1="1" y1="10" x2="19" y2="10" stroke="#f5c842" stroke-width="1.2"/>
+        <line x1="2.93" y1="2.93" x2="17.07" y2="17.07" stroke="#f5c842" stroke-width="1.2"/>
+        <line x1="17.07" y1="2.93" x2="2.93" y2="17.07" stroke="#f5c842" stroke-width="1.2"/>
+      </svg>
+    </div>
+    <div class="prof-name">QUOTA</div>
+    <div class="prof-fascia-big" id="pf-fascia">🌑 Neutrino</div>
+    <div class="prof-grid">
+      <div class="pg-box"><div class="pg-n" id="pf-qr">400</div><div class="pg-l">QR Rating</div></div>
+      <div class="pg-box"><div class="pg-n" id="pf-pct">Top 60%</div><div class="pg-l">Percentile</div></div>
+      <div class="pg-box"><div class="pg-n" id="pf-voti">0</div><div class="pg-l">Voti dati</div></div>
+      <div class="pg-box"><div class="pg-n" id="pf-acc">—%</div><div class="pg-l">Accuratezza</div></div>
+    </div>
+    <div class="prof-bar-wrap">
+      <div class="prof-bar-lbl"><span>Progressione fascia</span><span id="pf-next"></span></div>
+      <div class="prof-bar"><div class="prof-bar-fill" id="pf-bar" style="width:40%"></div></div>
+    </div>
+    <div class="prof-ranks" id="pf-ranks"></div>
+    <button class="prof-close" onclick="closeProf()">Chiudi</button>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<!-- MODAL DETAIL -->
-<div class="modal-bg" id="modal-bg" onclick="closeMod(event)">
-  <button class="modal-close" onclick="closeMod()">×</button>
-  <div class="modal-wrap" id="modal-wrap"></div>
-</div>
-
 <script>
 const BUR='https://god-core-backend.onrender.com';
 
-// ── QUOTA RATING SYSTEM (ELO percentile) ──────────────────────
-// Non crediti assoluti — posizione percentile dinamica
-// Se non giochi, scendi. Se azzecchi quando gli altri sbagliano, sali molto.
-
-const FASCIA_LIST=[
-  {n:'🌑 Neutrino',   pct:0,  max:40, c:'#a0a09a', rev:0},
-  {n:'🔵 Orbiter',    pct:40, max:70, c:'#60a5fa', rev:5},
-  {n:'💜 Pulsar',     pct:70, max:85, c:'#c084fc', rev:15},
-  {n:'⭐ Quasar',     pct:85, max:95, c:'#f5c842', rev:30},
-  {n:'✦ Singolarità', pct:95, max:100,c:'#00e87a', rev:50},
+// ── RATING ENGINE ─────────────────────────────────────────────
+const FL=[
+  {n:'🌑 Neutrino',   p:0,  max:40, c:'#a0a09a', rb:0},
+  {n:'🔵 Orbiter',    p:40, max:70, c:'#60a5fa', rb:5},
+  {n:'💜 Pulsar',     p:70, max:85, c:'#c084fc', rb:15},
+  {n:'⭐ Quasar',     p:85, max:95, c:'#f5c842', rb:30},
+  {n:'✦ Singolarità', p:95, max:100,c:'#00e87a', rb:50},
 ];
+let qr=parseFloat(localStorage.getItem('q_qr')||'400');
+let votes=JSON.parse(localStorage.getItem('qvotes')||'{}');
+let dvotes=JSON.parse(localStorage.getItem('qdvotes')||'{}');
+let vtot=parseInt(localStorage.getItem('q_vtot')||'0');
+let azz=parseInt(localStorage.getItem('q_azz')||'0');
+let streak=parseInt(localStorage.getItem('q_st')||'0');
+let doubleDown=JSON.parse(localStorage.getItem('q_dd')||'{}');
+let contraVotes=JSON.parse(localStorage.getItem('q_contra')||'{}');
+let notifCount=0;
 
-// QR = QUOTA Rating, da 0 a 1000
-// Percentile = posizione vs community simulata
-let qr = parseFloat(localStorage.getItem('q_qr')||'400'); // parte da 40° percentile
-let votes = JSON.parse(localStorage.getItem('qvotes')||'{}');
-let deepVotes = JSON.parse(localStorage.getItem('qdvotes')||'{}');
-let voti_totali = parseInt(localStorage.getItem('q_vtot')||'0');
-let azzeccati = parseInt(localStorage.getItem('q_azz')||'0');
-let currentStreak = parseInt(localStorage.getItem('q_st')||'0');
+function getPct(q){return Math.min(99,Math.max(1,Math.round((q/1000)*100)));}
+function getFascia(p){return FL.slice().reverse().find(f=>p>=f.p)||FL[0];}
 
-// Simula community size per calcolo percentile
-const COMMUNITY_SIZE = 2847;
-
-function getPercentile(qr_val){
-  // Formula: rating 0=0%, 500=50%, 1000=100% con curva
-  return Math.min(99, Math.max(0, Math.round((qr_val/1000)*100)));
+function decay(){
+  const last=parseInt(localStorage.getItem('q_ldt')||Date.now());
+  const dm=Math.floor((Date.now()-last)/86400000);
+  if(dm>=2){const pen=(dm-1)*8;qr=Math.max(0,qr-pen);save();}
 }
-
-function getFascia(pct){
-  return FASCIA_LIST.slice().reverse().find(f=>pct>=f.pct)||FASCIA_LIST[0];
-}
-
-// ELO update: quanto vale azzeccare dipende da quanto era difficile
-// Se il 20% aveva detto sì e hai detto sì → guadagni molto
-// Se l'80% aveva detto sì e hai detto sì → guadagni poco
-function updateRating(choice, correctAnswer, pctYes){
-  const pctCorrect = correctAnswer==='si' ? pctYes/100 : (100-pctYes)/100;
-  const difficulty = 1 - pctCorrect; // più era improbabile, più vale
-  
-  if(choice===correctAnswer){
-    // Azzeccata: +punti proporzionali alla difficoltà
-    const gain = Math.round(10 + difficulty * 40); // da +10 a +50
-    qr = Math.min(1000, qr + gain);
-    azzeccati++;
-    localStorage.setItem('q_azz', azzeccati);
-    return {result:'win', delta:'+'+gain};
-  } else {
-    // Sbagliata: -punti (meno se era difficile, di più se era facile)
-    const loss = Math.round(5 + (1-difficulty) * 20); // da -5 a -25
-    qr = Math.max(0, qr - loss);
-    return {result:'loss', delta:'-'+loss};
-  }
-}
-
-// Decay passivo: ogni giorno senza votare perdi rating
-// perché gli altri giocano e ti superano
-function applyDecay(){
-  const last = parseInt(localStorage.getItem('q_ldt')||Date.now());
-  const daysMissed = Math.floor((Date.now()-last)/86400000);
-  if(daysMissed >= 2){
-    const decayDays = daysMissed - 1;
-    const decayAmount = decayDays * 8; // -8 QR per giorno
-    qr = Math.max(0, qr - decayAmount);
-    if(decayAmount > 0) console.log('[QUOTA] Decay: -'+decayAmount+' QR ('+decayDays+'gg inattivo)');
-  }
-}
-
 function checkStreak(){
-  const today = new Date().toDateString();
-  const last = localStorage.getItem('q_ld');
-  const yest = new Date(Date.now()-86400000).toDateString();
-  if(last===today) return currentStreak;
-  if(last===yest){
-    currentStreak++;
-    if(currentStreak===7){qr=Math.min(1000,qr+30);toast('🔥 Streak 7 giorni! +30 QR');}
-    if(currentStreak===30){qr=Math.min(1000,qr+100);toast('🏆 Streak 30 giorni! +100 QR');}
-  } else if(last&&last!==yest){
-    qr=Math.max(0,qr-15);
-    currentStreak=1;
-    toast('💔 Streak rotta: -15 QR');
-  } else {currentStreak=1;}
-  localStorage.setItem('q_st',currentStreak);
-  localStorage.setItem('q_ld',today);
-  localStorage.setItem('q_ldt',Date.now());
-  return currentStreak;
+  const today=new Date().toDateString();
+  const last=localStorage.getItem('q_ld');
+  const yest=new Date(Date.now()-86400000).toDateString();
+  if(last===today)return;
+  if(last===yest){streak++;if(streak===7){qr=Math.min(1000,qr+30);pushNotif('🔥','Streak 7 giorni!','Bonus +30 QR. Continua così.');}if(streak===3){document.getElementById('chain-banner').classList.add('show');}}
+  else if(last&&last!==yest){qr=Math.max(0,qr-15);streak=1;pushNotif('💔','Streak rotta','-15 QR. Torna ogni giorno per non perdere posizioni.');}
+  else{streak=1;}
+  localStorage.setItem('q_st',streak);localStorage.setItem('q_ld',today);localStorage.setItem('q_ldt',Date.now());
 }
-
 function save(){
-  localStorage.setItem('q_qr', qr.toFixed(1));
-  localStorage.setItem('qvotes', JSON.stringify(votes));
-  localStorage.setItem('qdvotes', JSON.stringify(deepVotes));
-  localStorage.setItem('q_vtot', voti_totali);
-  const pct = getPercentile(qr);
-  const fascia = getFascia(pct);
-  // Aggiorna UI
-  const ncr = document.getElementById('nav-cr');
-  if(ncr) ncr.textContent = 'Top '+Math.max(1,100-pct)+'%';
-  const sbcr = document.getElementById('sb-cr');
-  if(sbcr) sbcr.textContent = Math.round(qr)+' QR';
-  const sbf = document.getElementById('sb-fascia');
-  if(sbf){sbf.textContent=fascia.n;sbf.style.color=fascia.c;}
-  const sbs = document.getElementById('sb-streak');
-  if(sbs) sbs.textContent = currentStreak;
+  localStorage.setItem('q_qr',qr.toFixed(1));
+  localStorage.setItem('qvotes',JSON.stringify(votes));
+  localStorage.setItem('qdvotes',JSON.stringify(dvotes));
+  localStorage.setItem('q_vtot',vtot);
+  localStorage.setItem('q_azz',azz);
+  localStorage.setItem('q_dd',JSON.stringify(doubleDown));
+  localStorage.setItem('q_contra',JSON.stringify(contraVotes));
+  const pct=getPct(qr);const f=getFascia(pct);
+  const nq=document.getElementById('nav-qr');if(nq)nq.textContent='Top '+(100-pct)+'%';
+  const sq=document.getElementById('sb-qr');if(sq)sq.textContent=Math.round(qr);
+  const sp=document.getElementById('sb-pct');if(sp)sp.textContent='Top '+(100-pct)+'% della community';
+  const sf=document.getElementById('sb-fascia');if(sf){sf.textContent=f.n;sf.style.color=f.c;sf.style.background='rgba('+hexToRgb(f.c)+',.08)';}
+  const ss=document.getElementById('sb-streak');if(ss)ss.textContent=streak;
 }
-
-// Aggiungi "crediti" come funzione compatibile (per reward display)
-function addCr(n, reason){ voti_totali++; localStorage.setItem('q_vtot',voti_totali); }
-
-applyDecay();
-checkStreak();
-
-// ── DATI ──────────────────────────────────────────────────────
-const HURRY=[
-  {id:'h1',cat:'Sport',q:'Sinner vince il primo set oggi contro Musetti?',info:'Sinner 71% vincente nei primi set negli ultimi 20 match. Musetti in buona forma sull\'erba.',deadline:Date.now()+4*3600000,reward:8},
-  {id:'h2',cat:'Finanza',q:'Il BTP 10Y chiude sopra 3.45% oggi?',info:'Apertura a 3.41%. Asta BOT ore 11:00. Dati inflazione USA alle 14:30.',deadline:Date.now()+6*3600000,reward:10},
-  {id:'h3',cat:'Mondo',q:'Biden rilascerà una dichiarazione sul Medio Oriente nelle prossime 3 ore?',info:'Vertice in corso. Fonti CNN indicano briefing previsto.',deadline:Date.now()+3*3600000,reward:6},
-  {id:'h4',cat:'Sport',q:'La Juventus segna nel primo tempo stasera?',info:'Juve ha segnato nel primo tempo nel 68% delle ultime 15 partite casalinghe.',deadline:Date.now()+8*3600000,reward:9},
-];
-
-const DEEP=[
-  {
-    id:'d1',cat:'Sport',featured:true,
-    q:'Lautaro Martínez sarà capocannoniere della Serie A 2026-27?',
-    ctx:'Ha segnato 24 gol la scorsa stagione, terzo in classifica. L\'Inter è favorita per lo Scudetto.',
-    deadline:new Date('2027-05-30').getTime(),
-    reward_total:180,
-    bets:[
-      {id:'gol',label:'Quanti gol farà in campionato?',cr:30,opts:['0-10','11-15','16-20','21-25','26-30','31+']},
-      {id:'assist',label:'Quanti assist?',cr:20,opts:['0-4','5-8','9-12','13+']},
-      {id:'capo',label:'Sarà capocannoniere?',cr:40,opts:['Sì','No']},
-      {id:'scudetto',label:'L\'Inter vince lo Scudetto?',cr:30,opts:['Sì','No']},
-      {id:'rinnovo',label:'Rinnoverà con l\'Inter entro luglio 2027?',cr:25,opts:['Sì','No','Già rinnovato']},
-      {id:'pallone',label:'Entrerà nella top 5 del Pallone d\'Oro?',cr:35,opts:['Sì','No']},
-    ]
-  },
-  {
-    id:'d2',cat:'Finanza',
-    q:'La BCE taglierà i tassi sotto il 2% entro fine 2026?',
-    ctx:'Tassi attuali al 2.5%. Lagarde ha segnalato cautela. Inflazione EU in calo.',
-    deadline:new Date('2026-12-31').getTime(),
-    reward_total:120,
-    bets:[
-      {id:'taglio',label:'Taglia sotto il 2% entro dicembre?',cr:40,opts:['Sì','No']},
-      {id:'quante',label:'Quanti tagli totali nel 2026?',cr:25,opts:['0','1','2','3','4+']},
-      {id:'spread',label:'Spread BTP-Bund sotto 100bp a fine anno?',cr:30,opts:['Sì','No']},
-      {id:'euro',label:'EUR/USD sopra 1.15 a dicembre?',cr:25,opts:['Sì','No']},
-    ]
-  },
-  {
-    id:'d3',cat:'Sport',
-    q:'Chi vincerà il Mondiale 2026?',
-    ctx:'USA, Canada e Messico ospitano. Argentina campione in carica. Francia favorita.',
-    deadline:new Date('2026-07-19').getTime(),
-    reward_total:200,
-    bets:[
-      {id:'vincitore',label:'Chi vince il Mondiale?',cr:60,opts:['Francia','Brasile','Argentina','Inghilterra','Spagna','Germania','Portogallo','Altro']},
-      {id:'capo_mond',label:'Capocannoniere del torneo?',cr:40,opts:['Mbappé','Ronaldo','Bellingham','Vinicius','Morata','Altro']},
-      {id:'italia',label:'L\'Italia supera i quarti?',cr:30,opts:['Sì','No','Non si qualifica']},
-      {id:'sorpresa',label:'Una sorpresa in semifinale (non tra le top 8)?',cr:35,opts:['Sì','No']},
-      {id:'gol_tot',label:'Gol totali del torneo?',cr:35,opts:['Meno di 150','150-179','180-210','Più di 210']},
-    ]
-  },
-];
-
-// ── UTILS ─────────────────────────────────────────────────────
+function hexToRgb(h){const r=parseInt(h.slice(1,3),16);const g=parseInt(h.slice(3,5),16);const b=parseInt(h.slice(5,7),16);return r+','+g+','+b;}
 function toast(m){
   const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');
   clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2800);
 }
+
+// ── NOTIFICHE ─────────────────────────────────────────────────
+function pushNotif(icon,title,body,onClick){
+  notifCount++;
+  const badge=document.getElementById('notif-badge');
+  badge.textContent=notifCount;badge.classList.add('show');
+  const stack=document.getElementById('notif-stack');
+  const el=document.createElement('div');
+  el.className='notif-item';
+  el.innerHTML=`<div class="ni-top"><span class="ni-icon">${icon}</span><span class="ni-title">${title}</span><button class="ni-close" onclick="this.closest('.notif-item').remove()">×</button></div><div class="ni-body">${body}</div>`;
+  el.onclick=onClick||null;
+  stack.appendChild(el);
+  setTimeout(()=>{el.classList.add('out');setTimeout(()=>el.remove(),300);},6000);
+  if(Notification.permission==='granted'){new Notification('QUOTA · '+title,{body,icon:'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><text y="28" font-size="28">⚡</text></svg>'});}
+}
+function toggleNotifs(){
+  notifCount=0;
+  const badge=document.getElementById('notif-badge');
+  badge.textContent='0';badge.classList.remove('show');
+  Notification.requestPermission();
+}
+
+// ── DATI ──────────────────────────────────────────────────────
+const catColor=c=>({Sport:'#fb923c',Finanza:'#f5c842',Politica:'#a855f7',Mondo:'#4f8ef7',Tech:'#2dd4bf'}[c]||'#a0a09a');
+
+const HURRY=[
+  {id:'h1',cat:'Sport',q:'Sinner vince il primo set contro Musetti?',info:'Sinner 71% vincente nei primi set negli ultimi 20 match. Musetti ottima forma erba.',deadline:Date.now()+4*3600000,qr:12,hype:95},
+  {id:'h2',cat:'Finanza',q:'Il BTP 10Y chiude sopra 3.45% oggi?',info:'Apertura 3.41%. Asta BOT ore 11:00. Dati inflazione USA alle 14:30.',deadline:Date.now()+6*3600000,qr:15,hype:88},
+  {id:'h3',cat:'Politica',q:'Meloni commenta i dazi USA nelle prossime 3 ore?',info:'Vertice G7 in corso. Conferenza stampa prevista alle 16:00.',deadline:Date.now()+3*3600000,qr:10,hype:82},
+  {id:'h4',cat:'Sport',q:'La Juventus segna nel primo tempo stasera?',info:'Juve segnato primo tempo nel 68% delle ultime 15 partite casalinghe.',deadline:Date.now()+8*3600000,qr:9,hype:91},
+];
+
+const DEEP=[
+  {id:'d1',cat:'Sport',featured:true,
+   q:'Lautaro Martínez sarà capocannoniere Serie A 2026-27?',
+   ctx:'24 gol la scorsa stagione. Inter favorita Scudetto. Rivali: Vlahovic, Osimhen.',
+   deadline:new Date('2027-05-30').getTime(),qr_max:180,
+   bets:[
+     {id:'gol',lbl:'Gol in campionato',qr:30,opts:['0-10','11-15','16-20','21-25','26-30','31+']},
+     {id:'assist',lbl:'Assist stagione',qr:20,opts:['0-4','5-8','9-12','13+']},
+     {id:'capo',lbl:'Sarà capocannoniere?',qr:40,opts:['Sì','No']},
+     {id:'scudetto',lbl:'Inter vince lo Scudetto?',qr:30,opts:['Sì','No']},
+     {id:'rinnovo',lbl:'Rinnova con l\'Inter entro luglio 2027?',qr:25,opts:['Sì','No','Già rinnovato']},
+     {id:'pallone',lbl:'Top 5 Pallone d\'Oro?',qr:35,opts:['Sì','No']},
+   ]},
+  {id:'d2',cat:'Politica',
+   q:'Chi vincerà le prossime elezioni politiche italiane?',
+   ctx:'Governo Meloni al 3° anno. Sondaggi: FdI 29%, PD 22%, M5S 14%. Elezioni entro 2027.',
+   deadline:new Date('2027-06-01').getTime(),qr_max:200,
+   bets:[
+     {id:'vince',lbl:'Chi vince le elezioni?',qr:60,opts:['Centrodestra','Centrosinistra','Nessuna maggioranza','Altri']},
+     {id:'premier',lbl:'Chi sarà premier?',qr:50,opts:['Meloni','Schlein','Conte','Altro']},
+     {id:'coali',lbl:'Il centrodestra mantiene la maggioranza?',qr:40,opts:['Sì con stessa coalizione','Sì con cambiamenti','No']},
+     {id:'fdipct',lbl:'FdI % alle elezioni?',qr:30,opts:['Sotto 25%','25-29%','30-35%','Oltre 35%']},
+     {id:'m5s',lbl:'M5S supera il 15%?',qr:20,opts:['Sì','No']},
+   ]},
+  {id:'d3',cat:'Sport',
+   q:'Chi vincerà il Mondiale 2026?',
+   ctx:'USA/Canada/Messico ospitano. Argentina campione. Francia, Brasile, Inghilterra favorite.',
+   deadline:new Date('2026-07-19').getTime(),qr_max:220,
+   bets:[
+     {id:'vince',lbl:'Paese vincitore',qr:70,opts:['Francia','Brasile','Argentina','Inghilterra','Spagna','Germania','Portogallo','Altro']},
+     {id:'capo',lbl:'Capocannoniere',qr:50,opts:['Mbappé','Ronaldo','Bellingham','Vinicius','Otro']},
+     {id:'italia',lbl:'Italia supera i quarti?',qr:35,opts:['Sì','No','Non si qualifica']},
+     {id:'gol',lbl:'Gol totali torneo',qr:35,opts:['<150','150-179','180-210','>210']},
+     {id:'sorpresa',lbl:'Una semi-finalista fuori dalle top 8?',qr:30,opts:['Sì','No']},
+   ]},
+  {id:'d4',cat:'Finanza',
+   q:'La BCE taglia i tassi sotto il 2% entro fine 2026?',
+   ctx:'Tassi attuali 2.5%. Lagarde cauta. Inflazione EU in calo. Mercati prezzano 2 tagli.',
+   deadline:new Date('2026-12-31').getTime(),qr_max:130,
+   bets:[
+     {id:'taglio',lbl:'Taglia sotto 2% entro dicembre?',qr:45,opts:['Sì','No']},
+     {id:'quante',lbl:'Tagli totali nel 2026',qr:30,opts:['0','1','2','3','4+']},
+     {id:'spread',lbl:'Spread BTP-Bund sotto 100bp a fine anno?',qr:30,opts:['Sì','No']},
+     {id:'euro',lbl:'EUR/USD sopra 1.15 a dicembre?',qr:25,opts:['Sì','No']},
+   ]},
+];
+
+// Flash events
+const FLASH_EVENTS=[
+  {id:'f1',cat:'Sport',q:'Sinner fa un ace nei prossimi 2 minuti?',ctx:'In campo ora al 3° set. 8 ace totali finora.',qr:20},
+  {id:'f2',cat:'Finanza',q:'Il Nasdaq apre in positivo tra 5 minuti?',ctx:'Futures +0.3%. Apertura mercati USA tra breve.',qr:18},
+  {id:'f3',cat:'Politica',q:'Il comunicato del G7 menziona l\'AI?',ctx:'Il comunicato finale viene letto tra 2 minuti.',qr:15},
+];
+
+// ── TICKER ────────────────────────────────────────────────────
+const TICKER_ITEMS=[
+  '⚡ Sinner 71% vince Wimbledon secondo QUOTA',
+  '📈 BTP 10Y: spread in calo a 118bp',
+  '⚽ Lautaro capocannoniere: QUOTA dice 34%',
+  '🗳️ Elezioni italiane: centrodestra favorito al 58%',
+  '🌍 Mondiale 2026: Francia in testa con 24%',
+  '💜 Top Contrarian questa settimana: +340 QR',
+  '🔥 Streak record: 23 giorni — utente @mk_trader',
+  '⭐ Quasar questa settimana: 847 utenti',
+  '⚡ Flash Event tra pochi minuti — rimani connesso',
+  '📊 Sentiment War: Sport batte Finanza 62% vs 38%',
+];
+function initTicker(){
+  const inner=document.getElementById('ticker-inner');
+  const items=[...TICKER_ITEMS,...TICKER_ITEMS].map(t=>`<span class="ticker-item"><span class="ticker-dot"></span>${t}</span>`).join('');
+  inner.innerHTML=items;
+}
+
+// ── SENTIMENT WAR ─────────────────────────────────────────────
+const SW_DATA=[
+  {cat:'Sport',   acc:68, c:'#fb923c'},
+  {cat:'Finanza', acc:54, c:'#f5c842'},
+  {cat:'Politica',acc:41, c:'#a855f7'},
+  {cat:'Mondo',   acc:59, c:'#4f8ef7'},
+];
+function renderSentimentWar(){
+  const bars=document.getElementById('sw-bars');
+  bars.innerHTML=SW_DATA.map(s=>`
+    <div class="sw-row">
+      <div class="sw-cat">${s.cat}</div>
+      <div class="sw-bar-wrap"><div class="sw-bar" style="width:${s.acc}%;background:${s.c}"></div></div>
+      <div class="sw-pct" style="color:${s.c}">${s.acc}%</div>
+    </div>`).join('');
+  // Aggiorna ogni 10 minuti con micro-variazioni
+  setInterval(()=>{
+    SW_DATA.forEach(s=>{s.acc=Math.min(99,Math.max(1,s.acc+(Math.random()-.5)*3|0));});
+    renderSentimentWar();
+  },10*60*1000);
+}
+
+// ── COUNTDOWN ─────────────────────────────────────────────────
 function cd(dl){
   const d=dl-Date.now();
   if(d<=0)return'SCADUTA';
@@ -395,240 +591,311 @@ function cd(dl){
   if(h>0)return h+'h '+m+'m';
   return m+'m '+s+'s';
 }
-function catColor(c){return{Sport:'#fb923c',Finanza:var_gold(),Politica:'#a855f7',Mondo:'#4f8ef7',Tech:'#2dd4bf'}[c]||'#a0a09a';}
-function var_gold(){return '#f5c842';}
 
-// ── RENDER HURRY UP ───────────────────────────────────────────
+// ── RENDER HURRY ─────────────────────────────────────────────
 function renderHurry(cards){
-  const sec=document.getElementById('hurry-section');
-  if(!cards.length){sec.innerHTML='<div style="padding:20px;text-align:center;color:var(--t3);font-size:12px">Nessuna quota Hurry Up attiva.</div>';return;}
-  sec.innerHTML=cards.map((c,i)=>{
-    const mv=votes[c.id];
-    const delay=i*50;
-    return `<div class="card-hurry" style="animation-delay:${delay}ms;margin-bottom:8px" onclick="openDetail('${c.id}','hurry')">
+  const wrap=document.getElementById('hurry-wrap');
+  wrap.innerHTML=cards.map((c,i)=>{
+    const mv=votes[c.id];const dd=doubleDown[c.id];const cv=contraVotes[c.id];
+    const isContra=cv&&!mv;
+    return `<div class="card-h" style="animation-delay:${i*50}ms" onclick="openHurryDetail('${c.id}')">
       <div class="ch-top">
-        <div class="ch-badge"><span class="rdot"></span>HURRY UP</div>
+        <div class="hurry-badge"><span class="rdot"></span>HURRY UP${c.hype>=90?' · 🔥 HYPE':''}</div>
         <div class="ch-timer" id="cd-${c.id}">${cd(c.deadline)}</div>
       </div>
       <div class="ch-body">
         <div class="ch-cat" style="color:${catColor(c.cat)}">${c.cat}</div>
         <div class="ch-q">${c.q}</div>
-        <div class="ch-info">
-          <div class="ch-info-title"><span class="rdot"></span>Info disponibili</div>
-          ${c.info}
-        </div>
+        <div class="ch-info">${c.info}</div>
         <div class="ch-btns">
-          <button class="ch-btn yes${mv==='si'?' voted-y':''}" onclick="voteH(event,'${c.id}','si',${c.reward})" ${mv?'disabled':''}>
-            ✓ Sì ${mv==='si'?'· ✓ Votato':'· +'+c.reward+' cr'}
+          <button class="ch-btn yes${mv==='si'?' voted-y':''}" onclick="event.stopPropagation();voteH('${c.id}','si',${c.qr})" ${mv||isContra?'disabled':''}>
+            ✓ Sì${mv==='si'?' ✓':''}${dd?'  ×2':''}
           </button>
-          <button class="ch-btn no${mv==='no'?' voted-n':''}" onclick="voteH(event,'${c.id}','no',${c.reward})" ${mv?'disabled':''}>
-            ✗ No ${mv==='no'?'· ✓ Votato':'· +'+c.reward+' cr'}
+          <button class="ch-btn no${mv==='no'?' voted-n':''}" onclick="event.stopPropagation();voteH('${c.id}','no',${c.qr})" ${mv||isContra?'disabled':''}>
+            ✗ No${mv==='no'?' ✓':''}${dd?'  ×2':''}
           </button>
         </div>
+        ${mv?`<div class="ch-actions">
+          ${!dd?`<button class="ch-action double" onclick="event.stopPropagation();doubleDownH('${c.id}',${c.qr})">⚡ Double Down ×2 QR</button>`:'<div class="ch-action" style="opacity:.4">Double Down usato</div>'}
+          <button class="ch-action" onclick="event.stopPropagation();exitH('${c.id}')">↩ Exit anticipato</button>
+        </div>`:`<div class="ch-actions">
+          <button class="ch-action contra" onclick="event.stopPropagation();contraH('${c.id}',${c.qr})">↺ Contra ${isContra?'✓':''} · +${c.qr*2} QR se vinci</button>
+        </div>`}
         <div class="ch-meta">
-          <span>Quota rapida · <strong style="color:var(--red)">+QR se azzecchi</strong></span>
-          ${mv?'<span style="color:var(--green);margin-left:4px">✓ Hai votato</span>':''}
+          <span>${c.hype}% hype</span>
+          ${mv?`<span style="color:var(--green)">✓ Votato ${mv==='si'?'Sì':'No'}</span>`:''}
+          ${cv?`<span style="color:var(--purple)">↺ Contrarian</span>`:''}
+          <span class="ch-qr">+${c.qr}${dd?'×2':''} QR</span>
         </div>
       </div>
     </div>`;
   }).join('');
 }
 
-// ── RENDER DEEP BET ───────────────────────────────────────────
+// ── RENDER DEEP ───────────────────────────────────────────────
 function renderDeep(cards){
-  const sec=document.getElementById('deep-section');
-  sec.innerHTML=cards.map((c,i)=>{
-    const dv=deepVotes[c.id]||{};
-    const voted=Object.keys(dv).length;
-    const total=c.bets.length;
-    const delay=50+i*60;
-    const earnedCr=c.bets.filter(b=>dv[b.id]).reduce((sum,b)=>sum+b.cr,0);
-    return `<div class="card-deep" style="animation-delay:${delay}ms;margin-bottom:8px" onclick="openDetail('${c.id}','deep')">
+  const wrap=document.getElementById('deep-wrap');
+  wrap.innerHTML=cards.map((c,i)=>{
+    const dv=dvotes[c.id]||{};
+    const placed=Object.keys(dv).length;
+    const totalQR=c.bets.filter(b=>dv[b.id]).reduce((s,b)=>s+b.qr,0);
+    return `<div class="card-d${c.featured?' featured':''}" style="animation-delay:${100+i*60}ms" onclick="openDeepDetail('${c.id}')">
       <div class="cd-hero">
-        <div class="cd-badges">
-          ${c.featured?'<span class="deep-badge">⭐ In evidenza</span>':''}
-          <span class="deep-badge" style="background:none;border-color:var(--b2);color:var(--t2)">Multi-scommessa</span>
+        <div class="cd-top">
+          <span class="cd-deep-badge">⭐ Deep Bet</span>
+          <span class="cd-cat" style="color:${catColor(c.cat)}">${c.cat}</span>
         </div>
-        <div class="cd-cat" style="color:${catColor(c.cat)};margin-bottom:8px">${c.cat}</div>
         <div class="cd-q">${c.q}</div>
-        <div class="cd-context">${c.ctx}</div>
-        <div class="cd-timer">⏳ ${cd(c.deadline)}</div>
-        ${voted>0?`<div style="font-size:10px;color:var(--green)">✓ ${voted}/${total} scommesse piazzate · ${Object.keys(dv).length} scommesse attive</div>`:`<div style="font-size:10px;color:var(--t3)">${total} scommesse disponibili · clicca per giocare</div>`}
+        <div class="cd-ctx">${c.ctx}</div>
+        <div class="cd-cd">⏳ ${cd(c.deadline)}</div>
+        ${placed>0?`<div style="font-size:10px;color:var(--green)">✓ ${placed}/${c.bets.length} piazzate · +${totalQR} QR in gioco</div>`:`<div style="font-size:10px;color:var(--t3)">${c.bets.length} scommesse · fino a +${c.qr_max} QR</div>`}
       </div>
       <div class="cd-bets">
         ${c.bets.slice(0,2).map(b=>{
           const sel=dv[b.id];
           return `<div class="cd-bet">
-            <div class="cd-bet-label">${b.label}<span class="cd-bet-cr">+${b.cr} cr</span></div>
-            <div class="cd-bet-opts">
-              ${b.opts.map(o=>`<button class="cd-opt${sel===o?' sel':''}" onclick="event.stopPropagation();selectOpt('${c.id}','${b.id}','${o}',this)" ${sel&&sel!==o?'disabled':''}>${o}</button>`).join('')}
+            <div class="cd-bet-lbl">${b.lbl}<span class="cd-bet-qr">+${b.qr} QR</span></div>
+            <div class="cd-opts">
+              ${b.opts.map(o=>`<button class="cd-opt${sel===o?' sel':''}" onclick="event.stopPropagation();selectOpt('${c.id}','${b.id}','${o}')" ${sel&&sel!==o?'disabled':''}>${o}</button>`).join('')}
             </div>
           </div>`;
         }).join('')}
-        ${total>2?`<div style="padding:10px 20px;font-size:11px;color:var(--t3);cursor:pointer" onclick="openDetail('${c.id}','deep')">+${total-2} altre scommesse → clicca per vedere tutto</div>`:''}
+        ${c.bets.length>2?`<div style="padding:8px 18px;font-size:10px;color:var(--t3)">+${c.bets.length-2} altre scommesse →</div>`:''}
       </div>
-      <div class="cd-footer">
-        ${voted>0?
-          `<div class="cd-voted-msg">✓ In gioco · ${voted}/${total} piazzate</div>
-           <div class="cd-total-cr">QR in gioco</div>`:
-          `<button class="cd-submit" onclick="event.stopPropagation();openDetail('${c.id}','deep')">Piazza le tue scommesse →</button>
-           <div class="cd-total-cr">fino a +${c.reward_total} QR</div>`
-        }
+      <div class="cd-foot">
+        ${placed>0?
+          `<div style="font-size:11px;color:var(--green)">✓ ${placed}/${c.bets.length} piazzate</div><div class="cd-tot-qr">+${totalQR} QR</div>`:
+          `<button class="cd-submit" onclick="event.stopPropagation();openDeepDetail('${c.id}')">Piazza le scommesse →</button><div class="cd-tot-qr">+${c.qr_max} QR max</div>`}
       </div>
     </div>`;
   }).join('');
 }
 
-// ── VOTE HURRY ────────────────────────────────────────────────
-function voteH(e,id,choice,reward){
-  e.stopPropagation();
+// ── AZIONI HURRY ──────────────────────────────────────────────
+function voteH(id,choice,qrAmount){
   if(votes[id])return;
-  votes[id]=choice;
-  addCr(1,'Voto');
+  votes[id]=choice;vtot++;
+  qr=Math.min(1000,qr+3);
   checkStreak();save();renderMain();
-  // Rating aggiornato quando la quota si chiude
-  // Per ora mostra feedback immediato
-  const pct=getPercentile(qr);
-  const f=getFascia(pct);
-  toast('⚡ Voto registrato · '+f.n+' · Top '+(100-pct)+'%');
+  const pct=getPct(qr);
+  toast('⚡ Votato '+choice.toUpperCase()+' · +'+qrAmount+' QR se azzecchi · Top '+(100-pct)+'%');
+  pushNotif('⚡','Voto registrato!','Se azzecchi guadagni +'+qrAmount+' QR e sali in classifica.');
+  localStorage.setItem('q_ldt',Date.now());
 }
 
-// ── SELECT OPZIONE DEEP ───────────────────────────────────────
-function selectOpt(cardId,betId,opt,btn){
-  if(!deepVotes[cardId])deepVotes[cardId]={};
-  if(deepVotes[cardId][betId]===opt){delete deepVotes[cardId][betId];}
-  else{
-    if(!deepVotes[cardId][betId])addCr(1,'Scommessa');
-    deepVotes[cardId][betId]=opt;
-  }
-  checkStreak();save();renderMain();
-  const pct=getPercentile(qr);
-  toast('⚡ Scommessa registrata · Top '+(100-pct)+'%');
+function doubleDownH(id,qrAmount){
+  if(!votes[id]||doubleDown[id])return;
+  doubleDown[id]=true;save();renderMain();
+  toast('⚡ Double Down! Il tuo QR raddoppia se azzecchi: +'+(qrAmount*2)+' QR');
+  pushNotif('⚡','Double Down attivato!','Hai raddoppiato la posta. +'+(qrAmount*2)+' QR se vinci.');
 }
 
-// ── MODAL DETAIL ──────────────────────────────────────────────
-function openDetail(id,type){
-  const card=type==='hurry'?HURRY.find(c=>c.id===id):DEEP.find(c=>c.id===id);
+function exitH(id){
+  if(!votes[id])return;
+  // Exit anticipato: cristallizza 30% del QR potenziale
+  const card=HURRY.find(c=>c.id===id);
   if(!card)return;
+  const exitQr=Math.round(card.qr*0.3);
+  qr=Math.min(1000,qr+exitQr);
+  delete votes[id];save();renderMain();
+  toast('↩ Exit anticipato: +'+exitQr+' QR cristallizzati');
+}
 
-  let html='';
-  if(type==='hurry'){
-    const mv=votes[card.id];
-    html=`<div class="mbox">
-      <div class="mbox-head">${card.cat} · Hurry Up</div>
-      <div style="padding:22px">
-        <div style="font-family:var(--sg);font-size:22px;font-weight:800;line-height:1.3;margin-bottom:12px">${card.q}</div>
-        <div style="background:rgba(255,61,90,.06);border:1px solid rgba(255,61,90,.15);border-radius:8px;padding:14px;margin-bottom:16px">
-          <div style="font-size:9px;font-weight:700;letter-spacing:.1em;color:var(--red);margin-bottom:8px">📊 INFO DISPONIBILI</div>
-          <div style="font-size:13px;color:var(--t2);line-height:1.65">${card.info}</div>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;padding:12px;background:var(--gd);border:1px solid rgba(245,200,66,.15);border-radius:8px">
-          <div><div style="font-size:9px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase">⏱ Scadenza</div><div style="font-family:var(--sg);font-size:18px;font-weight:800;color:var(--red)" id="mcd-${card.id}">${cd(card.deadline)}</div></div>
-          <div style="text-align:right"><div style="font-size:9px;color:var(--t3);letter-spacing:.1em;text-transform:uppercase">Premio</div><div style="font-family:var(--sg);font-size:18px;font-weight:800;color:var(--gold)">+QR se azzecchi</div></div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          <button class="ch-btn yes${mv==='si'?' voted-y':''}" style="padding:14px;border-radius:10px;font-size:14px" onclick="voteH(event,'${card.id}','si',${card.reward});closeMod()" ${mv?'disabled':''}>✓ Sì${mv==='si'?' · Votato':''}</button>
-          <button class="ch-btn no${mv==='no'?' voted-n':''}" style="padding:14px;border-radius:10px;font-size:14px" onclick="voteH(event,'${card.id}','no',${card.reward});closeMod()" ${mv?'disabled':''}>✗ No${mv==='no'?' · Votato':''}</button>
-        </div>
-      </div>
-    </div>`;
-  } else {
-    const dv=deepVotes[card.id]||{};
-    html=`<div class="mbox">
-      <div class="mbox-head">${card.cat} · Deep Bet · fino a +${card.reward_total} cr</div>
-      <div style="padding:22px 22px 16px">
-        <div style="font-family:var(--sg);font-size:22px;font-weight:800;line-height:1.3;margin-bottom:10px">${card.q}</div>
-        <div style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:14px;padding-left:10px;border-left:2px solid rgba(255,255,255,.08)">${card.ctx}</div>
-        <div style="display:inline-flex;align-items:center;gap:6px;font-family:var(--sg);font-size:12px;font-weight:700;color:var(--gold);background:var(--gd);border:1px solid rgba(245,200,66,.15);padding:5px 12px;border-radius:20px">⏳ ${cd(card.deadline)}</div>
-      </div>
+function contraH(id,qrAmount){
+  if(votes[id]||contraVotes[id])return;
+  contraVotes[id]=true;save();renderMain();
+  toast('↺ Sei il Contrarian! +'+qrAmount*2+' QR se la maggioranza sbaglia');
+  pushNotif('↺','Contrarian attivato!','Stai scommettendo contro la community. Rischio alto, reward alto.');
+}
+
+// ── SELECT DEEP ───────────────────────────────────────────────
+function selectOpt(cardId,betId,opt){
+  if(!dvotes[cardId])dvotes[cardId]={};
+  if(dvotes[cardId][betId]===opt){delete dvotes[cardId][betId];}
+  else{dvotes[cardId][betId]=opt;}
+  checkStreak();save();renderMain();
+  toast('⚡ Scommessa aggiornata');
+}
+
+// ── DETAIL MODALS ─────────────────────────────────────────────
+function openHurryDetail(id){
+  const c=HURRY.find(x=>x.id===id);if(!c)return;
+  const mv=votes[c.id];
+  showModal(`<div style="padding:22px">
+    <div style="font-size:8px;font-weight:800;letter-spacing:.16em;color:${catColor(c.cat)};margin-bottom:8px">${c.cat} · HURRY UP</div>
+    <div style="font-family:var(--sg);font-size:22px;font-weight:800;line-height:1.3;margin-bottom:12px">${c.q}</div>
+    <div style="background:rgba(255,61,90,.06);border:1px solid rgba(255,61,90,.15);border-radius:8px;padding:14px;margin-bottom:16px;font-size:13px;color:var(--t2);line-height:1.65"><div style="font-size:8px;font-weight:700;letter-spacing:.1em;color:var(--red);margin-bottom:6px">📊 INFO DISPONIBILI</div>${c.info}</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;background:var(--gd);border:1px solid rgba(245,200,66,.15);border-radius:8px;padding:12px 16px;margin-bottom:16px">
+      <div><div style="font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em">⏱ Scadenza</div><div style="font-family:var(--sg);font-size:20px;font-weight:900;color:var(--red)">${cd(c.deadline)}</div></div>
+      <div style="text-align:right"><div style="font-size:8px;color:var(--t3);text-transform:uppercase;letter-spacing:.1em">Premio</div><div style="font-family:var(--sg);font-size:20px;font-weight:900;color:var(--gold)">+${c.qr} QR</div></div>
     </div>
-    <div class="mbox">
-      <div class="mbox-head">Le tue scommesse</div>
-      ${card.bets.map(b=>{
-        const sel=dv[b.id];
-        return `<div class="cd-bet" style="padding:16px 22px">
-          <div class="cd-bet-label">${b.label}<span class="cd-bet-cr">+${b.cr} cr se azzecchi</span></div>
-          <div class="cd-bet-opts">
-            ${b.opts.map(o=>`<button class="cd-opt${sel===o?' sel':''}" onclick="selectOpt('${card.id}','${b.id}','${o}',this);document.querySelectorAll('.cd-opt').forEach(x=>{if(x.textContent.trim()==='${o}'&&x.closest('[data-bid=\\'${b.id}\\']'))x.classList.toggle('sel')});renderMain()" ${sel&&sel!==o?'disabled':''}>${o}</button>`).join('')}
-          </div>
-        </div>`;
-      }).join('')}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button class="ch-btn yes${mv==='si'?' voted-y':''}" style="padding:14px;border-radius:10px;font-size:14px" onclick="voteH('${c.id}','si',${c.qr});closeModal()" ${mv?'disabled':''}>✓ Sì</button>
+      <button class="ch-btn no${mv==='no'?' voted-n':''}" style="padding:14px;border-radius:10px;font-size:14px" onclick="voteH('${c.id}','no',${c.qr});closeModal()" ${mv?'disabled':''}>✗ No</button>
     </div>
-    <div class="mbox" style="padding:16px 22px;display:flex;align-items:center;justify-content:space-between">
-      <div style="font-size:12px;color:var(--t2)">${Object.keys(dv).length}/${card.bets.length} scommesse piazzate</div>
-      <div style="font-family:var(--sg);font-size:14px;font-weight:800;color:var(--gold)">+${card.bets.filter(b=>dv[b.id]).reduce((s,b)=>s+b.cr,0)} cr in gioco</div>
-    </div>`;
+  </div>`);
+}
+
+function openDeepDetail(id){
+  const c=DEEP.find(x=>x.id===id);if(!c)return;
+  const dv=dvotes[c.id]||{};
+  showModal(`
+    <div style="padding:22px 22px 16px">
+      <div style="font-size:8px;font-weight:800;letter-spacing:.16em;color:${catColor(c.cat)};margin-bottom:8px">${c.cat} · DEEP BET</div>
+      <div style="font-family:var(--sg);font-size:22px;font-weight:800;line-height:1.3;margin-bottom:8px">${c.q}</div>
+      <div style="font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:12px;padding-left:9px;border-left:2px solid rgba(255,255,255,.08)">${c.ctx}</div>
+      <div style="display:inline-flex;align-items:center;gap:5px;font-family:var(--sg);font-size:11px;font-weight:700;color:var(--gold);background:var(--gd);border:1px solid rgba(245,200,66,.15);padding:4px 11px;border-radius:20px">⏳ ${cd(c.deadline)} · fino a +${c.qr_max} QR</div>
+    </div>
+    ${c.bets.map(b=>{
+      const sel=dv[b.id];
+      return `<div style="padding:14px 22px;border-top:1px solid rgba(255,255,255,.05)">
+        <div style="font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--t3);margin-bottom:8px;display:flex;justify-content:space-between">${b.lbl}<span style="color:var(--gold)">+${b.qr} QR</span></div>
+        <div class="cd-opts">${b.opts.map(o=>`<button class="cd-opt${sel===o?' sel':''}" onclick="selectOpt('${c.id}','${b.id}','${o}');updateModal('${c.id}')" ${sel&&sel!==o?'disabled':''}>${o}</button>`).join('')}</div>
+      </div>`;
+    }).join('')}
+    <div style="padding:14px 22px;background:rgba(0,0,0,.2);display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:11px;color:var(--t2)">${Object.keys(dv).length}/${c.bets.length} scommesse</div>
+      <div style="font-family:var(--sg);font-size:13px;font-weight:800;color:var(--gold)">+${c.bets.filter(b=>dv[b.id]).reduce((s,b)=>s+b.qr,0)} QR in gioco</div>
+    </div>`);
+}
+
+// ── MODAL GENERICO ────────────────────────────────────────────
+let modalEl=null;
+function showModal(html){
+  if(!modalEl){
+    modalEl=document.createElement('div');
+    modalEl.style.cssText='position:fixed;inset:0;z-index:700;background:rgba(4,4,12,.9);backdrop-filter:blur(16px);overflow-y:auto;padding:20px;display:flex;align-items:flex-start;justify-content:center';
+    modalEl.onclick=e=>{if(e.target===modalEl)closeModal();};
+    const closeBtn=document.createElement('button');
+    closeBtn.style.cssText='position:fixed;top:20px;right:20px;width:40px;height:40px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:50%;color:#fff;font-size:20px;cursor:pointer;z-index:701;display:flex;align-items:center;justify-content:center';
+    closeBtn.textContent='×';closeBtn.onclick=closeModal;
+    document.body.appendChild(modalEl);document.body.appendChild(closeBtn);
+    modalEl._close=closeBtn;
   }
+  const inner=document.createElement('div');
+  inner.style.cssText='background:rgba(14,14,24,.98);border:1px solid rgba(255,255,255,.1);border-radius:16px;width:min(640px,94vw);margin:auto;box-shadow:0 32px 80px rgba(0,0,0,.9);overflow:hidden;animation:flashIn .3s ease';
+  inner.innerHTML=html;
+  modalEl.innerHTML='';modalEl.appendChild(inner);
+  modalEl.style.display='flex';document.body.style.overflow='hidden';
+}
+function closeModal(){if(modalEl){modalEl.style.display='none';if(modalEl._close)modalEl._close.style.display='none';document.body.style.overflow='';}}
+function updateModal(cardId){const c=DEEP.find(x=>x.id===cardId);if(c)openDeepDetail(cardId);}
 
-  document.getElementById('modal-wrap').innerHTML=html;
-  document.getElementById('modal-bg').classList.add('open');
-  document.body.style.overflow='hidden';
-
-  clearInterval(window._mcd);
-  window._mcd=setInterval(()=>{
-    const el=document.getElementById('mcd-'+card.id);
-    if(el)el.textContent=cd(card.deadline);
+// ── FLASH EVENT ───────────────────────────────────────────────
+let flashTimer=null,flashActive=null,flashSecs=90;
+function triggerFlash(){
+  if(flashActive)return;
+  const f=FLASH_EVENTS[Math.floor(Math.random()*FLASH_EVENTS.length)];
+  flashActive=f;flashSecs=90;
+  document.getElementById('fc-cat').textContent=f.cat;
+  document.getElementById('fc-q').textContent=f.q;
+  document.getElementById('fc-ctx').textContent=f.ctx;
+  document.getElementById('fc-timer').textContent='90';
+  document.getElementById('flash-card').classList.add('show');
+  document.getElementById('flash-overlay').classList.add('active');
+  document.getElementById('fc-yes').disabled=false;
+  document.getElementById('fc-no').disabled=false;
+  pushNotif('⚡','Flash Event!',f.q+' — Hai 90 secondi!');
+  flashTimer=setInterval(()=>{
+    flashSecs--;
+    document.getElementById('fc-timer').textContent=flashSecs;
+    if(flashSecs<=0)closeFlash();
+    if(flashSecs<=10)document.getElementById('fc-timer').style.color='#ff3d5a';
   },1000);
 }
-
-function closeMod(e){
-  if(e&&e.target!==document.getElementById('modal-bg')&&!e.target.classList.contains('modal-close'))return;
-  document.getElementById('modal-bg').classList.remove('open');
-  document.body.style.overflow='';
-  clearInterval(window._mcd);
+function voteFlash(choice){
+  if(!flashActive)return;
+  clearInterval(flashTimer);
+  qr=Math.min(1000,qr+5);vtot++;save();
+  toast('⚡ Flash votato! +'+flashActive.qr+' QR se azzecchi!');
+  closeFlash();
 }
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeMod({target:document.getElementById('modal-bg')});});
+function closeFlash(){
+  clearInterval(flashTimer);flashActive=null;
+  document.getElementById('flash-card').classList.remove('show');
+  document.getElementById('flash-overlay').classList.remove('active');
+  document.getElementById('fc-timer').style.color='#fff';
+}
+// Flash ogni 8-15 minuti
+function scheduleFlash(){setTimeout(()=>{triggerFlash();scheduleFlash();},Math.random()*420000+480000);}
+
+// ── CHAIN BET ─────────────────────────────────────────────────
+function openChain(){
+  showModal(`<div style="padding:22px">
+    <div style="font-family:var(--sg);font-size:10px;font-weight:700;color:var(--purple);margin-bottom:10px;letter-spacing:.1em;text-transform:uppercase">🔗 CHAIN BET ESCLUSIVO · Solo per te</div>
+    <div style="font-family:var(--sg);font-size:20px;font-weight:800;margin-bottom:12px">Hai 3 previsioni giuste di fila. Questo evento è visibile solo a chi è in streak.</div>
+    <div style="background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.2);border-radius:8px;padding:14px;margin-bottom:16px;font-size:13px;color:rgba(168,85,247,.8);line-height:1.6">La Juventus vince e Sinner vince lo stesso giorno?<br><br>Premio: +85 QR (il doppio del normale)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button style="padding:14px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.2);color:var(--purple);font-family:var(--sg)" onclick="toast('⚡ Chain Bet: Sì! +85 QR se azzecchi');closeModal()">✓ Sì · +85 QR</button>
+      <button style="padding:14px;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;background:rgba(255,61,90,.08);border:1px solid rgba(255,61,90,.18);color:var(--red);font-family:var(--sg)" onclick="toast('Chain Bet: No piazzato');closeModal()">✗ No · +85 QR</button>
+    </div>
+  </div>`);
+}
+
+// ── PROFILO ───────────────────────────────────────────────────
+function openProf(){
+  const pct=getPct(qr);const f=getFascia(pct);const nextF=FL[FL.indexOf(f)+1];
+  const progPct=nextF?Math.round(((pct-f.p)/(nextF.p-f.p))*100):100;
+  document.getElementById('pf-fascia').textContent=f.n;
+  document.getElementById('pf-fascia').style.color=f.c;
+  document.getElementById('pf-qr').textContent=Math.round(qr);
+  document.getElementById('pf-pct').textContent='Top '+(100-pct)+'%';
+  document.getElementById('pf-voti').textContent=vtot;
+  document.getElementById('pf-acc').textContent=vtot>0?Math.round(azz/vtot*100)+'%':'—%';
+  document.getElementById('pf-bar').style.width=progPct+'%';
+  document.getElementById('pf-next').textContent=nextF?'→ '+nextF.n+' ('+nextF.p+'%)':'MAX';
+  document.getElementById('pf-ranks').innerHTML=FL.map(r=>`
+    <div class="pr-row${r.n===f.n?' active':''}">
+      <div class="pr-dot" style="background:${r.c}"></div>
+      <div class="pr-name" style="color:${r.n===f.n?r.c:'var(--t3)'}">${r.n}</div>
+      <div class="pr-req">Top ${100-r.p}% · ${r.rb}% revenue</div>
+    </div>`).join('');
+  document.getElementById('prof-bg').classList.add('open');
+}
+function closeProf(e){
+  if(e&&e.target!==document.getElementById('prof-bg'))return;
+  document.getElementById('prof-bg').classList.remove('open');
+}
 
 // ── FILTRI ────────────────────────────────────────────────────
-let activeCat='tutti',activeType='tutti',showMiei=false;
-
+let activeCat='tutti',activeType='tutti';
 function filterCat(cat){
-  activeCat=cat;showMiei=false;
-  document.querySelectorAll('.nav-cat').forEach(b=>{
-    b.classList.toggle('on',b.textContent===cat||(cat==='tutti'&&b.textContent==='Tutti'));
-  });
+  activeCat=cat;activeType='tutti';
+  document.querySelectorAll('.nav-cat').forEach(b=>b.classList.toggle('on',b.textContent===cat||(cat==='tutti'&&b.textContent==='Tutti')));
   renderMain();
 }
-function filterType(type){
-  activeType=type;showMiei=false;
-  document.querySelectorAll('.sb-item').forEach(b=>{
-    b.classList.toggle('on',b.textContent.trim().startsWith(type==='tutti'?'Tutte':type==='hurry'?'Hurry':'Deep'));
-  });
-  renderMain();
+function filterType(t){activeType=t;renderMain();}
+function filterMiei(){
+  showModal('<div style="padding:22px"><div style="font-family:var(--sg);font-size:18px;font-weight:800;margin-bottom:16px">I miei voti</div>'+
+    HURRY.filter(c=>votes[c.id]).map(c=>`<div style="padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:12px;color:var(--t2)">${c.q}<span style="float:right;color:${votes[c.id]==='si'?'var(--green)':'var(--red)'}">→ ${votes[c.id].toUpperCase()}</span></div>`).join('')+
+    '</div>');
 }
-function filterMiei(){showMiei=true;renderMain();}
+function filterContra(){
+  showModal('<div style="padding:22px"><div style="font-family:var(--sg);font-size:18px;font-weight:800;color:var(--purple);margin-bottom:8px">↺ Contrarian</div><div style="font-size:12px;color:var(--t2);margin-bottom:16px">Hai scommesso contro la community su '+Object.keys(contraVotes).length+' previsioni.</div><div style="font-size:11px;color:var(--t3)">I Contrarian con ragione guadagnano il doppio del QR normale. Il badge Contrarian è il più raro su QUOTA.</div></div>');
+}
 
-// ── RENDER MAIN ───────────────────────────────────────────────
 function renderMain(){
-  let hurry=[...HURRY];
-  let deep=[...DEEP];
-  if(activeCat!=='tutti'){hurry=hurry.filter(c=>c.cat===activeCat);deep=deep.filter(c=>c.cat===activeCat);}
-  if(showMiei){hurry=hurry.filter(c=>votes[c.id]);deep=deep.filter(c=>deepVotes[c.id]&&Object.keys(deepVotes[c.id]).length>0);}
-  if(activeType==='hurry')deep=[];
-  if(activeType==='deep')hurry=[];
-
-  document.getElementById('cnt-tutti').textContent=HURRY.length+DEEP.length;
-  document.getElementById('cnt-hurry').textContent=HURRY.length;
-  document.getElementById('cnt-deep').textContent=DEEP.length;
-
-  const hs=document.querySelector('.sec-head');
-  if(hs)hs.style.display=hurry.length?'flex':'none';
-  const ds=document.querySelectorAll('.sec-head')[1];
-  if(ds)ds.style.display=deep.length?'flex':'none';
-
-  renderHurry(hurry);
-  renderDeep(deep);
-  save();
+  let h=[...HURRY],d=[...DEEP];
+  if(activeCat!=='tutti'){h=h.filter(c=>c.cat===activeCat);d=d.filter(c=>c.cat===activeCat);}
+  if(activeType==='hurry')d=[];
+  if(activeType==='deep')h=[];
+  document.getElementById('cnt-t').textContent=HURRY.length+DEEP.length;
+  document.getElementById('cnt-h').textContent=HURRY.length;
+  document.getElementById('cnt-d').textContent=DEEP.length;
+  renderHurry(h);renderDeep(d);
 }
 
 // ── COUNTDOWN LIVE ────────────────────────────────────────────
-setInterval(()=>{
-  HURRY.forEach(c=>{
-    const el=document.getElementById('cd-'+c.id);
-    if(el)el.textContent=cd(c.deadline);
-  });
-},1000);
+setInterval(()=>{HURRY.forEach(c=>{const el=document.getElementById('cd-'+c.id);if(el)el.textContent=cd(c.deadline);});},1000);
 
 // ── INIT ──────────────────────────────────────────────────────
-save();renderMain();
-console.log('[QUOTA] QR:',Math.round(qr),'Percentile:',getPercentile(qr),'Fascia:',getFascia(getPercentile(qr)).n);
+decay();checkStreak();save();
+initTicker();renderSentimentWar();renderMain();
+scheduleFlash();
+// Notifica di benvenuto dopo 3 secondi
+setTimeout(()=>pushNotif('⚡','Benvenuto su QUOTA','Hai 4 Hurry Up in scadenza oggi. Non perderle!'),3000);
+setTimeout(()=>pushNotif('🔥','Flash Event in arrivo','Preparati: tra ~10 minuti arriva un evento lampo.'),8000);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closeFlash();}});
+</script>
+</body>
+</html>
