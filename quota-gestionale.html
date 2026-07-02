@@ -212,6 +212,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--g
       <button class="news-tab" onclick="switchTab('ai')">AI-Ready ⚡</button>
       <button class="news-tab" onclick="switchTab('hot')">🔥 Hot</button>
       <button class="news-tab" onclick="switchTab('live')">✓ Live</button>
+      <button class="news-tab" onclick="switchTab('eventi')">📅 Eventi</button>
     </div>
 
     <div id="feed-list" style="flex:1;overflow-y:auto">
@@ -468,15 +469,16 @@ function safeGet(id){return document.getElementById(id);}
 
 function renderFeed(){
   const list=document.getElementById('feed-list');
-  const empty=document.getElementById('empty');
   let filtered=[...quotes];
   if(activeTab==='ai')filtered=filtered.filter(q=>q.status==='ai');
   if(activeTab==='hot')filtered=filtered.filter(q=>q.hype>=80);
   if(activeTab==='live')filtered=filtered.filter(q=>q.status==='published');
   // Ordina per hype desc
   filtered.sort((a,b)=>b.hype-a.hype);
-  if(!filtered.length){if(empty)empty.style.display='flex';list.innerHTML='';return;}
-  empty.style.display='none';
+  if(!filtered.length){
+    list.innerHTML='<div class="empty-c"><div style="font-size:24px">⚡</div><div style="font-family:var(--sg);font-size:14px;color:var(--t2)">Nessuna notizia in questa tab</div><div style="font-size:11px">Premi "Genera quote da RSS" o cambia tab</div></div>';
+    return;
+  }
 
   const hypeColor=h=>h>=85?'#ff3d5a':h>=70?'#ff8c00':h>=50?'#f5c842':'#4f8ef7';
   list.innerHTML=filtered.map(q=>`
@@ -657,8 +659,8 @@ async function resolveQ(esito){
 // ── TAB ───────────────────────────────────────────────────────
 function switchTab(t){
   activeTab=t;
-  document.querySelectorAll('.news-tab').forEach((b,i)=>b.classList.toggle('on',['all','ai','hot','live'][i]===t));
-  renderFeed();
+  document.querySelectorAll('.news-tab').forEach((b,i)=>b.classList.toggle('on',['all','ai','hot','live','eventi'][i]===t));
+  if(t==='eventi'){renderEventsTab();}else{renderFeed();}
 }
 
 // ── CHAT ─────────────────────────────────────────────────────
@@ -704,6 +706,191 @@ function simulateActivity(){
   document.getElementById('tb-voti').textContent=n;
   document.getElementById('tb-top').textContent='Top 1%: '+Math.round(850+Math.random()*50)+' QR';
 }
+
+
+// ── EVENTI + GENERATORE SCOMMESSE AI ─────────────────────────
+let evList=JSON.parse(localStorage.getItem('q_events')||'[]');
+let selEv=null;
+
+const BG_EV={
+  tennis:'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=600&q=80',
+  calcio:'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600&q=80',
+  f1:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
+  finanza:'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&q=80',
+  politica:'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=600&q=80',
+  sport:'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=600&q=80',
+};
+function evBg(title){
+  const t=(title||'').toLowerCase();
+  if(t.includes('wimbledon')||t.includes('tennis')||t.includes('atp')||t.includes('sinner'))return BG_EV.tennis;
+  if(t.includes('inter')||t.includes('juve')||t.includes('milan')||t.includes('champions')||t.includes('calcio')||t.includes('serie a'))return BG_EV.calcio;
+  if(t.includes('formula')||t.includes('f1')||t.includes('gp '))return BG_EV.f1;
+  if(t.includes('bce')||t.includes('fed')||t.includes('btp')||t.includes('tassi')||t.includes('cpi')||t.includes('nfp'))return BG_EV.finanza;
+  if(t.includes('elezioni')||t.includes('governo')||t.includes('meloni'))return BG_EV.politica;
+  return BG_EV.sport;
+}
+
+function applyBgs(){
+  document.querySelectorAll('[data-bg]').forEach(function(el){
+    el.style.backgroundImage='url('+el.getAttribute('data-bg')+')';
+  });
+}
+
+function renderEventsTab(){
+  const list=safeGet('feed-list');
+  if(!list)return;
+  const addForm='<div style="padding:12px;border-bottom:1px solid var(--b1);background:rgba(8,8,18,.95)">'
+    +'<div style="font-size:8px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--t3);margin-bottom:7px">Nuovo evento calendario</div>'
+    +'<div style="display:flex;flex-direction:column;gap:6px">'
+    +'<input id="ev-title" class="ed-input" type="text" placeholder="Es: Wimbledon 2026 · Semifinale Sinner" style="font-size:12px">'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px">'
+    +'<select id="ev-cat" class="ed-input sm"><option>Sport</option><option>Finanza</option><option>Politica</option></select>'
+    +'<input id="ev-date" class="ed-input sm" type="datetime-local">'
+    +'<select id="ev-type" class="ed-input sm"><option value="deep">Deep Bet</option><option value="hurry">Hurry Up</option></select>'
+    +'</div>'
+    +'<input id="ev-ctx" class="ed-input sm" type="text" placeholder="Contesto per AI (stats, quote bookmaker, forma recente...)">'
+    +'<button class="btn-gen" onclick="addAndGenBets()" style="font-size:11px;padding:8px">⚡ Crea evento + genera 10 scommesse AI</button>'
+    +'</div></div>';
+
+  if(!evList.length){
+    list.innerHTML=addForm+'<div class="empty-c"><div style="font-size:20px">📅</div><div style="font-family:var(--sg);font-size:13px;color:var(--t2)">Nessun evento nel calendario</div><div style="font-size:11px">Crea il primo evento qui sopra</div></div>';
+    return;
+  }
+
+  const rows=evList.map(function(ev,i){
+    const bg=evBg(ev.title);
+    const betsN=ev.bets?ev.bets.length:0;
+    const status=ev.published?'published':betsN?'ai':'pending';
+    const statusTxt=ev.published?'✓ Live':betsN?betsN+' scommesse pronte':'Da generare';
+    return '<div class="news-row '+status+(selEv&&selEv.id===ev.id?' selected':'')+'" onclick="selectEv('+i+')">'
+      +'<div class="nr-inner">'
+      +'<div data-bg="'+bg+'" style="width:56px;height:40px;border-radius:5px;background-size:cover;background-position:center;flex-shrink:0"></div>'
+      +'<div>'
+      +'<div class="nr-title">'+ev.title+'</div>'
+      +'<div class="nr-meta"><span class="nr-src">'+ev.cat+' · '+(ev.date?new Date(ev.date).toLocaleString('it-IT',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'senza data')+'</span>'
+      +'<span class="nbadge '+status+'">'+statusTxt+'</span></div>'
+      +'</div>'
+      +'<div class="nr-actions">'
+      +(betsN&&!ev.published?'<button class="nr-act-btn pub" onclick="event.stopPropagation();pubEv('+i+')">✓ Live</button>':'')
+      +'<button class="nr-act-btn gen" onclick="event.stopPropagation();genBets('+i+')">⚡ Bets</button>'
+      +'<button class="nr-act-btn rej" onclick="event.stopPropagation();delEv('+i+')">✕</button>'
+      +'</div></div></div>';
+  }).join('');
+
+  list.innerHTML=addForm+rows;
+  setTimeout(applyBgs,0);
+}
+
+async function addAndGenBets(){
+  const titleEl=safeGet('ev-title');
+  const title=titleEl?titleEl.value.trim():'';
+  if(!title){log('Inserisci il titolo evento','err');return;}
+  const ev={
+    id:'ev_'+Date.now(),
+    title:title,
+    cat:(safeGet('ev-cat')||{}).value||'Sport',
+    date:(safeGet('ev-date')||{}).value||'',
+    type:(safeGet('ev-type')||{}).value||'deep',
+    ctx:(safeGet('ev-ctx')||{}).value||'',
+    bets:[],published:false
+  };
+  evList.unshift(ev);
+  saveEvList();
+  renderEventsTab();
+  await genBets(0);
+}
+
+async function genBets(idx){
+  const ev=evList[idx];if(!ev)return;
+  let groqKey=localStorage.getItem('quota_groq_key');
+  if(!groqKey){
+    const k=window.prompt('Groq API key (console.groq.com):');
+    if(!k)return;
+    localStorage.setItem('quota_groq_key',k.trim());groqKey=k.trim();
+  }
+  log('Generando 10 scommesse: '+ev.title.slice(0,40)+'...','info');
+  try{
+    const r=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+groqKey},
+      body:JSON.stringify({
+        model:'llama-3.3-70b-versatile',
+        max_tokens:1400,
+        temperature:0.75,
+        messages:[
+          {role:'system',content:'Sei editor di QUOTA, prediction market italiano. Genera scommesse INTRIGANTI per eventi reali. Regole: numeri specifici quando possibile, tensione emotiva, varia la difficoltà. Sport: risultato, marcatori, statistiche, momenti chiave. Finanza: soglie numeriche precise, dichiarazioni, impatto. Rispondi SOLO con JSON array di 10 oggetti, nessun testo extra: [{"id":"b1","q":"domanda max 70 caratteri","opts":["opzione1","opzione2"]}]. Le opzioni possono essere 2, 3 o 4.'},
+          {role:'user',content:'Evento: '+ev.title+'\nCategoria: '+ev.cat+'\nData: '+(ev.date||'prossimamente')+'\nContesto: '+(ev.ctx||'nessuno')+'\n\nGenera esattamente 10 scommesse intriganti.'}
+        ]
+      })
+    });
+    const d=await r.json();
+    if(d.error)throw new Error(d.error.message);
+    const txt=(d.choices&&d.choices[0]&&d.choices[0].message&&d.choices[0].message.content)||'[]';
+    const m=txt.match(/\[[\s\S]*\]/);
+    if(!m)throw new Error('Formato risposta AI non valido');
+    const bets=JSON.parse(m[0]);
+    if(!Array.isArray(bets)||!bets.length)throw new Error('Nessuna scommessa generata');
+    ev.bets=bets.slice(0,10).map(function(b,i){return{id:b.id||('b'+i),q:b.q||'',opts:b.opts||['Sì','No']};});
+    saveEvList();
+    renderEventsTab();
+    selectEv(idx);
+    log('✓ '+ev.bets.length+' scommesse generate','ok');
+  }catch(e){log('Errore AI: '+e.message,'err');}
+}
+
+function selectEv(idx){
+  selEv=evList[idx];const ev=selEv;if(!ev)return;
+  const ed=safeGet('editor');if(ed)ed.classList.add('show');
+  const bt=safeGet('ed-bar-title');if(bt)bt.textContent=ev.title.slice(0,50);
+  const q=safeGet('ed-q');if(q)q.value=ev.title;
+  const cat=safeGet('ed-cat');if(cat)cat.value=ev.cat;
+  const ins=safeGet('ai-insight');
+  if(ins){
+    ins.classList.add('show');
+    const bg=evBg(ev.title);
+    let betsHtml='<div style="color:var(--t3);font-size:11px;padding:8px 0">Nessuna scommessa. Premi ⚡ Bets.</div>';
+    if(ev.bets&&ev.bets.length){
+      betsHtml=ev.bets.map(function(b,i){
+        const opts=(b.opts||[]).map(function(o){return '<span style="font-size:9px;padding:2px 7px;border:1px solid rgba(245,200,66,.2);color:var(--gold);border-radius:4px;margin-right:3px">'+o+'</span>';}).join('');
+        return '<div style="margin-bottom:5px;padding:6px 8px;background:rgba(255,255,255,.03);border-radius:5px;border-left:2px solid rgba(168,85,247,.3)">'
+          +'<div style="font-size:10px;font-weight:700;color:var(--purple);margin-bottom:3px">'+(i+1)+'. '+b.q+'</div>'
+          +'<div>'+opts+'</div></div>';
+      }).join('');
+    }
+    ins.innerHTML='<div data-bg="'+bg+'" style="height:70px;background-size:cover;background-position:center;border-radius:5px 5px 0 0;margin:-10px -10px 10px;position:relative"><div style="position:absolute;inset:0;background:rgba(6,6,14,.65)"></div><div style="position:relative;padding:10px;font-family:var(--sg);font-size:12px;font-weight:800">'+ev.title+'</div></div>'+betsHtml+(ev.published?'<div style="color:var(--green);font-size:11px;margin-top:6px">✓ Pubblicato live</div>':'');
+    setTimeout(applyBgs,0);
+  }
+  renderEventsTab();
+}
+
+async function pubEv(idx){
+  const ev=evList[idx];if(!ev||!ev.bets||!ev.bets.length){log('Genera prima le scommesse','err');return;}
+  const deadline=ev.date?new Date(ev.date).getTime():Date.now()+7*86400000;
+  try{
+    const r=await fetch(BUR+'/api/v2/quota/card',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        id:ev.id,categoria:ev.cat,domanda:ev.title,
+        contesto:ev.ctx||'',pct_si:50,
+        deadline:new Date(deadline).toISOString(),
+        reward:ev.bets.length*15,source_url:'',
+        bets:JSON.stringify(ev.bets)
+      })
+    });
+    const d=await r.json();
+    if(d.ok)log('✓ LIVE su quota.html: '+ev.title.slice(0,40),'ok');
+    else log('Backend: '+(d.error||'errore'),'err');
+  }catch(e){log('Backend non raggiungibile: '+e.message,'err');return;}
+  ev.published=true;saveEvList();stats.pub++;upStats();
+  renderEventsTab();
+}
+
+function delEv(idx){
+  evList.splice(idx,1);selEv=null;saveEvList();
+  renderEventsTab();
+  const ed=safeGet('editor');if(ed)ed.classList.remove('show');
+}
+function saveEvList(){localStorage.setItem('q_events',JSON.stringify(evList));}
 
 // ── RESET COMPLETO ───────────────────────────────────────────
 function resetAll(){
