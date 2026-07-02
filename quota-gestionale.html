@@ -186,7 +186,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--g
         <button class="btn-gen" id="btn-gen" onclick="generateBatch()">⚡ Genera quote da RSS</button>
         <button class="btn-sec" onclick="fetchRSS()">↓ Aggiorna notizie</button>
         <button class="btn-sec" onclick="publishAll()">✓ Pubblica tutte le AI-ready</button>
-        <button class="btn-sec" onclick="rejectAll()">✕ Scarta tutte le basse hype</button>
+        <button class="btn-sec" onclick="rejectAll()">✕ Scarta tutte le basse hype</button><button class="btn-sec" onclick="resetAll()" style="color:var(--red);border-color:rgba(255,61,90,.2);margin-top:6px">🗑 Cancella tutto e ricarica</button>
       </div>
       <div>
         <div class="ls-title">Sessione</div>
@@ -703,6 +703,21 @@ function simulateActivity(){
   const n=Math.floor(Math.random()*50+80);
   document.getElementById('tb-voti').textContent=n;
   document.getElementById('tb-top').textContent='Top 1%: '+Math.round(850+Math.random()*50)+' QR';
+}
+
+// ── RESET COMPLETO ───────────────────────────────────────────
+function resetAll(){
+  if(!confirm('Cancella TUTTE le notizie e ricarica da zero?'))return;
+  quotes=[];
+  stats={rss:0,gen:0,pub:0,rej:0};
+  selected=null;
+  localStorage.removeItem('qgest');
+  localStorage.removeItem('q_events');
+  evList=[];
+  document.getElementById('editor').classList.remove('show');
+  upStats();
+  renderFeed();
+  log('Reset completo. Premi "Genera quote da RSS" per ricominciare.','ok');
 }
 
 // ── INIT ─────────────────────────────────────────────────────
