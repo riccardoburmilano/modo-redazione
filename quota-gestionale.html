@@ -319,8 +319,8 @@ function log(m,t){
   b.appendChild(d);b.scrollTop=b.scrollHeight;
 }
 function upStats(){
-  ['rss','gen','pub','rej'].forEach(k=>document.getElementById('st-'+k).textContent=stats[k]);
-  document.getElementById('tb-live').textContent=quotes.filter(q=>q.status==='published').length;
+  ['rss','gen','pub','rej'].forEach(k=>{const el=safeGet('st-'+k);if(el)el.textContent=stats[k];});
+  const tbl=safeGet('tb-live');if(tbl)tbl.textContent=quotes.filter(q=>q.status==='published').length;
   localStorage.setItem('qgest',JSON.stringify({quotes,stats}));
 }
 
@@ -464,6 +464,8 @@ Rispondi SOLO con JSON: {"domanda":"max 85 caratteri, intrigante","contesto":"da
 }
 
 // ── RENDER FEED ───────────────────────────────────────────────
+function safeGet(id){return document.getElementById(id);}
+
 function renderFeed(){
   const list=document.getElementById('feed-list');
   const empty=document.getElementById('empty');
