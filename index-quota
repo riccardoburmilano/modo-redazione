@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QUOTA · Il mercato delle previsioni</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080810;--s1:#0f0f1a;--s2:#161625;
+  --b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.1);
+  --gold:#f5c842;--gd:rgba(245,200,66,.1);--gg:rgba(245,200,66,.06);
+  --green:#00e87a;--red:#ff3d5a;--purple:#a855f7;
+  --text:#f0efe8;--t2:#909090;--t3:#404040;
+  --g:'Inter',sans-serif;--sg:'Space Grotesk',sans-serif;
+}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--text);font-family:var(--g)}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 50% at 20% 10%,rgba(80,30,120,.2),transparent 60%),radial-gradient(ellipse 50% 40% at 80% 90%,rgba(20,50,120,.15),transparent 60%);pointer-events:none;z-index:0}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:58px;background:rgba(8,8,16,.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--b1);display:flex;align-items:center;padding:0 24px;gap:12px}
+.n-logo{display:flex;align-items:center;gap:8px;text-decoration:none}
+.n-ast{animation:rot 18s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+.n-name{font-family:var(--sg);font-size:20px;font-weight:800;background:linear-gradient(135deg,#fff,var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.n-right{margin-left:auto;display:flex;gap:8px}
+.n-btn{padding:8px 18px;font-size:12px;font-weight:700;border-radius:20px;cursor:pointer;transition:all .2s;font-family:var(--sg);border:1px solid transparent}
+.n-btn.ghost{background:transparent;border-color:var(--b2);color:var(--t2)}
+.n-btn.ghost:hover{border-color:var(--b2);color:var(--text)}
+.n-btn.solid{background:var(--gold);color:#000;border-color:var(--gold)}
+.n-btn.solid:hover{opacity:.88}
+
+/* SECTIONS */
+section{position:relative;z-index:1}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:80px 24px 60px}
+.hero-eye{font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:20px;display:flex;align-items:center;gap:8px;justify-content:center}
+.hero-eye::before,.hero-eye::after{content:'';width:32px;height:1px;background:rgba(245,200,66,.3)}
+.hero-h{font-family:var(--sg);font-size:clamp(40px,8vw,80px);font-weight:900;line-height:1.05;letter-spacing:-.04em;margin-bottom:20px}
+.hero-h span{background:linear-gradient(135deg,var(--green),#00c866);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-h em{background:linear-gradient(135deg,var(--red),#ff6b81);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-style:normal}
+.hero-sub{font-size:18px;color:var(--t2);line-height:1.65;max-width:540px;margin:0 auto 40px}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:60px}
+.btn-lg{padding:14px 32px;font-size:14px;font-weight:800;border-radius:12px;cursor:pointer;transition:all .22s;font-family:var(--sg);border:none;text-decoration:none;display:inline-flex;align-items:center;gap:8px}
+.btn-gold{background:var(--gold);color:#000}
+.btn-gold:hover{box-shadow:0 12px 32px rgba(245,200,66,.35);transform:translateY(-2px)}
+.btn-ghost{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--b2)}
+.btn-ghost:hover{background:rgba(255,255,255,.1)}
+
+/* DEMO CARD HERO */
+.demo-card{background:rgba(18,18,28,.9);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:20px 24px;max-width:460px;margin:0 auto;box-shadow:0 24px 60px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.06);text-align:left;position:relative}
+.demo-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);border-radius:16px 16px 0 0}
+.dc-cat{font-size:9px;font-weight:800;letter-spacing:.18em;color:#fb923c;margin-bottom:10px}
+.dc-q{font-family:var(--sg);font-size:17px;font-weight:700;line-height:1.3;margin-bottom:14px}
+.dc-bar{height:7px;background:rgba(255,255,255,.06);border-radius:4px;overflow:hidden;margin-bottom:8px;position:relative}
+.dc-bar-y{height:100%;background:linear-gradient(90deg,#00c866,var(--green));box-shadow:0 0 12px rgba(0,232,122,.4);width:71%}
+.dc-bar-n{position:absolute;top:0;right:0;height:100%;background:linear-gradient(90deg,var(--red),#ff6b81);width:29%}
+.dc-pcts{display:flex;justify-content:space-between;font-family:var(--sg);font-size:14px;font-weight:800;margin-bottom:14px}
+.dc-yes{color:var(--green)}.dc-no{color:var(--red)}
+.dc-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dc-btn{padding:10px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sg);border:1px solid transparent;transition:all .2s}
+.dc-btn.yes{background:rgba(0,232,122,.1);border-color:rgba(0,232,122,.2);color:var(--green)}
+.dc-btn.yes:hover{background:var(--green);color:#000}
+.dc-btn.no{background:rgba(255,61,90,.1);border-color:rgba(255,61,90,.2);color:var(--red)}
+.dc-btn.no:hover{background:var(--red);color:#fff}
+
+/* STATS STRIP */
+.stats{display:flex;justify-content:center;gap:0;flex-wrap:wrap;border-top:1px solid var(--b1);border-bottom:1px solid var(--b1);background:rgba(255,255,255,.02)}
+.stat{flex:1;min-width:140px;padding:28px 20px;text-align:center;border-right:1px solid var(--b1)}
+.stat:last-child{border-right:none}
+.stat-n{font-family:var(--sg);font-size:34px;font-weight:900;color:var(--gold);text-shadow:0 0 24px rgba(245,200,66,.3);line-height:1}
+.stat-l{font-size:11px;color:var(--t2);margin-top:6px;letter-spacing:.04em}
+
+/* COME FUNZIONA */
+.how{padding:80px 24px;max-width:1000px;margin:0 auto}
+.section-eye{font-size:9px;font-weight:800;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:14px;text-align:center}
+.section-h{font-family:var(--sg);font-size:clamp(28px,4vw,44px);font-weight:900;letter-spacing:-.03em;text-align:center;margin-bottom:48px}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--b1)}
+.step{background:var(--s1);padding:28px 24px}
+.step-n{font-family:var(--sg);font-size:48px;font-weight:900;color:var(--b2);line-height:1;margin-bottom:14px}
+.step-icon{font-size:28px;margin-bottom:12px}
+.step-h{font-family:var(--sg);font-size:17px;font-weight:700;margin-bottom:8px}
+.step-t{font-size:13px;color:var(--t2);line-height:1.65}
+
+/* FASCE BDE */
+.fasce{padding:80px 24px;max-width:1000px;margin:0 auto}
+.fascia-grid{display:flex;flex-direction:column;gap:2px}
+.fascia-row{display:grid;grid-template-columns:160px 1fr auto;align-items:center;gap:16px;padding:16px 20px;border-radius:8px;transition:background .15s}
+.fascia-row:hover{background:rgba(255,255,255,.03)}
+.fascia-name{font-family:var(--sg);font-size:15px;font-weight:700}
+.fascia-bar-wrap{background:rgba(255,255,255,.04);border-radius:4px;height:6px;overflow:hidden}
+.fascia-bar{height:100%;border-radius:4px}
+.fascia-pct{font-size:12px;color:var(--t2);white-space:nowrap}
+.f-n{color:#a0a09a}.f-o{color:#60a5fa}.f-p{color:#c084fc}.f-q{color:var(--gold)}.f-s{color:var(--green)}
+
+/* PREMI */
+.premi{padding:80px 24px;background:rgba(255,255,255,.015);border-top:1px solid var(--b1);border-bottom:1px solid var(--b1)}
+.premi-inner{max-width:1000px;margin:0 auto}
+.premi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:40px}
+.premio{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:24px;text-align:center}
+.premio-icon{font-size:32px;margin-bottom:12px}
+.premio-n{font-family:var(--sg);font-size:26px;font-weight:900;color:var(--gold);text-shadow:0 0 20px rgba(245,200,66,.3);margin-bottom:4px}
+.premio-l{font-size:11px;color:var(--t2);margin-bottom:10px;letter-spacing:.04em}
+.premio-t{font-size:13px;color:var(--t2);line-height:1.6}
+
+/* PERCHE' */
+.perche{padding:80px 24px;max-width:1000px;margin:0 auto}
+.perche-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--b1)}
+.perche-item{background:var(--s1);padding:28px 24px;border-left:3px solid transparent;transition:all .2s}
+.perche-item:hover{background:var(--s2);border-left-color:var(--gold)}
+.perche-icon{font-size:24px;margin-bottom:12px}
+.perche-h{font-family:var(--sg);font-size:16px;font-weight:700;margin-bottom:8px}
+.perche-t{font-size:13px;color:var(--t2);line-height:1.65}
+
+/* ISCRIZIONE */
+.signup{padding:80px 24px;text-align:center;max-width:560px;margin:0 auto}
+.signup-h{font-family:var(--sg);font-size:clamp(28px,4vw,40px);font-weight:900;letter-spacing:-.03em;margin-bottom:14px}
+.signup-sub{font-size:15px;color:var(--t2);line-height:1.65;margin-bottom:32px}
+.signup-form{display:flex;gap:8px;max-width:400px;margin:0 auto}
+.signup-input{flex:1;padding:13px 16px;background:rgba(255,255,255,.06);border:1px solid var(--b2);color:var(--text);font-size:14px;border-radius:10px;outline:none;font-family:var(--g);transition:border-color .2s}
+.signup-input:focus{border-color:rgba(245,200,66,.4)}
+.signup-input::placeholder{color:var(--t3)}
+.signup-btn{padding:13px 20px;background:var(--gold);border:none;color:#000;font-size:13px;font-weight:800;border-radius:10px;cursor:pointer;font-family:var(--sg);transition:all .2s;white-space:nowrap}
+.signup-btn:hover{opacity:.88}
+.signup-ok{font-size:13px;color:var(--green);display:none;margin-top:12px}
+.signup-fine{font-size:11px;color:var(--t3);margin-top:12px}
+
+/* FOOTER */
+footer{background:#040408;border-top:1px solid var(--b1);padding:32px 24px}
+.footer-inner{max-width:1000px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.f-logo{font-family:var(--sg);font-size:18px;font-weight:800;color:var(--gold)}
+.f-links{display:flex;gap:20px;font-size:11px}
+.f-links a{color:var(--t3);text-decoration:none;transition:color .15s}
+.f-links a:hover{color:var(--text)}
+.f-copy{font-size:11px;color:var(--t3)}
+
+@media(max-width:768px){
+  .steps{grid-template-columns:1fr}
+  .premi-grid{grid-template-columns:1fr}
+  .perche-grid{grid-template-columns:1fr}
+  .stats{flex-direction:column}
+  .stat{border-right:none;border-bottom:1px solid var(--b1)}
+  .fascia-row{grid-template-columns:120px 1fr auto}
+  .signup-form{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="n-logo" href="#">
+    <svg class="n-ast" width="20" height="20" viewBox="0 0 20 20" fill="none">
+      <line x1="10" y1="1" x2="10" y2="19" stroke="#f5c842" stroke-width="1.2"/>
+      <line x1="1" y1="10" x2="19" y2="10" stroke="#f5c842" stroke-width="1.2"/>
+      <line x1="2.93" y1="2.93" x2="17.07" y2="17.07" stroke="#f5c842" stroke-width="1.2"/>
+      <line x1="17.07" y1="2.93" x2="2.93" y2="17.07" stroke="#f5c842" stroke-width="1.2"/>
+    </svg>
+    <span class="n-name">QUOTA</span>
+  </a>
+  <div class="n-right">
+    <a href="#come-funziona" class="n-btn ghost">Come funziona</a>
+    <a href="quota.html" class="n-btn solid">Entra →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eye">Il mercato delle previsioni</div>
+  <h1 class="hero-h">Prevedi.<br><span>Vinci.</span> <em>Ripeti.</em></h1>
+  <p class="hero-sub">QUOTA è il primo prediction market italiano. Sfida la community su sport, finanza e politica — e guadagna crediti ogni volta che azzecchi.</p>
+  <div class="hero-btns">
+    <a href="quota.html" class="btn-lg btn-gold">⚡ Inizia gratis →</a>
+    <a href="#come-funziona" class="btn-lg btn-ghost">Come funziona</a>
+  </div>
+  <div class="demo-card">
+    <div class="dc-cat">SPORT · WIMBLEDON 2026</div>
+    <div class="dc-q">Sinner difende il titolo a Wimbledon?</div>
+    <div class="dc-bar"><div class="dc-bar-y"></div><div class="dc-bar-n"></div></div>
+    <div class="dc-pcts"><span class="dc-yes">71% Sì</span><span class="dc-no">29% No</span></div>
+    <div class="dc-btns">
+      <button class="dc-btn yes" onclick="this.textContent='✓ Votato';this.disabled=true;document.querySelector('.dc-btn.no').style.opacity='.3'">✓ Sì — +50 cr</button>
+      <button class="dc-btn no" onclick="this.textContent='✓ Votato';this.disabled=true;document.querySelector('.dc-btn.yes').style.opacity='.3'">✗ No — +50 cr</button>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="stat"><div class="stat-n" id="s-users">2.847</div><div class="stat-l">Utenti attivi</div></div>
+  <div class="stat"><div class="stat-n" id="s-quota">143</div><div class="stat-l">Quote aperte</div></div>
+  <div class="stat"><div class="stat-n" id="s-acc">68%</div><div class="stat-l">Accuratezza media</div></div>
+  <div class="stat"><div class="stat-n" id="s-dist">€4.2k</div><div class="stat-l">Valore redistribuito</div></div>
+</section>
+
+<!-- COME FUNZIONA -->
+<section class="how" id="come-funziona">
+  <div class="section-eye">Come funziona</div>
+  <h2 class="section-h">Tre passi. Poi vinci.</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-n">01</div>
+      <div class="step-icon">⚡</div>
+      <div class="step-h">Scegli una quota</div>
+      <div class="step-t">Ogni giorno nuove previsioni su sport, finanza, politica e attualità. Ognuna con una percentuale calcolata da QUOTA e una scadenza precisa.</div>
+    </div>
+    <div class="step">
+      <div class="step-n">02</div>
+      <div class="step-icon">🎯</div>
+      <div class="step-h">Vota Sì o No</div>
+      <div class="step-t">Esprimi la tua previsione. Guadagni 5 crediti solo per partecipare. Se azzecchi, ricevi i crediti premio. Più sei preciso, più sali di fascia.</div>
+    </div>
+    <div class="step">
+      <div class="step-n">03</div>
+      <div class="step-icon">💰</div>
+      <div class="step-h">Accumula e incassa</div>
+      <div class="step-t">I crediti BDE si accumulano. Ogni mese il 50% del valore generato dalla community viene redistribuito per fascia. Chi prevede meglio, guadagna di più.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FASCE BDE -->
+<section class="fasce" id="fasce">
+  <div class="section-eye">Sistema BDE</div>
+  <h2 class="section-h">Cinque fasce. Una classifica.</h2>
+  <p style="text-align:center;color:var(--t2);font-size:14px;margin-bottom:40px;max-width:500px;margin-left:auto;margin-right:auto">La tua fascia dipende dalla tua accuratezza nel tempo — non da quanto spendi. Inizia come Neutrino, arriva alla Singolarità.</p>
+  <div class="fascia-grid">
+    <div class="fascia-row">
+      <div class="fascia-name f-n">🌑 Neutrino</div>
+      <div class="fascia-bar-wrap"><div class="fascia-bar" style="width:20%;background:#a0a09a"></div></div>
+      <div class="fascia-pct">Top 100%  · Tutti iniziano qui</div>
+    </div>
+    <div class="fascia-row">
+      <div class="fascia-name f-o">🔵 Orbiter</div>
+      <div class="fascia-bar-wrap"><div class="fascia-bar" style="width:40%;background:#60a5fa"></div></div>
+      <div class="fascia-pct">Top 40%  · +quota giornaliera</div>
+    </div>
+    <div class="fascia-row">
+      <div class="fascia-name f-p">💜 Pulsar</div>
+      <div class="fascia-bar-wrap"><div class="fascia-bar" style="width:60%;background:#c084fc"></div></div>
+      <div class="fascia-pct">Top 15%  · +bonus mensile</div>
+    </div>
+    <div class="fascia-row">
+      <div class="fascia-name f-q">⭐ Quasar</div>
+      <div class="fascia-bar-wrap"><div class="fascia-bar" style="width:80%;background:var(--gold)"></div></div>
+      <div class="fascia-pct">Top 5%  · +revenue share</div>
+    </div>
+    <div class="fascia-row">
+      <div class="fascia-name f-s">✦ Singolarità</div>
+      <div class="fascia-bar-wrap"><div class="fascia-bar" style="width:100%;background:linear-gradient(90deg,#00c866,var(--green))"></div></div>
+      <div class="fascia-pct">Top 1%  · Pool élite mensile</div>
+    </div>
+  </div>
+</section>
+
+<!-- PREMI -->
+<section class="premi">
+  <div class="premi-inner">
+    <div class="section-eye">Revenue sharing</div>
+    <h2 class="section-h" style="text-align:center">Il tuo valore. Redistribuito.</h2>
+    <div class="premi-grid">
+      <div class="premio">
+        <div class="premio-icon">🌑</div>
+        <div class="premio-n">5 cr</div>
+        <div class="premio-l">Per ogni voto</div>
+        <div class="premio-t">Guadagni crediti solo partecipando. Gratis, ogni giorno, senza limiti.</div>
+      </div>
+      <div class="premio">
+        <div class="premio-icon">⭐</div>
+        <div class="premio-n">+300 cr</div>
+        <div class="premio-l">Fascia Quasar · mensile</div>
+        <div class="premio-t">Top 5% della community. Il revenue pool mensile viene diviso tra i migliori previsori.</div>
+      </div>
+      <div class="premio">
+        <div class="premio-icon">✦</div>
+        <div class="premio-n">Pool élite</div>
+        <div class="premio-l">Fascia Singolarità</div>
+        <div class="premio-t">Top 1%. Accesso al pool élite mensile — il più grande premio della community QUOTA.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PERCHE' QUOTA -->
+<section class="perche">
+  <div style="max-width:1000px;margin:0 auto">
+    <div class="section-eye" style="text-align:center;padding:80px 0 14px">Perché QUOTA</div>
+    <h2 class="section-h">Non scommesse. Previsioni.</h2>
+    <div class="perche-grid">
+      <div class="perche-item">
+        <div class="perche-icon">🧠</div>
+        <div class="perche-h">Cognitivo, non fortunato</div>
+        <div class="perche-t">Vinci perché sai leggere le notizie meglio degli altri — non perché hai fortuna. La tua accuratezza nel tempo è l'unico parametro che conta.</div>
+      </div>
+      <div class="perche-item">
+        <div class="perche-icon">📊</div>
+        <div class="perche-h">Percentuali reali</div>
+        <div class="perche-t">Ogni quota ha una percentuale calcolata su dati reali — statistiche, quote bookmaker, sentiment di mercato. Non opinioni, dati.</div>
+      </div>
+      <div class="perche-item">
+        <div class="perche-icon">🔄</div>
+        <div class="perche-h">50% redistribuito</div>
+        <div class="perche-t">Il 50% di tutto il valore generato torna alla community ogni mese. Più QUOTA cresce, più vale essere nella fascia alta.</div>
+      </div>
+      <div class="perche-item">
+        <div class="perche-icon">⚡</div>
+        <div class="perche-h">Aggiornato ogni minuto</div>
+        <div class="perche-t">Le percentuali cambiano con le notizie. Un infortunio, una dichiarazione, un dato macro — e la quota si muove in tempo reale.</div>
+      </div>
+      <div class="perche-item">
+        <div class="perche-icon">🆓</div>
+        <div class="perche-h">Gratis per sempre</div>
+        <div class="perche-t">La versione free è completa. Premium a 5€/mese aggiunge analisi avanzate, accesso anticipato alle quote e crediti bonus mensili.</div>
+      </div>
+      <div class="perche-item">
+        <div class="perche-icon">🇮🇹</div>
+        <div class="perche-h">100% italiano</div>
+        <div class="perche-t">Il primo prediction market serio in italiano. Notizie, analisi e community in lingua. Fatto a Milano, per chi legge le notizie davvero.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA ISCRIZIONE -->
+<section class="signup">
+  <h2 class="signup-h">Pronto a prevedere?</h2>
+  <p class="signup-sub">Unisciti alla community. Ricevi le quote del giorno ogni mattina alle 8:00.</p>
+  <div class="signup-form">
+    <input class="signup-input" type="email" id="email" placeholder="La tua email">
+    <button class="signup-btn" onclick="sub()">Iscriviti →</button>
+  </div>
+  <div class="signup-ok" id="sub-ok">✓ Perfetto. Ci vediamo domani mattina.</div>
+  <div class="signup-fine">Niente spam. Una email al giorno. Disiscrizione in un click.</div>
+  <div style="margin-top:24px">
+    <a href="quota.html" class="btn-lg btn-gold" style="display:inline-flex">⚡ Entra in QUOTA →</a>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="f-logo">QUOTA·</div>
+    <div class="f-links">
+      <a href="quota.html">App</a>
+      <a href="#come-funziona">Come funziona</a>
+      <a href="#fasce">Fasce BDE</a>
+      <a href="feed.html">MODO</a>
+    </div>
+    <div class="f-copy">© 2026 QUOTA · BUR Society</div>
+  </div>
+</footer>
+
+<script>
+function sub(){
+  const e=document.getElementById('email');
+  if(!e.value||!e.value.includes('@'))return;
+  localStorage.setItem('quota_email',e.value);
+  e.style.display='none';document.querySelector('.signup-btn').style.display='none';
+  document.getElementById('sub-ok').style.display='block';
+}
+
+// Anima counter stats
+function animateN(el,target,suffix){
+  let n=0;const s=target/60;
+  const t=setInterval(()=>{n=Math.min(target,n+s);el.textContent=Math.floor(n).toLocaleString('it-IT')+(suffix||'');if(n>=target)clearInterval(t);},16);
+}
+
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      animateN(document.getElementById('s-users'),2847);
+      animateN(document.getElementById('s-quota'),143);
+      obs.disconnect();
+    }
+  });
+},{threshold:.3});
+obs.observe(document.querySelector('.stats'));
+</script>
+</body>
+</html>
