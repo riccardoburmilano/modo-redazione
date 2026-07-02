@@ -221,7 +221,10 @@ body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradi
     <button class="nav-cat" onclick="filterCat('Politica')">🏛 Politica</button>
   </div>
   <div class="nav-right">
-    <div class="nav-qr" onclick="openProf()">🎯 <span id="nav-qr">Top 60%</span></div>
+    <div class="nav-qr" onclick="openProf()" style="display:flex;align-items:center;gap:6px">
+    <span id="nav-tg-photo" style="display:none"><img id="nav-tg-img" style="width:20px;height:20px;border-radius:50%" src=""></span>
+    🎯 <span id="nav-qr">Top 60%</span>
+  </div>
     <a class="nav-squad" href="squad.html">👥 Squad</a>
     <div class="nav-live"><span class="ldot"></span>Live</div>
   </div>
@@ -734,6 +737,27 @@ setInterval(()=>{
 },1000);
 
 // ── INIT ──────────────────────────────────────────────────────
+// Carica profilo Telegram se disponibile
+const tgId=localStorage.getItem('quota_tg_id');
+const tgName=localStorage.getItem('quota_tg_name');
+const tgPhoto=localStorage.getItem('quota_tg_photo');
+if(tgId){
+  // Usa telegram_id come token
+  if(!localStorage.getItem('quota_token')||!localStorage.getItem('quota_token').startsWith('tg_')){
+    localStorage.setItem('quota_token','tg_'+tgId);
+  }
+  // Mostra foto nella nav
+  if(tgPhoto){
+    const ph=document.getElementById('nav-tg-photo');
+    const img=document.getElementById('nav-tg-img');
+    if(ph&&img){ph.style.display='inline';img.src=tgPhoto;}
+  }
+}
+// Se non loggato, redirect alla home per il login
+if(!tgId&&!localStorage.getItem('quota_token')){
+  // Genera token anonimo — può sempre fare login dopo
+  localStorage.setItem('quota_token','anon_'+Math.random().toString(36).slice(2)+Date.now().toString(36));
+}
 decay();checkStreak();save();
 initTicker();renderCards();scheduleFlash();
 setTimeout(()=>push('⚡','Benvenuto su QUOTA','5 eventi ad alto hype questa settimana. Piazza le tue scommesse!'),2000);
